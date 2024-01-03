@@ -1,5 +1,5 @@
 if not defined DevEnvDir (
-    call vcvarsall.bat
+    call vcvarsall.bat amd64
 )
 
 call qmake.exe %1.pro || goto :error
