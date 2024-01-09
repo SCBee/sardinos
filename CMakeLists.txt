@@ -1,0 +1,348 @@
+cmake_minimum_required(VERSION 3.27)
+project(vcsi_sardinos)
+
+set(CMAKE_CXX_STANDARD 20)
+
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTOUIC ON)
+set(CMAKE_AUTORCC ON)
+
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
+include_directories(actions)
+include_directories(audio)
+include_directories(build/obj)
+include_directories(custom)
+include_directories(dockWidgets)
+include_directories(dynamicVectorData)
+include_directories(flarmDevice)
+include_directories(graphicsWidgets)
+include_directories(groundMode)
+include_directories(joystick)
+include_directories(lights)
+include_directories(lights/service/container)
+include_directories(lights/service/domain)
+include_directories(lights/service/interface)
+include_directories(lights/service/protocolAdapter)
+include_directories(lights/view)
+include_directories(mapDrawing)
+include_directories(missionDrawing)
+include_directories(notification)
+include_directories(payloadDrawing)
+include_directories(pluginDependingOnPlugin)
+include_directories(pointOfInterest)
+include_directories(preflightChecklist)
+include_directories(restrictionZoneApi)
+include_directories(routes)
+include_directories(shapes)
+include_directories(stanagE2PrivateMessage)
+include_directories(standardPaths)
+include_directories(terrainProfile)
+include_directories(trackDrawing)
+include_directories(vectorData)
+include_directories(vehicleTab)
+include_directories(videoStream)
+include_directories(zeroizeGcsData)
+
+add_executable(examples
+        actions/ActionExampleDockWidget.cxx
+        actions/ActionExampleDockWidget.h
+        actions/ActionExamplePlugin.cxx
+        actions/ActionExamplePlugin.h
+        actions/ActionExamplePluginContent.cxx
+        actions/ActionExamplePluginContent.h
+        actions/DelayedActionPromiseFulfillment.cxx
+        actions/DelayedActionPromiseFulfillment.h
+        audio/AudioExampleDockWidget.cxx
+        audio/AudioExampleDockWidget.h
+        audio/AudioExamplePlugin.cxx
+        audio/AudioExamplePlugin.h
+        audio/AudioExamplePluginContent.cxx
+        audio/AudioExamplePluginContent.h
+        build/obj/moc_MissionPlanningContentCreator.cpp
+        build/obj/moc_MissionPlanningPlugin.cpp
+        build/obj/moc_predefs.h
+        custom/release/qrc_MissionPlanning.cpp
+        custom/MissionPlanningContentCreator.cpp
+        custom/MissionPlanningContentCreator.h
+        custom/MissionPlanningPlugin.cpp
+        custom/MissionPlanningPlugin.h
+        dockWidgets/DockWidgetsContent.cxx
+        dockWidgets/DockWidgetsContent.h
+        dockWidgets/DockWidgetsPlugin.cxx
+        dockWidgets/DockWidgetsPlugin.h
+        dynamicVectorData/DynamicVectorDataDrawing.cxx
+        dynamicVectorData/DynamicVectorDataDrawing.h
+        dynamicVectorData/DynamicVectorDataDrawingPlugin.cxx
+        dynamicVectorData/DynamicVectorDataDrawingPlugin.h
+        dynamicVectorData/DynamicVectorDataDrawingPluginContent.cxx
+        dynamicVectorData/DynamicVectorDataDrawingPluginContent.h
+        dynamicVectorData/DynamicVectorDataPolygon.cxx
+        dynamicVectorData/DynamicVectorDataPolygon.h
+        flarmDevice/FlarmDeviceExamplePlugin.cxx
+        flarmDevice/FlarmDeviceExamplePlugin.h
+        flarmDevice/FlarmDeviceExamplePluginContent.cxx
+        flarmDevice/FlarmDeviceExamplePluginContent.h
+        graphicsWidgets/GdtContent.cxx
+        graphicsWidgets/GdtContent.h
+        graphicsWidgets/GdtWidgets.cxx
+        graphicsWidgets/GdtWidgets.h
+        graphicsWidgets/GraphicsWidgetContentCreator.cxx
+        graphicsWidgets/GraphicsWidgetContentCreator.h
+        graphicsWidgets/GraphicsWidgetPlugin.cxx
+        graphicsWidgets/GraphicsWidgetPlugin.h
+        graphicsWidgets/QmlGdtView.cxx
+        graphicsWidgets/QmlGdtView.h
+        graphicsWidgets/VehicleGraphicsWidgetDisplay.cxx
+        graphicsWidgets/VehicleGraphicsWidgetDisplay.h
+        groundMode/GroundModeContent.cxx
+        groundMode/GroundModeContent.h
+        groundMode/GroundModeContentCreator.cxx
+        groundMode/GroundModeContentCreator.h
+        groundMode/GroundModePlugin.cxx
+        groundMode/GroundModePlugin.h
+        joystick/JoystickDisplay.cxx
+        joystick/JoystickDisplay.h
+        joystick/JoystickPlugin.cxx
+        joystick/JoystickPlugin.h
+        lights/service/container/LightsServiceContainer.cxx
+        lights/service/container/LightsServiceContainer.h
+        lights/service/domain/LightsControlStateSyncer.cxx
+        lights/service/domain/LightsControlStateSyncer.h
+        lights/service/domain/LightsStateModel.cxx
+        lights/service/domain/LightsStateModel.h
+        lights/service/domain/LightsToggleActionsRegistrar.cxx
+        lights/service/domain/LightsToggleActionsRegistrar.h
+        lights/service/domain/LightsVsmSimulation.cxx
+        lights/service/domain/LightsVsmSimulation.h
+        lights/service/domain/NullEditableSingleLightModel.cxx
+        lights/service/domain/NullEditableSingleLightModel.h
+        lights/service/domain/NullSingleLightModel.cxx
+        lights/service/domain/NullSingleLightModel.h
+        lights/service/domain/SingleLightModel.cxx
+        lights/service/domain/SingleLightModel.h
+        lights/service/domain/SingleLightVsmSimulation.cxx
+        lights/service/domain/SingleLightVsmSimulation.h
+        lights/service/interface/I_EditableSingleLightModel.h
+        lights/service/interface/I_LightsStateModel.h
+        lights/service/interface/I_SingleLightModel.h
+        lights/service/interface/StanagLightType.h
+        lights/service/protocolAdapter/LightsConfigurationReceiver.cxx
+        lights/service/protocolAdapter/LightsConfigurationReceiver.h
+        lights/service/protocolAdapter/LightsPowerRequestSender.cxx
+        lights/service/protocolAdapter/LightsPowerRequestSender.h
+        lights/service/protocolAdapter/LightsStatusReceiver.cxx
+        lights/service/protocolAdapter/LightsStatusReceiver.h
+        lights/view/LightsPanelView.cxx
+        lights/view/LightsPanelView.h
+        lights/view/LightsPresenter.cxx
+        lights/view/LightsPresenter.h
+        lights/view/LightsQmlComponentRegistration.cxx
+        lights/view/LightsQmlComponentRegistration.h
+        lights/view/LightsViewContainer.cxx
+        lights/view/LightsViewContainer.h
+        lights/LightsContainer.cxx
+        lights/LightsContainer.h
+        lights/LightsContainerRegistry.cxx
+        lights/LightsContainerRegistry.h
+        lights/LightsPlugin.cxx
+        lights/LightsPlugin.h
+        mapDrawing/FaaObstacleContent.cxx
+        mapDrawing/FaaObstacleContent.h
+        mapDrawing/FaaObstacleInfo.h
+        mapDrawing/FaaObstacleSource.cxx
+        mapDrawing/FaaObstacleSource.h
+        mapDrawing/MapDrawingPlugin.cxx
+        mapDrawing/MapDrawingPlugin.h
+        missionDrawing/ExampleGeospatialSimpleWaypoint.cxx
+        missionDrawing/ExampleGeospatialSimpleWaypoint.h
+        missionDrawing/ExampleMissionDomain.cxx
+        missionDrawing/ExampleMissionDomain.h
+        missionDrawing/ExampleSimpleWaypointConnector.cxx
+        missionDrawing/ExampleSimpleWaypointConnector.h
+        missionDrawing/MissionDrawingApiPlugin.cxx
+        missionDrawing/MissionDrawingApiPlugin.h
+        missionDrawing/MissionDrawingApiPluginContent.cxx
+        missionDrawing/MissionDrawingApiPluginContent.h
+        notification/ExampleNotificationContent.cxx
+        notification/ExampleNotificationContent.h
+        notification/NotificationContentCreator.cxx
+        notification/NotificationContentCreator.h
+        notification/NotificationPlugin.cxx
+        notification/NotificationPlugin.h
+        notification/NotificationToBeRemovedAfterTime.cxx
+        notification/NotificationToBeRemovedAfterTime.h
+        notification/NotificationWithLongString.cxx
+        notification/NotificationWithLongString.h
+        payloadDrawing/ExamplePayloadDomain.cxx
+        payloadDrawing/ExamplePayloadDomain.h
+        payloadDrawing/ExamplePayloadDrawingApiPlugin.cxx
+        payloadDrawing/ExamplePayloadDrawingApiPlugin.h
+        payloadDrawing/ExamplePayloadDrawingApiPluginContent.cxx
+        payloadDrawing/ExamplePayloadDrawingApiPluginContent.h
+        payloadDrawing/ExamplePayloadProjectedFootprintDrawing.cxx
+        payloadDrawing/ExamplePayloadProjectedFootprintDrawing.h
+        payloadDrawing/ExamplePayloadStarepointDrawing.cxx
+        payloadDrawing/ExamplePayloadStarepointDrawing.h
+        pluginDependingOnPlugin/AnimalTrackerContent.cxx
+        pluginDependingOnPlugin/AnimalTrackerContent.h
+        pluginDependingOnPlugin/AnimalTrackerPlugin.cxx
+        pluginDependingOnPlugin/AnimalTrackerPlugin.h
+        pluginDependingOnPlugin/I_AnimalTrackerApi.cxx
+        pluginDependingOnPlugin/I_AnimalTrackerApi.h
+        pluginDependingOnPlugin/LivestockCounterContent.cxx
+        pluginDependingOnPlugin/LivestockCounterContent.h
+        pluginDependingOnPlugin/LivestockCounterPlugin.cxx
+        pluginDependingOnPlugin/LivestockCounterPlugin.h
+        pointOfInterest/PointOfInterestContent.cxx
+        pointOfInterest/PointOfInterestContent.h
+        pointOfInterest/PointOfInterestContextMenuContent.cxx
+        pointOfInterest/PointOfInterestContextMenuContent.h
+        pointOfInterest/PointOfInterestCrudContent.cxx
+        pointOfInterest/PointOfInterestCrudContent.h
+        pointOfInterest/PointOfInterestPlugin.cxx
+        pointOfInterest/PointOfInterestPlugin.h
+        preflightChecklist/PreflightChecklistExampleBusinessLogic.cxx
+        preflightChecklist/PreflightChecklistExampleBusinessLogic.h
+        preflightChecklist/PreflightChecklistExampleChecklistBuilder.cxx
+        preflightChecklist/PreflightChecklistExampleChecklistBuilder.h
+        preflightChecklist/PreflightChecklistExampleContent.cxx
+        preflightChecklist/PreflightChecklistExampleContent.h
+        preflightChecklist/PreflightChecklistExamplePlugin.cxx
+        preflightChecklist/PreflightChecklistExamplePlugin.h
+        preflightChecklist/PreflightChecklistExampleView.cxx
+        preflightChecklist/PreflightChecklistExampleView.h
+        restrictionZoneApi/RestrictionZoneApiExampleContent.cxx
+        restrictionZoneApi/RestrictionZoneApiExampleContent.h
+        restrictionZoneApi/RestrictionZoneApiExamplePlugin.cxx
+        restrictionZoneApi/RestrictionZoneApiExamplePlugin.h
+        restrictionZoneApi/RestrictionZoneApiExampleView.cxx
+        restrictionZoneApi/RestrictionZoneApiExampleView.h
+        routes/CloakingDeviceJsonDefines.h
+        routes/CloakingDevicePower.cxx
+        routes/CloakingDevicePower.h
+        routes/CustomCloakingDeviceUploadSource.cxx
+        routes/CustomCloakingDeviceUploadSource.h
+        routes/CustomRoutePropertiesContent.cxx
+        routes/CustomRoutePropertiesContent.h
+        routes/CustomWaypointEditingContent.cxx
+        routes/CustomWaypointEditingContent.h
+        routes/CustomWaypointUploadContent.cxx
+        routes/CustomWaypointUploadContent.h
+        routes/CustomWaypointUploadContentCreator.cxx
+        routes/CustomWaypointUploadContentCreator.h
+        routes/DownloadedCloakingDevicePowerMessageReceiver.cxx
+        routes/DownloadedCloakingDevicePowerMessageReceiver.h
+        routes/DownloadedCloakingDevicePowerView.cxx
+        routes/DownloadedCloakingDevicePowerView.h
+        routes/DownloadedCloakingDevicePowerWaypointEditor.cxx
+        routes/DownloadedCloakingDevicePowerWaypointEditor.h
+        routes/DownloadedWaypointCustomEditingContent.cxx
+        routes/DownloadedWaypointCustomEditingContent.h
+        routes/DownloadedWaypointCustomEditingContentCreator.cxx
+        routes/DownloadedWaypointCustomEditingContentCreator.h
+        routes/PlannedWaypointCloakingDeviceMutator.cxx
+        routes/PlannedWaypointCloakingDeviceMutator.h
+        routes/PlannedWaypointCustomEditingContent.cxx
+        routes/PlannedWaypointCustomEditingContent.h
+        routes/PlannedWaypointCustomEditingUi.cxx
+        routes/PlannedWaypointCustomEditingUi.h
+        routes/ReadonlyRoutesContent.cxx
+        routes/ReadonlyRoutesContent.h
+        routes/ReadonlyRoutesContentCreator.cxx
+        routes/ReadonlyRoutesContentCreator.h
+        routes/RoutesPlugin.cxx
+        routes/RoutesPlugin.h
+        shapes/ShapesPlugin.cxx
+        shapes/ShapesPlugin.h
+        stanagE2PrivateMessage/StanagE2PrivateMessageContent.cxx
+        stanagE2PrivateMessage/StanagE2PrivateMessageContent.h
+        stanagE2PrivateMessage/StanagE2PrivateMessageContentCreator.cxx
+        stanagE2PrivateMessage/StanagE2PrivateMessageContentCreator.h
+        stanagE2PrivateMessage/StanagE2PrivateMessageControlWidgets.cxx
+        stanagE2PrivateMessage/StanagE2PrivateMessageControlWidgets.h
+        stanagE2PrivateMessage/StanagE2PrivateMessagePlugin.cxx
+        stanagE2PrivateMessage/StanagE2PrivateMessagePlugin.h
+        stanagE2PrivateMessage/StanagE2PrivateMessagePolarityReceiver.cxx
+        stanagE2PrivateMessage/StanagE2PrivateMessagePolarityReceiver.h
+        stanagE2PrivateMessage/StanagE2PrivateMessagePolaritySender.cxx
+        stanagE2PrivateMessage/StanagE2PrivateMessagePolaritySender.h
+        standardPaths/StandardPathsExampleContent.cxx
+        standardPaths/StandardPathsExampleContent.h
+        standardPaths/StandardPathsExamplePlugin.cxx
+        standardPaths/StandardPathsExamplePlugin.h
+        standardPaths/StandardPathsExampleView.cxx
+        standardPaths/StandardPathsExampleView.h
+        terrainProfile/TerrainProfileContent.cxx
+        terrainProfile/TerrainProfileContent.h
+        terrainProfile/TerrainProfilePlugin.cxx
+        terrainProfile/TerrainProfilePlugin.h
+        trackDrawing/ExampleTrackDomain.cxx
+        trackDrawing/ExampleTrackDomain.h
+        trackDrawing/ExampleTrackVisualization.cxx
+        trackDrawing/ExampleTrackVisualization.h
+        trackDrawing/TrackVisualizationExamplePlugin.cxx
+        trackDrawing/TrackVisualizationExamplePlugin.h
+        trackDrawing/TrackVisualizationExamplePluginContent.cxx
+        trackDrawing/TrackVisualizationExamplePluginContent.h
+        vectorData/VectorDataDockWidget.cxx
+        vectorData/VectorDataDockWidget.h
+        vectorData/VectorDataExampleContent.cxx
+        vectorData/VectorDataExampleContent.h
+        vectorData/VectorDataExamplePlugin.cxx
+        vectorData/VectorDataExamplePlugin.h
+        vectorData/VectorDataFeatureTree.cxx
+        vectorData/VectorDataFeatureTree.h
+        vectorData/VectorLayerIdFeatureIdPair.cxx
+        vectorData/VectorLayerIdFeatureIdPair.h
+        vehicleTab/BatteryContent.cxx
+        vehicleTab/BatteryContent.h
+        vehicleTab/SingleVehicleStatusDisplay.cxx
+        vehicleTab/SingleVehicleStatusDisplay.h
+        vehicleTab/VehicleStatusContent.cxx
+        vehicleTab/VehicleStatusContent.h
+        vehicleTab/VehicleTabPlugin.cxx
+        vehicleTab/VehicleTabPlugin.h
+        videoStream/VideoStream.waf.cxx
+        videoStream/VideoStreamContent.cxx
+        videoStream/VideoStreamContent.h
+        videoStream/VideoStreamMonitorContent.cxx
+        videoStream/VideoStreamMonitorContent.h
+        videoStream/VideoStreamPlugin.cxx
+        videoStream/VideoStreamPlugin.h
+        videoStream/VideoStreamVectorPickContent.cxx
+        videoStream/VideoStreamVectorPickContent.h
+        zeroizeGcsData/PurgeSessionsExampleZeroizable.cxx
+        zeroizeGcsData/PurgeSessionsExampleZeroizable.h
+        zeroizeGcsData/ZeroizeGcsDataExampleContent.cxx
+        zeroizeGcsData/ZeroizeGcsDataExampleContent.h
+        zeroizeGcsData/ZeroizeGcsDataExamplePlugin.cxx
+        zeroizeGcsData/ZeroizeGcsDataExamplePlugin.h)
+
+
+# LMT and QT Base
+include_directories(.)
+include_directories("C:/Program Files/LMCDL/vcsi/sdk/include")
+include_directories("C:/Qt/Qt5.12.7/5.12.7/msvc2015_64/bin")
+include_directories("C:/Qt/Qt5.12.7/5.12.7/mingw73_64/include")
+
+# QT Specific (msvc)
+include_directories("C:/Qt/Qt5.12.7/5.12.7/msvc2015_64/include/QtCore")
+include_directories("C:/Qt/Qt5.12.7/5.12.7/msvc2015_64/include")
+include_directories("C:/Qt/Qt5.12.7/5.12.7/msvc2015_64/include/QtPositioning")
+include_directories("C:/Qt/Qt5.12.7/5.12.7/msvc2015_64/include/QtGui")
+include_directories("C:/Qt/Qt5.12.7/5.12.7/msvc2015_64/include/QtQml")
+include_directories("C:/Qt/Qt5.12.7/5.12.7/msvc2015_64/include/QtQuick")
+include_directories("C:/Qt/Qt5.12.7/5.12.7/msvc2015_64/include/QtWidgets")
+
+# QT Specific (mingw)
+include_directories("C:/Qt/Qt5.12.7/5.12.7/mingw73_64/include/QtCore")
+include_directories("C:/Qt/Qt5.12.7/5.12.7/mingw73_64/include")
+include_directories("C:/Qt/Qt5.12.7/5.12.7/mingw73_64/include/QtPositioning")
+include_directories("C:/Qt/Qt5.12.7/5.12.7/mingw73_64/include/QtGui")
+include_directories("C:/Qt/Qt5.12.7/5.12.7/mingw73_64/include/QtQml")
+include_directories("C:/Qt/Qt5.12.7/5.12.7/mingw73_64/include/QtQuick")
+include_directories("C:/Qt/Qt5.12.7/5.12.7/mingw73_64/include/QtWidgets")
+include_directories("C:/Qt/Qt5.12.7/5.12.7/mingw73_64/include/QtPositioning/5.12.7/QtPositioning/private")
+
+# custom libs
+include_directories("C:/Program Files/LMCDL/vcsi/sdk/examples/custom")
