@@ -1,8 +1,0 @@
-# Copyright (c) 2016 Lockheed Martin Corp.  All rights reserved.
-
-message_number: 107
-name: 'Vehicle Lights State'
-fields:
-  - name: 'Navigation Lights State'
-    type: 'Integer 2'
-    var: enabledLightsBitmap

@@ -1,9 +1,0 @@
-<RCC>
-    <qresource prefix="/audio">
-       <file>dot.wav</file>
-       <file>dash.wav</file>
-       <file>gong.wav</file>
-       <file>long-wav.wav</file>
-       <file>SoundEffects.wav</file>
-    </qresource>
-</RCC>

@@ -1,1 +1,0 @@
-CMakeLists.txt not found in C:\Program Files\LMCDL\vcsi\sdk\examples Select CMakeLists.txt

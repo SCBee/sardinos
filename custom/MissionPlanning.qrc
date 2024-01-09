@@ -1,5 +1,0 @@
-<RCC>
- <qresource prefix="/MissionPlanning">
-  <file alias="missionPlanningDinoIcon">Dino.svg</file>
- </qresource>
-</RCC>

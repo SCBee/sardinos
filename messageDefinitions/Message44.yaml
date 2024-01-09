@@ -1,8 +1,0 @@
-# Copyright (c) 2017 Lockheed Martin Corp.  All rights reserved.
-
-message_number: 44
-name: 'Vehicle Lights Command'
-fields:
-  - name: 'Set Lights'
-    type: 'Integer 2'
-    var: enabledLightsBitmap
