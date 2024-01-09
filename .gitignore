@@ -5,10 +5,17 @@ examples.pro
 generate_messages.py
 install.bat
 replace.vbs
+custom/MakeFile
+custom/MakeFile.Debug
+custom/MakeFile.Release
+test_plugin/MakeFile
+test_plugin/MakeFile
+test_plugin/MakeFile
 
 # Folders
 .idea
 .vs
+.vscode
 actions
 audio
 build
