@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<kml xmlns="">
+  <Document>
+   <Folder>
+    <name>Placemarks</name>
+    <Placemark>
+      <name>Simple Polygon</name>
+      <Polygon>
+        <outerBoundaryIs>
+          <LinearRing>
+            <coordinates>-120,50,0
+            -40,-20,0
+            30,40,0
+            -20,60,0
+            -120,50,0</coordinates>
+          </LinearRing>
+        </outerBoundaryIs>
+      </Polygon>
+    </Placemark>
+	</Folder>
+  </Document>
+</kml>

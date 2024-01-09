@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<messages id="MessagingExampleDeflector">
+   <message id="30264" name="Deflector Dish Command">
+      <field name="Polarity" type="Unsigned 1" engName="polarity" enumName="DeflectorPolarity">
+         <enumerated value="0" name="Horizontal" engName="Horizontal"/>
+         <enumerated value="1" name="Vertical" engName="Vertical"/>
+         <enumerated value="2" name="Crossed" engName="Crossed"/>
+      </field>
+      <field name="Bearing" type="Double" default="0" engName="dishBearing"/>
+   </message>
+   <message id="30265" name="Cloaking Device Command">
+      <field name="Waypoint Number" type="Unsigned 2" default="1" max="65535" min="1" engName="waypointNumber"/>
+      <field name="Cloaking Device Power" type="Unsigned 1" engName="cloakingDevicePower" enumName="CloakingDevicePower">
+         <enumerated value="0" name="Power Off" engName="POWER_OFF"/>
+         <enumerated value="1" name="Power On" engName="POWER_ON"/>
+      </field>
+   </message>
+   <message id="33264" name="Deflector Dish Status Report">
+      <field name="Polarity" type="Unsigned 1" engName="polarity" enumName="DeflectorPolarity">
+         <enumerated value="0" name="Horizontal" engName="Horizontal"/>
+         <enumerated value="1" name="Vertical" engName="Vertical"/>
+         <enumerated value="2" name="Crossed" engName="Crossed"/>
+      </field>
+      <field name="Rotational Drift" type="Unsigned 2" default="0" engName="drift"/>
+      <field name="Bearing" type="Double" default="0" engName="dishBearing"/>
+   </message>
+   <message id="33265" name="Cloaking Device Report">
+      <field name="Waypoint Number" type="Unsigned 2" default="1" max="65535" min="1" engName="waypointNumber"/>
+      <field name="Cloaking Device Power" type="Unsigned 1" engName="cloakingDevicePower" enumName="CloakingDevicePower">
+         <enumerated value="0" name="Power Off" engName="POWER_OFF"/>
+         <enumerated value="1" name="Power On" engName="POWER_ON"/>
+      </field>
+   </message>
+</messages>

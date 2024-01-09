@@ -1,0 +1,9 @@
+<!-- Copyright (c) 2019 Lockheed Martin Corp. All rights reserved. -->
+
+<RCC>
+ <qresource prefix="/PointOfInterestPlugin">
+  <file alias="makeHostileMenuItemIcon.svg">hostile.svg</file>
+  <file alias="makeFriendlyMenuItemIcon.svg">friendly.svg</file>
+  <file alias="makeNeutralMenuItemIcon.svg">neutral.svg</file>
+ </qresource>
+</RCC>

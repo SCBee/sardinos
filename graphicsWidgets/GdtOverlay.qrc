@@ -1,0 +1,7 @@
+<RCC>
+ <qresource prefix="/gdtoverlay">
+  <file alias="GdtOverlay">gdtOverlay.svg</file>
+  <file alias="GdtOverlayIcon">gdtOverlayIcon.svg</file>
+  <file alias="GdtOverlayQml">GdtOverlay.qml</file>
+ </qresource>
+</RCC>

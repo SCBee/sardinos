@@ -1,0 +1,40 @@
+# Copyright (c) 2016 Lockheed Martin Corp.  All rights reserved.
+
+message_number: 1302
+name: Field Configuration Command
+fields:
+  - name: 'VSM ID'
+    type: 'Integer 4'
+    var: vsmId
+  - name: 'Data Link ID'
+    type: Id
+    var: dataLinkId
+  - name: 'Station Number'
+    type: 'Unsigned 4'
+    var: stationNumber
+  - name: 'Requested Message'
+    type: 'Unsigned 4'
+    var: messageNumber
+  - name: 'Requested Field'
+    type: 'Unsigned 1'
+    var: fieldNumber
+  - name: 'Field Supported'
+    type: 'Unsigned 1'
+    var: fieldSupported
+    enum:
+      name: FieldSupported
+      values:
+        0: false
+        1: true
+  - name: 'Enumeration Count'
+    type: 'Unsigned 1'
+    var: enumerationCount
+  - name: 'Enumeration Index'
+    type: 'Unsigned 1'
+    var: enumerationIndex
+  - name: 'Enumeration Text'
+    type: 'Character 16'
+    var: enumerationText
+  - name: 'Help Text'
+    type: 'Character 80'
+    var: helpText

@@ -1,0 +1,21 @@
+# Copyright (c) 2017 Lockheed Martin Corp.  All rights reserved.
+
+message_number: 30264
+name: Deflector Dish Command 
+fields:
+  - name: 'Polarity'
+    type: 'Unsigned 1'
+    var: polarity
+    enum: 
+      name: DeflectorPolarity
+      values:
+        0: Horizontal
+        1: Vertical
+        2: Crossed
+  - name: 'Bearing'
+    type: Double
+    var: dishBearing
+    range: 
+      min: -1.57079632679 # -pi/2
+      max: 1.57079632679 # pi/2
+      epsilon: 0.001

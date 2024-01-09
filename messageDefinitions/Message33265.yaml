@@ -1,0 +1,17 @@
+# Copyright (c) 2017 Lockheed Martin Corp.  All rights reserved.
+
+message_number: 33265
+name: 'Cloaking Device Report'
+fields:
+  - name: 'Waypoint Number'
+    type: 'Unsigned 2'
+    var: waypointNumber
+  - name: 'Cloaking Device Power'
+    enum:
+      name: CloakingDevicePower
+      values:
+        0: POWER_OFF
+        1: POWER_ON
+    type: 'Unsigned 1'
+    var: cloakingDevicePower
+

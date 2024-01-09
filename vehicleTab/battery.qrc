@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/battery">
+        <file>batteryIndicator.qml</file>
+        <file>battery.png</file>
+    </qresource>
+</RCC>
