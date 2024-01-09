@@ -12,10 +12,14 @@ TEMPLATE = lib
 
 SOURCES += \
     MissionPlanningPlugin.cpp \
-    MissionPlanningContentCreator.cpp 
+    MissionPlanningContentCreator.cpp \
+    MissionPlanningPolygon.cpp \
+    MissionPlanningPolygonDrawing.cpp
 HEADERS += \
     MissionPlanningPlugin.h \
-    MissionPlanningContentCreator.h 
+    MissionPlanningContentCreator.h \
+    MissionPlanningPolygon.h \
+    MissionPlanningPolygonDrawing.h
 
 INCLUDEPATH += $$EXAMPLES_ROOT_DIRECTORY/../include 
 win32:INCLUDEPATH += .

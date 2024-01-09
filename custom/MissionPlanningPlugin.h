@@ -7,15 +7,13 @@
 class MissionPlanningContentCreator;
 
 namespace LmCdl {
-    class I_VcsiMapExtensionApi;
-
-    class I_PointOfInterestApi;
-
-    class I_VcsiApplicationApi;
+class I_VectorDataDrawingApi;
+class I_PointOfInterestApi;
+class I_VcsiApplicationApi;
 }
 
 class MissionPlanningPlugin : public QObject, public LmCdl::I_Plugin {
-Q_OBJECT
+    Q_OBJECT
     Q_INTERFACES(LmCdl::I_Plugin)
     Q_PLUGIN_METADATA(IID "LMCDL.Plugin.I_Plugin/1.0")
 
@@ -40,9 +38,11 @@ private:
 private:
     Q_DISABLE_COPY(MissionPlanningPlugin);
 
-    LmCdl::I_PointOfInterestApi *pointOfInterestApi_;
+    LmCdl::I_PointOfInterestApi* pointOfInterestApi_;
 
-    LmCdl::I_VcsiApplicationApi *applicationApi_;
+    LmCdl::I_VcsiApplicationApi* applicationApi_;
+
+    LmCdl::I_VectorDataDrawingApi* vectorDrawingApi_;
 
     QScopedPointer<MissionPlanningContentCreator> pluginContentCreator_;
 };
