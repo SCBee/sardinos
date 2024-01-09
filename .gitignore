@@ -39,8 +39,8 @@ vectorData
 vehicleTab
 videoStream
 zeroizeGcsData
-/test_plugin/debug/
-/test_plugin/release/
-/custom/debug/
-/custom/release/
-/custom/.qmake.stash
+test_plugin/debug
+test_plugin/release
+custom/debug
+custom/release
+custom/.qmake.stash
