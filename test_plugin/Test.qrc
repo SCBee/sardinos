@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/Test">
+        <file alias="DinoIcon">Dino.svg</file>
+    </qresource>
+</RCC>

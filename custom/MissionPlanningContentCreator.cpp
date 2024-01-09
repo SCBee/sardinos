@@ -17,11 +17,11 @@ Copyright (c) 2017 Lockheed Martin Corp. All rights reserved.
 #include <sstream>
 #include <iomanip>
 
-MissionPlanningContentCreator::MissionPlanningContentCreator(LmCdl::I_VcsiMapExtensionApi& mapApi, LmCdl::I_PointOfInterestApi& poiApi, LmCdl::I_VcsiUserNotificationApi& notApi)
-    : contextMenuItem_(mapApi.terrainContextMenu().registerMenuItem())
-    , poiApi_(poiApi)
-    , notApi_(notApi)
-{
+MissionPlanningContentCreator::MissionPlanningContentCreator(LmCdl::I_VcsiMapExtensionApi &mapApi,
+                                                             LmCdl::I_PointOfInterestApi &poiApi,
+                                                             LmCdl::I_VcsiUserNotificationApi &notApi)
+        : contextMenuItem_(mapApi.terrainContextMenu().registerMenuItem()), poiApi_(poiApi), notApi_(notApi),
+          notification_(nullptr) {
     contextMenuItem_.setBackgroundColor(*new QColor(235, 12, 12, 180));
     contextMenuItem_.setDescription("Add Mission Bound");
     contextMenuItem_.setGrouping(LmCdl::ContextMenuItemGrouping::Bottom);
@@ -30,18 +30,16 @@ MissionPlanningContentCreator::MissionPlanningContentCreator(LmCdl::I_VcsiMapExt
     connectToApiSignals();
 }
 
-MissionPlanningContentCreator::~MissionPlanningContentCreator() { }
+MissionPlanningContentCreator::~MissionPlanningContentCreator() = default;
 
-void MissionPlanningContentCreator::connectToApiSignals()
-{
+void MissionPlanningContentCreator::connectToApiSignals() {
     connect(&contextMenuItem_,
-        &LmCdl::I_ContextMenuItem::clicked, this,
-        &MissionPlanningContentCreator::getPoiProperties);
+            &LmCdl::I_ContextMenuItem::clicked, this,
+            &MissionPlanningContentCreator::getPoiProperties);
 }
 
-void MissionPlanningContentCreator::getPoiProperties(const LmCdl::ContextMenuEvent &event) 
-{
-    auto location = event.worldLocation();
+void MissionPlanningContentCreator::getPoiProperties(const LmCdl::ContextMenuEvent &event) {
+    const auto &location = event.worldLocation();
 
     auto properties = new LmCdl::VcsiPointOfInterestProperties(*new QString("Mission Bound"), location);
 
@@ -52,8 +50,9 @@ void MissionPlanningContentCreator::getPoiProperties(const LmCdl::ContextMenuEve
     auto label = new QLabel();
 
     std::stringstream ss;
-    
-    ss << "Mission bound placed at " << std::fixed << std::setprecision(5) << location.latitude() << ", " << std::fixed << std::setprecision(5) << location.longitude(); 
+
+    ss << "Mission bound placed at " << std::fixed << std::setprecision(5) << location.latitude() << ", " << std::fixed
+       << std::setprecision(5) << location.longitude();
 
     std::string xString = ss.str();
 
@@ -70,15 +69,14 @@ void MissionPlanningContentCreator::getPoiProperties(const LmCdl::ContextMenuEve
     notification_ = &notApi_.addNotification(label);
 }
 
-void MissionPlanningContentCreator::removeNotification()
-{
+void MissionPlanningContentCreator::removeNotification() {
     notApi_.removeNotification(*notification_);
-    notification_ = NULL;
+    notification_ = nullptr;
 }
 
-void MissionPlanningContentCreator::publishAndMapPointOfInterest(LmCdl::VcsiPointOfInterestId sourceId, const LmCdl::VcsiPointOfInterestProperties& pointOfInterest)
-{
-    auto mapIds = [this, sourceId](const LmCdl::VcsiPointOfInterestId& cloneId) { };
+void MissionPlanningContentCreator::publishAndMapPointOfInterest(const LmCdl::VcsiPointOfInterestId &sourceId,
+                                                                 const LmCdl::VcsiPointOfInterestProperties &pointOfInterest) {
+    auto mapIds = [sourceId](const LmCdl::VcsiPointOfInterestId &cloneId) {};
 
     poiApi_.addPointOfInterest(pointOfInterest, mapIds);
 }

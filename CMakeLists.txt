@@ -316,7 +316,11 @@ add_executable(examples
         zeroizeGcsData/ZeroizeGcsDataExampleContent.cxx
         zeroizeGcsData/ZeroizeGcsDataExampleContent.h
         zeroizeGcsData/ZeroizeGcsDataExamplePlugin.cxx
-        zeroizeGcsData/ZeroizeGcsDataExamplePlugin.h)
+        zeroizeGcsData/ZeroizeGcsDataExamplePlugin.h
+        test_plugin/TestPlugin.cpp
+        test_plugin/TestPlugin.h
+        test_plugin/TestContentCreator.cpp
+        test_plugin/TestContentCreator.h)
 
 
 # LMT and QT Base

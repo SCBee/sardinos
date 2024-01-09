@@ -1,10 +1,18 @@
-#pragma once
+//
+// Created by dev on 1/8/2024.
+//
+
+#ifndef VCSI_SARDINOS_TESTPLUGIN_H
+#define VCSI_SARDINOS_TESTPLUGIN_H
+
+#include <memory>
 
 #include <LmCdl/I_Plugin.h>
+
 #include <QObject>
 #include <QScopedPointer>
 
-class MissionPlanningContentCreator;
+class TestContentCreator;
 
 namespace LmCdl {
     class I_VcsiMapExtensionApi;
@@ -14,15 +22,15 @@ namespace LmCdl {
     class I_VcsiApplicationApi;
 }
 
-class MissionPlanningPlugin : public QObject, public LmCdl::I_Plugin {
+class TestPlugin : public QObject, public LmCdl::I_Plugin {
 Q_OBJECT
     Q_INTERFACES(LmCdl::I_Plugin)
     Q_PLUGIN_METADATA(IID "LMCDL.Plugin.I_Plugin/1.0")
 
 public:
-    MissionPlanningPlugin();
+    TestPlugin();
 
-    virtual ~MissionPlanningPlugin();
+    virtual ~TestPlugin();
 
     QList<LmCdl::PluginRequirement> requiredApis() const override;
 
@@ -37,12 +45,11 @@ public:
 private:
     void startPluginIfInitialized();
 
-private:
-    Q_DISABLE_COPY(MissionPlanningPlugin);
+    Q_DISABLE_COPY(TestPlugin);
 
     LmCdl::I_PointOfInterestApi *pointOfInterestApi_;
-
     LmCdl::I_VcsiApplicationApi *applicationApi_;
-
-    QScopedPointer<MissionPlanningContentCreator> pluginContentCreator_;
+    std::unique_ptr<TestContentCreator> pluginContentCreator_;
 };
+
+#endif //VCSI_SARDINOS_TESTPLUGIN_H

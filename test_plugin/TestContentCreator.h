@@ -1,14 +1,17 @@
-#pragma once
+//
+// Created by dev on 1/9/2024.
+//
 
-#include <LmCdl/UniqueIdentifier.h>
-#include <QObject>
-#include <QtGlobal>
+#ifndef VCSI_SARDINOS_TESTCONTENTCREATOR_H
+#define VCSI_SARDINOS_TESTCONTENTCREATOR_H
+
 #include <memory>
 #include <unordered_map>
+
+#include <LmCdl/UniqueIdentifier.h>
 #include <LmCdl/VcsiIdentifiedPointOfInterest.h>
 #include <LmCdl/VcsiPointOfInterestProperties.h>
 #include <LmCdl/I_ContextMenu.h>
-#include <qgeocoordinate.h>
 #include <LmCdl/VcsiMilStdCode.h>
 #include <LmCdl/I_ContextMenuItem.h>
 #include <LmCdl/I_VcsiMapExtensionApi.h>
@@ -16,6 +19,9 @@
 #include <LmCdl/I_VcsiUserNotificationApi.h>
 #include <LmCdl/I_UserNotification.h>
 
+#include <QObject>
+#include <QtGlobal>
+#include <qgeocoordinate.h>
 
 namespace LmCdl {
     class I_VcsiMapExtensionApi;
@@ -25,13 +31,13 @@ namespace LmCdl {
     class I_VcsiApplicationApi;
 }
 
-class MissionPlanningContentCreator : public QObject {
+class TestContentCreator : public QObject {
 Q_OBJECT
 public:
-    MissionPlanningContentCreator(LmCdl::I_VcsiMapExtensionApi &mapApi, LmCdl::I_PointOfInterestApi &poiApi,
-                                  LmCdl::I_VcsiUserNotificationApi &notApi);
+    TestContentCreator(LmCdl::I_VcsiMapExtensionApi &mapApi, LmCdl::I_PointOfInterestApi &poiApi,
+                       LmCdl::I_VcsiUserNotificationApi &notApi);
 
-    virtual ~MissionPlanningContentCreator();
+    virtual ~TestContentCreator();
 
     void publishAndMapPointOfInterest(const LmCdl::VcsiPointOfInterestId &sourceId,
                                       const LmCdl::VcsiPointOfInterestProperties &pointOfInterest);
@@ -43,7 +49,7 @@ public:
     void removeNotification();
 
 private:
-    Q_DISABLE_COPY(MissionPlanningContentCreator);
+    Q_DISABLE_COPY(TestContentCreator);
 
     LmCdl::I_ContextMenuItem &contextMenuItem_;
     QHash<LmCdl::VcsiPointOfInterestId, LmCdl::VcsiPointOfInterestId> sourceIdsToClonedIds_;
@@ -51,3 +57,5 @@ private:
     LmCdl::I_VcsiUserNotificationApi &notApi_;
     LmCdl::I_UserNotification *notification_;
 };
+
+#endif //VCSI_SARDINOS_TESTCONTENTCREATOR_H
