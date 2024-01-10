@@ -16,28 +16,27 @@
 #include <LmCdl/VectorDataDrawing.h>
 #include <MissionPlanningPolygonDrawing.h>
 #include <MissionPlanningPolygon.h>
+#include <LmCdl/I_VectorDataDrawingApi.h>
 
 MissionPlanningContentCreator::MissionPlanningContentCreator(LmCdl::I_VcsiMapExtensionApi &mapApi,
                                                              LmCdl::I_PointOfInterestApi &poiApi,
                                                              LmCdl::I_VcsiUserNotificationApi &notApi,
                                                              LmCdl::I_VectorDataDrawingApi &drawApi)
-        : contextMenuItem_(mapApi.terrainContextMenu().registerMenuItem()),
-          contextMenuItem2_(mapApi.terrainContextMenu().registerMenuItem()), poiApi_(poiApi), notApi_(notApi),
-          drawApi_(drawApi), notification_(nullptr) {
+        : contextMenuItem_(mapApi.terrainContextMenu().registerMenuItem())
+        , poiApi_(poiApi)
+        , notApi_(notApi)
+        , drawApi_(drawApi)
+        , notification_(nullptr) 
+{
     contextMenuItem_.setBackgroundColor(*new QColor(235, 12, 12, 180));
     contextMenuItem_.setDescription("Add Mission Bound");
     contextMenuItem_.setGrouping(LmCdl::ContextMenuItemGrouping::Bottom);
     contextMenuItem_.setIcon(":/MissionPlanning/missionPlanningDinoIcon");
     contextMenuItem_.setVisible(true);
 
-    contextMenuItem2_.setBackgroundColor(*new QColor(12, 255, 12, 255));
-    contextMenuItem2_.setDescription("Execute Draw");
-    contextMenuItem2_.setGrouping(LmCdl::ContextMenuItemGrouping::Bottom);
-    contextMenuItem2_.setVisible(true);
-
     connectToApiSignals();
 
-    drawApi_.addDrawingForVectorData(*drawing_);
+    drawApi_.addDrawingForVectorData(*drawing_, LmCdl::I_VectorDataDrawingApi::DrawingMode::OptimizedForFrequentChanges);
 }
 
 MissionPlanningContentCreator::~MissionPlanningContentCreator() = default;
@@ -45,9 +44,6 @@ MissionPlanningContentCreator::~MissionPlanningContentCreator() = default;
 void MissionPlanningContentCreator::connectToApiSignals() {
     connect(&contextMenuItem_, &LmCdl::I_ContextMenuItem::clicked, this,
             &MissionPlanningContentCreator::getPoiProperties);
-
-    connect(&contextMenuItem2_, &LmCdl::I_ContextMenuItem::clicked, this,
-            &MissionPlanningContentCreator::updatePolygon);
 
     connect(&poiApi_, &LmCdl::I_PointOfInterestApi::pointOfInterestRemoved, this,
             &MissionPlanningContentCreator::removePoi);
@@ -96,19 +92,20 @@ void MissionPlanningContentCreator::publishAndMapPointOfInterest(LmCdl::VcsiPoin
     poiApi_.addPointOfInterest(pointOfInterest, mapIds);
 
     pois_.insert(sourceId, pointOfInterest);
+
+    updatePolygon();
 }
 
-void MissionPlanningContentCreator::removePoi(LmCdl::VcsiPointOfInterestId id) {
+void MissionPlanningContentCreator::removePoi(LmCdl::VcsiPointOfInterestId id) 
+{
     pois_.remove(id);
+
+    updatePolygon();
 }
 
 void MissionPlanningContentCreator::updatePolygon() {
     QString numPois = QString::number(poiApi_.pointsOfInterest().size());
     notApi_.addNotification(new QLabel(*new QString(numPois)));
-
-    if (poiApi_.pointsOfInterest().size() < 3) {
-        return;
-    }
 
     auto polygon = new QGeoPolygon();
     auto points = poiApi_.pointsOfInterest();
@@ -121,4 +118,7 @@ void MissionPlanningContentCreator::updatePolygon() {
     drawing_->clear();
     drawing_->addPolygon(missionPolygon);
     drawing_->update();
+
+    drawApi_.removeDrawingForVectorData(*drawing_);
+    drawApi_.addDrawingForVectorData(*drawing_, LmCdl::I_VectorDataDrawingApi::DrawingMode::OptimizedForFrequentChanges);
 }

@@ -53,7 +53,6 @@ private:
     void removePoi(LmCdl::VcsiPointOfInterestId id);
 
     LmCdl::I_ContextMenuItem &contextMenuItem_;
-    LmCdl::I_ContextMenuItem &contextMenuItem2_;
     QHash<LmCdl::VcsiPointOfInterestId, LmCdl::VcsiPointOfInterestProperties> pois_;
     LmCdl::I_PointOfInterestApi &poiApi_;
     LmCdl::I_VcsiUserNotificationApi &notApi_;
