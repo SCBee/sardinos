@@ -53,6 +53,8 @@ private:
 
     void clearDrawing();
 
+    void clearDrawing();
+
     void removePoi(LmCdl::VcsiPointOfInterestId id);
 
     void testEmitSignal();
