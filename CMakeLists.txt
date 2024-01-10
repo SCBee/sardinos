@@ -320,7 +320,9 @@ add_executable(examples
         test_plugin/TestPlugin.cpp
         test_plugin/TestPlugin.h
         test_plugin/TestContentCreator.cpp
-        test_plugin/TestContentCreator.h)
+        test_plugin/TestContentCreator.h
+        custom/MissionPlanningPolygon.cpp
+        custom/MissionPlanningPolygonDrawing.cpp)
 
 
 # LMT and QT Base
