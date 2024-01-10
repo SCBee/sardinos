@@ -50,6 +50,8 @@ private:
 
     void updatePolygon();
 
+    void clearDrawing();
+
     void removePoi(LmCdl::VcsiPointOfInterestId id);
 
     LmCdl::I_ContextMenuItem &contextMenuItem_;

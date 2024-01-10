@@ -31,7 +31,7 @@ MissionPlanningContentCreator::MissionPlanningContentCreator(LmCdl::I_VcsiMapExt
     contextMenuItem_.setVisible(true);
 
     contextMenuItem2_.setBackgroundColor(*new QColor(12, 255, 12, 255));
-    contextMenuItem2_.setDescription("Execute Draw");
+    contextMenuItem2_.setDescription("Execute Clear");
     contextMenuItem2_.setGrouping(LmCdl::ContextMenuItemGrouping::Bottom);
     contextMenuItem2_.setVisible(true);
 
@@ -46,11 +46,11 @@ void MissionPlanningContentCreator::connectToApiSignals() {
     connect(&contextMenuItem_, &LmCdl::I_ContextMenuItem::clicked, this,
             &MissionPlanningContentCreator::getPoiProperties);
 
-    connect(&contextMenuItem2_, &LmCdl::I_ContextMenuItem::clicked, this,
-            &MissionPlanningContentCreator::updatePolygon);
-
     connect(&poiApi_, &LmCdl::I_PointOfInterestApi::pointOfInterestRemoved, this,
             &MissionPlanningContentCreator::removePoi);
+
+    connect(&contextMenuItem2_, &LmCdl::I_ContextMenuItem::clicked, this,
+            &MissionPlanningContentCreator::clearDrawing);
 }
 
 void MissionPlanningContentCreator::getPoiProperties(const LmCdl::ContextMenuEvent &event) {
@@ -96,10 +96,14 @@ void MissionPlanningContentCreator::publishAndMapPointOfInterest(LmCdl::VcsiPoin
     poiApi_.addPointOfInterest(pointOfInterest, mapIds);
 
     pois_.insert(sourceId, pointOfInterest);
+
+    updatePolygon();
 }
 
 void MissionPlanningContentCreator::removePoi(LmCdl::VcsiPointOfInterestId id) {
     pois_.remove(id);
+
+    updatePolygon();
 }
 
 void MissionPlanningContentCreator::updatePolygon() {
@@ -121,4 +125,11 @@ void MissionPlanningContentCreator::updatePolygon() {
     drawing_->clear();
     drawing_->addPolygon(missionPolygon);
     drawing_->update();
+
+    drawApi_.addDrawingForVectorData(*drawing_,
+                                     LmCdl::I_VectorDataDrawingApi::DrawingMode::OptimizedForFrequentChanges);
+}
+
+void MissionPlanningContentCreator::clearDrawing() {
+    drawApi_.removeDrawingForVectorData(*drawing_);
 }
