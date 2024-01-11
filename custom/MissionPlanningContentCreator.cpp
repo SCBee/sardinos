@@ -14,8 +14,6 @@
 #include <LmCdl/VectorDataPolygonDrawing.h>
 #include <QGeoRectangle>
 #include <LmCdl/VectorDataDrawing.h>
-#include <MissionPlanningPolygonDrawing.h>
-#include <MissionPlanningPolygon.h>
 #include <LmCdl/I_VectorDataDrawingApi.h>
 
 MissionPlanningContentCreator::MissionPlanningContentCreator(LmCdl::I_VcsiMapExtensionApi &mapApi,
@@ -70,6 +68,13 @@ void MissionPlanningContentCreator::getPoiProperties(const LmCdl::ContextMenuEve
     label->setText(xString.c_str());
 
     auto removeTimer = new QTimer();
+<<<<<<< Updated upstream
+=======
+    removeTimer->setInterval(100);
+    connect(removeTimer, &QTimer::timeout, this, &MissionPlanningContentCreator::removeNotification);
+    removeTimer->start();
+    notification_ = &notApi_.addNotification(label);
+>>>>>>> Stashed changes
 
     removeTimer->setInterval(3000);
 
@@ -103,20 +108,28 @@ void MissionPlanningContentCreator::removePoi(LmCdl::VcsiPointOfInterestId id)
     updatePolygon();
 }
 
+<<<<<<< Updated upstream
 void MissionPlanningContentCreator::updatePolygon() {
     QString numPois = QString::number(poiApi_.pointsOfInterest().size());
     notApi_.addNotification(new QLabel(*new QString(numPois)));
 
     auto polygon = new QGeoPolygon();
+=======
+Q_SLOT void MissionPlanningContentCreator::updatePolygon() {
+    
+>>>>>>> Stashed changes
     auto points = poiApi_.pointsOfInterest();
 
-    for (const auto &p: points) {
-        polygon->addCoordinate(p.pointOfInterest().location());
+    auto lines = *new QList<MissionPlanningLine*>();
+
+    for (auto i = 0; i < points.size(); i ++) {
+        if (i == points.size() - 1)
+            lines.append(new MissionPlanningLine(points[i].pointOfInterest().location(), points[0].pointOfInterest().location()));
+        lines.append(new MissionPlanningLine(points[i].pointOfInterest().location(), points[i+1].pointOfInterest().location()));
     }
-    auto missionPolygon = new MissionPlanningPolygon(*polygon);
 
     drawing_->clear();
-    drawing_->addPolygon(missionPolygon);
+    drawing_->addLines(lines);
     drawing_->update();
 
     drawApi_.removeDrawingForVectorData(*drawing_);

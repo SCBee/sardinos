@@ -1,6 +1,5 @@
 #include <MissionPlanningPolygon.h>
 
-
 MissionPlanningPolygon::MissionPlanningPolygon(QGeoPolygon polygon)
     : polygon_(polygon)
 {

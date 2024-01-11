@@ -6,26 +6,29 @@
 #include <LmCdl/I_VectorDataDrawing.h>
 #include <MissionPlanningPolygon.h>
 #include <QObject>
+#include <MissionPlanningLine.h>
 
-class MissionPlanningPolygonDrawing : public LmCdl::I_VectorDataDrawing {
+class MissionPlanningDrawing : public LmCdl::I_VectorDataDrawing {
 Q_OBJECT
 
 public:
-    MissionPlanningPolygonDrawing();
+    MissionPlanningDrawing();
 
-    ~MissionPlanningPolygonDrawing() override;
+    virtual ~MissionPlanningDrawing();
 
-    [[nodiscard]] const QSet<LmCdl::I_VectorDataPointDrawing *> &
-    pointDrawings(const QGeoRectangle &area) const override;
+    [[nodiscard]] const QSet<LmCdl::I_VectorDataPointDrawing *> &pointDrawings(const QGeoRectangle &area) const override;
 
     [[nodiscard]] const QSet<LmCdl::I_VectorDataLineDrawing *> &lineDrawings(const QGeoRectangle &area) const override;
 
-    [[nodiscard]] const QSet<LmCdl::I_VectorDataPolygonDrawing *> &
-    polygonDrawings(const QGeoRectangle &area) const override;
+    [[nodiscard]] const QSet<LmCdl::I_VectorDataPolygonDrawing *> &polygonDrawings(const QGeoRectangle &area) const override;
 
     [[nodiscard]] const QSet<LmCdl::I_VectorDataPolygonDrawing *> &polygonDrawings() const;
 
     void addPolygon(MissionPlanningPolygon *polygon);
+
+    void addLine(MissionPlanningLine *line);
+
+    void addLines(QList<MissionPlanningLine*> lines);
 
     void clear();
 

@@ -16,8 +16,9 @@
 #include <LmCdl/I_VcsiUserNotificationApi.h>
 #include <LmCdl/I_UserNotification.h>
 #include <LmCdl/I_VectorDataDrawingApi.h>
-#include <MissionPlanningPolygonDrawing.h>
+#include <MissionPlanningDrawing.h>
 #include <MissionPlanningPolygon.h>
+#include <MissionPlanningLine.h>
 #include<QList>
 
 namespace LmCdl {
@@ -54,9 +55,10 @@ private:
 
     LmCdl::I_ContextMenuItem &contextMenuItem_;
     QHash<LmCdl::VcsiPointOfInterestId, LmCdl::VcsiPointOfInterestProperties> pois_;
+    
     LmCdl::I_PointOfInterestApi &poiApi_;
     LmCdl::I_VcsiUserNotificationApi &notApi_;
     LmCdl::I_VectorDataDrawingApi &drawApi_;
     LmCdl::I_UserNotification *notification_;
-    MissionPlanningPolygonDrawing *drawing_ = new MissionPlanningPolygonDrawing();
+    MissionPlanningDrawing *drawing_ = new MissionPlanningDrawing();
 };
