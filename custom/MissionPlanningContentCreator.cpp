@@ -68,13 +68,10 @@ void MissionPlanningContentCreator::getPoiProperties(const LmCdl::ContextMenuEve
     label->setText(xString.c_str());
 
     auto removeTimer = new QTimer();
-<<<<<<< Updated upstream
-=======
     removeTimer->setInterval(100);
     connect(removeTimer, &QTimer::timeout, this, &MissionPlanningContentCreator::removeNotification);
     removeTimer->start();
     notification_ = &notApi_.addNotification(label);
->>>>>>> Stashed changes
 
     removeTimer->setInterval(3000);
 
@@ -108,16 +105,9 @@ void MissionPlanningContentCreator::removePoi(LmCdl::VcsiPointOfInterestId id)
     updatePolygon();
 }
 
-<<<<<<< Updated upstream
-void MissionPlanningContentCreator::updatePolygon() {
-    QString numPois = QString::number(poiApi_.pointsOfInterest().size());
-    notApi_.addNotification(new QLabel(*new QString(numPois)));
-
-    auto polygon = new QGeoPolygon();
-=======
 Q_SLOT void MissionPlanningContentCreator::updatePolygon() {
     
->>>>>>> Stashed changes
+
     auto points = poiApi_.pointsOfInterest();
 
     auto lines = *new QList<MissionPlanningLine*>();
