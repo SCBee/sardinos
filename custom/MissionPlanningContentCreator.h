@@ -49,9 +49,13 @@ private:
 
     void removeNotification();
 
-    void updatePolygon();
+    void updateDrawing();
 
     void removePoi(LmCdl::VcsiPointOfInterestId id);
+
+    void testEmitSignal();
+
+    void delay(int ms);
 
     LmCdl::I_ContextMenuItem &contextMenuItem_;
     QHash<LmCdl::VcsiPointOfInterestId, LmCdl::VcsiPointOfInterestProperties> pois_;
