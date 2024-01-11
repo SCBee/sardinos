@@ -37,15 +37,10 @@ public:
 
     virtual ~MissionPlanningContentCreator();
 
-public slots:
-
-    void updatePolygon();
-
-
 private:
     Q_DISABLE_COPY(MissionPlanningContentCreator);
 
-    void publishAndMapPointOfInterest(const LmCdl::VcsiPointOfInterestId &sourceId,
+    void publishAndMapPointOfInterest(LmCdl::VcsiPointOfInterestId sourceId,
                                       const LmCdl::VcsiPointOfInterestProperties &pointOfInterest);
 
     void getPoiProperties(const LmCdl::ContextMenuEvent &event);
@@ -54,7 +49,13 @@ private:
 
     void removeNotification();
 
+    void updateDrawing();
+
+    void removePoi(LmCdl::VcsiPointOfInterestId id);
+
     void testEmitSignal();
+
+    void delay(int ms);
 
     LmCdl::I_ContextMenuItem &contextMenuItem_;
     QHash<LmCdl::VcsiPointOfInterestId, LmCdl::VcsiPointOfInterestProperties> pois_;

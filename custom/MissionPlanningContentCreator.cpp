@@ -15,6 +15,8 @@
 #include <QGeoRectangle>
 #include <LmCdl/VectorDataDrawing.h>
 #include <LmCdl/I_VectorDataDrawingApi.h>
+#include <QTime>
+#include <QCoreApplication>
 
 MissionPlanningContentCreator::MissionPlanningContentCreator(LmCdl::I_VcsiMapExtensionApi &mapApi,
                                                              LmCdl::I_PointOfInterestApi &poiApi,
@@ -34,7 +36,7 @@ MissionPlanningContentCreator::MissionPlanningContentCreator(LmCdl::I_VcsiMapExt
 
     connectToApiSignals();
 
-    drawApi_.addDrawingForVectorData(*drawing_, LmCdl::I_VectorDataDrawingApi::DrawingMode::OptimizedForFrequentChanges);
+    updateDrawing();
 }
 
 MissionPlanningContentCreator::~MissionPlanningContentCreator() = default;
@@ -44,7 +46,7 @@ void MissionPlanningContentCreator::connectToApiSignals() {
             &MissionPlanningContentCreator::getPoiProperties);
 
     connect(&poiApi_, &LmCdl::I_PointOfInterestApi::pointOfInterestRemoved, this,
-            &MissionPlanningContentCreator::removePoi);
+            &MissionPlanningContentCreator::updateDrawing);
 }
 
 void MissionPlanningContentCreator::getPoiProperties(const LmCdl::ContextMenuEvent &event) {
@@ -72,14 +74,6 @@ void MissionPlanningContentCreator::getPoiProperties(const LmCdl::ContextMenuEve
     connect(removeTimer, &QTimer::timeout, this, &MissionPlanningContentCreator::removeNotification);
     removeTimer->start();
     notification_ = &notApi_.addNotification(label);
-
-    removeTimer->setInterval(3000);
-
-    connect(removeTimer, &QTimer::timeout, this, &MissionPlanningContentCreator::removeNotification);
-
-    removeTimer->start();
-
-    notification_ = &notApi_.addNotification(label);
 }
 
 void MissionPlanningContentCreator::removeNotification() {
@@ -95,18 +89,19 @@ void MissionPlanningContentCreator::publishAndMapPointOfInterest(LmCdl::VcsiPoin
 
     pois_.insert(sourceId, pointOfInterest);
 
-    updatePolygon();
+    updateDrawing();
 }
 
 void MissionPlanningContentCreator::removePoi(LmCdl::VcsiPointOfInterestId id) 
 {
     pois_.remove(id);
 
-    updatePolygon();
+    updateDrawing();
 }
 
-Q_SLOT void MissionPlanningContentCreator::updatePolygon() {
+Q_SLOT void MissionPlanningContentCreator::updateDrawing() {
     
+    delay(20);
 
     auto points = poiApi_.pointsOfInterest();
 
@@ -115,7 +110,8 @@ Q_SLOT void MissionPlanningContentCreator::updatePolygon() {
     for (auto i = 0; i < points.size(); i ++) {
         if (i == points.size() - 1)
             lines.append(new MissionPlanningLine(points[i].pointOfInterest().location(), points[0].pointOfInterest().location()));
-        lines.append(new MissionPlanningLine(points[i].pointOfInterest().location(), points[i+1].pointOfInterest().location()));
+        else 
+            lines.append(new MissionPlanningLine(points[i].pointOfInterest().location(), points[i+1].pointOfInterest().location()));
     }
 
     drawing_->clear();
@@ -124,4 +120,11 @@ Q_SLOT void MissionPlanningContentCreator::updatePolygon() {
 
     drawApi_.removeDrawingForVectorData(*drawing_);
     drawApi_.addDrawingForVectorData(*drawing_, LmCdl::I_VectorDataDrawingApi::DrawingMode::OptimizedForFrequentChanges);
+}
+
+void MissionPlanningContentCreator::delay(int ms)
+{
+    QTime dieTime= QTime::currentTime().addMSecs(ms);
+    while (QTime::currentTime() < dieTime)
+        QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
 }
