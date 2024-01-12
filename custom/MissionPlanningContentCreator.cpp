@@ -54,23 +54,6 @@ void MissionPlanningContentCreator::getPoiProperties(const LmCdl::ContextMenuEve
     auto id = new LmCdl::VcsiPointOfInterestId();
 
     publishAndMapPointOfInterest(*id, *properties);
-
-    auto label = new QLabel();
-
-    std::stringstream ss;
-
-    ss << "Mission bound placed at " << std::fixed << std::setprecision(5) << location.latitude() << ", " << std::fixed
-       << std::setprecision(5) << location.longitude();
-
-    std::string xString = ss.str();
-
-    label->setText(xString.c_str());
-
-    auto removeTimer = new QTimer();
-    removeTimer->setInterval(5000);
-    connect(removeTimer, &QTimer::timeout, this, &MissionPlanningContentCreator::removeNotification);
-    removeTimer->start();
-    notification_ = &notApi_.addNotification(label);
 }
 
 void MissionPlanningContentCreator::removeNotification() {
@@ -144,7 +127,12 @@ Q_SLOT void MissionPlanningContentCreator::updateDrawing() {
         }
     }
 
+    draw(polygons, lines);
+}
+
+void MissionPlanningContentCreator::draw(QList<MissionPlanningPolygon*> polygons, QList<MissionPlanningLine*> lines){
     drawing_->clear();
+    drawing_->addPolygons(polygons);
     drawing_->addLines(lines);
     drawing_->update();
 

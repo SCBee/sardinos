@@ -12,9 +12,9 @@ QGeoPolygon MissionPlanningPolygon::polygon() const { return polygon_; }
 QPen MissionPlanningPolygon::pen() const
 {
     QPen pen = QPen(Qt::SolidLine);
-    pen.setWidth(10);
-    pen.setColor(QColor(0, 80, 190, 50));
+    pen.setWidth(1);
+    pen.setColor(QColor(255, 255, 255, 255));
     return pen;
 }
 
-QBrush MissionPlanningPolygon::brush() const { return QBrush(Qt::SolidPattern); }
+QBrush MissionPlanningPolygon::brush() const { return QBrush(Qt::NoBrush); }
