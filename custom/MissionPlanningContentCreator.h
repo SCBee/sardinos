@@ -16,37 +16,54 @@
 #include <LmCdl/I_VcsiUserNotificationApi.h>
 #include <LmCdl/I_UserNotification.h>
 #include <LmCdl/I_VectorDataDrawingApi.h>
-#include <MissionPlanningPolygonDrawing.h>
+#include <MissionPlanningDrawing.h>
 #include <MissionPlanningPolygon.h>
+#include <MissionPlanningLine.h>
 #include<QList>
+#include <vector>
 
 namespace LmCdl {
-class I_VcsiMapExtensionApi;
-class I_PointOfInterestApi;
-class I_VcsiApplicationApi;
+    class I_VcsiMapExtensionApi;
+
+    class I_PointOfInterestApi;
+
+    class I_VcsiApplicationApi;
 }
 
 class MissionPlanningContentCreator : public QObject {
-    Q_OBJECT
+Q_OBJECT
 public:
-    MissionPlanningContentCreator(LmCdl::I_VcsiMapExtensionApi& mapApi, LmCdl::I_PointOfInterestApi& poiApi, LmCdl::I_VcsiUserNotificationApi& notApi, LmCdl::I_VectorDataDrawingApi& drawApi);
+    MissionPlanningContentCreator(LmCdl::I_VcsiMapExtensionApi &mapApi, LmCdl::I_PointOfInterestApi &poiApi,
+                                  LmCdl::I_VcsiUserNotificationApi &notApi, LmCdl::I_VectorDataDrawingApi &drawApi);
+
     virtual ~MissionPlanningContentCreator();
 
 private:
     Q_DISABLE_COPY(MissionPlanningContentCreator);
 
-    void publishAndMapPointOfInterest(LmCdl::VcsiPointOfInterestId sourceId, const LmCdl::VcsiPointOfInterestProperties& pointOfInterest);
-    void getPoiProperties(const LmCdl::ContextMenuEvent &event);
-    void connectToApiSignals();
-    void removeNotification();
-    void updatePolygon();
-    void removePoi(LmCdl::VcsiPointOfInterestId id);
+    void publishAndMapPointOfInterest(LmCdl::VcsiPointOfInterestId sourceId, const LmCdl::VcsiPointOfInterestProperties &pointOfInterest);
 
-    LmCdl::I_ContextMenuItem& contextMenuItem_;
-    QHash<LmCdl::VcsiPointOfInterestId, LmCdl::VcsiPointOfInterestProperties> pois_;
-    LmCdl::I_PointOfInterestApi& poiApi_;
-    LmCdl::I_VcsiUserNotificationApi& notApi_;
-    LmCdl::I_VectorDataDrawingApi& drawApi_;
-    LmCdl::I_UserNotification* notification_;
-    MissionPlanningPolygonDrawing* drawing_ = new MissionPlanningPolygonDrawing();
+    void getPoiProperties(const LmCdl::ContextMenuEvent &event);
+
+    void connectToApiSignals();
+
+    void removeNotification();
+
+    void updateDrawing();
+
+    void draw(QList<MissionPlanningPolygon*> polygons, QList<MissionPlanningLine*> lines);
+
+    std::vector<double> sqPolar(QGeoCoordinate &point, QGeoCoordinate &com);
+    
+    void cvhull();
+
+    void delay(int ms);
+
+    LmCdl::I_ContextMenuItem &contextMenuItem_;
+    std::vector<std::vector<QGeoCoordinate>> pois_;
+    LmCdl::I_PointOfInterestApi &poiApi_;
+    LmCdl::I_VcsiUserNotificationApi &notApi_;
+    LmCdl::I_VectorDataDrawingApi &drawApi_;
+    LmCdl::I_UserNotification *notification_;
+    MissionPlanningDrawing *drawing_ = new MissionPlanningDrawing();
 };

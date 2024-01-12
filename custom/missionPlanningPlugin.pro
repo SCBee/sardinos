@@ -14,12 +14,16 @@ SOURCES += \
     MissionPlanningPlugin.cpp \
     MissionPlanningContentCreator.cpp \
     MissionPlanningPolygon.cpp \
-    MissionPlanningPolygonDrawing.cpp
+    MissionPlanningDrawing.cpp \
+    MissionPlanningLine.cpp 
+
 HEADERS += \
     MissionPlanningPlugin.h \
     MissionPlanningContentCreator.h \
     MissionPlanningPolygon.h \
-    MissionPlanningPolygonDrawing.h
+    MissionPlanningDrawing.h \
+    MissionPlanningLine.h
+
 
 INCLUDEPATH += $$EXAMPLES_ROOT_DIRECTORY/../include 
 win32:INCLUDEPATH += .
