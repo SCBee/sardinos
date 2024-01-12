@@ -13,8 +13,8 @@ MissionPlanningLine::~MissionPlanningLine(){}
 QPen MissionPlanningLine::pen() const
 {
     QPen pen = QPen(Qt::SolidLine);
-    pen.setWidth(10);
-    pen.setColor(QColor(0, 80, 190, 200));
+    pen.setWidth(2);
+    pen.setColor(QColor(9, 60, 214, 235));
     return pen;
 }
 

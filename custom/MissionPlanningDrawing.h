@@ -26,6 +26,8 @@ public:
 
     void addPolygon(MissionPlanningPolygon *polygon);
 
+    void addPolygons(QList<MissionPlanningPolygon*> polygon);
+
     void addLine(MissionPlanningLine *line);
 
     void addLines(QList<MissionPlanningLine*> lines);

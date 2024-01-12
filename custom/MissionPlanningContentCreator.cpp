@@ -17,6 +17,7 @@
 #include <LmCdl/I_VectorDataDrawingApi.h>
 #include <QTime>
 #include <QCoreApplication>
+#include <algorithm>
 
 MissionPlanningContentCreator::MissionPlanningContentCreator(LmCdl::I_VcsiMapExtensionApi &mapApi,
                                                              LmCdl::I_PointOfInterestApi &poiApi,
@@ -57,23 +58,6 @@ void MissionPlanningContentCreator::getPoiProperties(const LmCdl::ContextMenuEve
     auto id = new LmCdl::VcsiPointOfInterestId();
 
     publishAndMapPointOfInterest(*id, *properties);
-
-    auto label = new QLabel();
-
-    std::stringstream ss;
-
-    ss << "Mission bound placed at " << std::fixed << std::setprecision(5) << location.latitude() << ", " << std::fixed
-       << std::setprecision(5) << location.longitude();
-
-    std::string xString = ss.str();
-
-    label->setText(xString.c_str());
-
-    auto removeTimer = new QTimer();
-    removeTimer->setInterval(100);
-    connect(removeTimer, &QTimer::timeout, this, &MissionPlanningContentCreator::removeNotification);
-    removeTimer->start();
-    notification_ = &notApi_.addNotification(label);
 }
 
 void MissionPlanningContentCreator::removeNotification() {
@@ -92,18 +76,17 @@ void MissionPlanningContentCreator::publishAndMapPointOfInterest(LmCdl::VcsiPoin
     updateDrawing();
 }
 
-void MissionPlanningContentCreator::removePoi(LmCdl::VcsiPointOfInterestId id) 
-{
-    pois_.remove(id);
-
-    updateDrawing();
-}
-
 Q_SLOT void MissionPlanningContentCreator::updateDrawing() {
     
     delay(20);
 
     auto points = poiApi_.pointsOfInterest();
+
+    auto polygon = new QGeoPolygon(findSmallestBoundingBox(points));
+
+    auto polygons = *new QList<MissionPlanningPolygon*>();
+
+    polygons.append(new MissionPlanningPolygon(*polygon));
 
     auto lines = *new QList<MissionPlanningLine*>();
 
@@ -114,7 +97,12 @@ Q_SLOT void MissionPlanningContentCreator::updateDrawing() {
             lines.append(new MissionPlanningLine(points[i].pointOfInterest().location(), points[i+1].pointOfInterest().location()));
     }
 
+    draw(polygons, lines);
+}
+
+void MissionPlanningContentCreator::draw(QList<MissionPlanningPolygon*> polygons, QList<MissionPlanningLine*> lines){
     drawing_->clear();
+    drawing_->addPolygons(polygons);
     drawing_->addLines(lines);
     drawing_->update();
 
@@ -127,4 +115,28 @@ void MissionPlanningContentCreator::delay(int ms)
     QTime dieTime= QTime::currentTime().addMSecs(ms);
     while (QTime::currentTime() < dieTime)
         QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
+}
+
+QList<QGeoCoordinate> MissionPlanningContentCreator::findSmallestBoundingBox(const QList<LmCdl::VcsiIdentifiedPointOfInterest>& points) {
+    
+    if (points.empty()) return QList<QGeoCoordinate>();
+    
+    QGeoCoordinate southwest, northeast, southeast, northwest;
+    southwest = northeast = southeast = northwest = points[0].pointOfInterest().location(); 
+
+    for (const auto& point : points) {
+        southwest.setLatitude(std::min(southwest.latitude(), point.pointOfInterest().location().latitude()));
+        southwest.setLongitude(std::min(southwest.longitude(), point.pointOfInterest().location().longitude()));
+
+        northeast.setLatitude(std::max(northeast.latitude(), point.pointOfInterest().location().latitude()));
+        northeast.setLongitude(std::max(northeast.longitude(), point.pointOfInterest().location().longitude()));
+    }
+
+    southeast.setLatitude(southwest.latitude());
+    southeast.setLongitude(northeast.longitude());
+
+    northwest.setLatitude(northeast.latitude());
+    northwest.setLongitude(southwest.longitude());
+
+    return  {southwest,  southeast, northeast, northwest};
 }

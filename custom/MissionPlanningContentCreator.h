@@ -51,11 +51,13 @@ private:
 
     void updateDrawing();
 
-    void removePoi(LmCdl::VcsiPointOfInterestId id);
+    void draw(QList<MissionPlanningPolygon*> polygons, QList<MissionPlanningLine*> lines);
 
     void testEmitSignal();
 
     void delay(int ms);
+    
+    QList<QGeoCoordinate> findSmallestBoundingBox(const QList<LmCdl::VcsiIdentifiedPointOfInterest>& points);
 
     LmCdl::I_ContextMenuItem &contextMenuItem_;
     QHash<LmCdl::VcsiPointOfInterestId, LmCdl::VcsiPointOfInterestProperties> pois_;
