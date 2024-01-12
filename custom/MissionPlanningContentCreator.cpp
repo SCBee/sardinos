@@ -117,13 +117,19 @@ Q_SLOT void MissionPlanningContentCreator::updateDrawing() {
 
     delay(20);
 
-    auto polygons = QList<MissionPlanningPolygon *>();
+    auto points = poiApi_.pointsOfInterest();
+
+    auto polygon = new QGeoPolygon(findSmallestBoundingBox(points));
+
+    auto polygons = *new QList<MissionPlanningPolygon*>();
+
+    polygons.append(new MissionPlanningPolygon(*polygon));
 
     auto lines = QList<MissionPlanningLine *>();
 
     pois_.clear();
 
-    for (auto p : poiApi_.pointsOfInterest()) pois_.push_back({p.pointOfInterest().location()});
+    for (auto p : points) pois_.push_back({p.pointOfInterest().location()});
 
     cvhull();
 
@@ -152,4 +158,28 @@ void MissionPlanningContentCreator::delay(int ms) {
     QTime dieTime = QTime::currentTime().addMSecs(ms);
     while (QTime::currentTime() < dieTime)
         QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
+}
+
+QList<QGeoCoordinate> MissionPlanningContentCreator::findSmallestBoundingBox(const QList<LmCdl::VcsiIdentifiedPointOfInterest>& points) {
+    
+    if (points.empty()) return QList<QGeoCoordinate>();
+    
+    QGeoCoordinate southwest, northeast, southeast, northwest;
+    southwest = northeast = southeast = northwest = points[0].pointOfInterest().location(); 
+
+    for (const auto& point : points) {
+        southwest.setLatitude(std::min(southwest.latitude(), point.pointOfInterest().location().latitude()));
+        southwest.setLongitude(std::min(southwest.longitude(), point.pointOfInterest().location().longitude()));
+
+        northeast.setLatitude(std::max(northeast.latitude(), point.pointOfInterest().location().latitude()));
+        northeast.setLongitude(std::max(northeast.longitude(), point.pointOfInterest().location().longitude()));
+    }
+
+    southeast.setLatitude(southwest.latitude());
+    southeast.setLongitude(northeast.longitude());
+
+    northwest.setLatitude(northeast.latitude());
+    northwest.setLongitude(southwest.longitude());
+
+    return  {southwest,  southeast, northeast, northwest};
 }

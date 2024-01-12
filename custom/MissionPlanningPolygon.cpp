@@ -12,7 +12,7 @@ QGeoPolygon MissionPlanningPolygon::polygon() const { return polygon_; }
 QPen MissionPlanningPolygon::pen() const
 {
     QPen pen = QPen(Qt::SolidLine);
-    pen.setWidth(1);
+    pen.setWidth(2);
     pen.setColor(QColor(255, 255, 255, 255));
     return pen;
 }

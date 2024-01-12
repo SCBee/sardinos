@@ -59,6 +59,8 @@ private:
 
     void delay(int ms);
 
+    QList<QGeoCoordinate> findSmallestBoundingBox(const QList<LmCdl::VcsiIdentifiedPointOfInterest>& points);
+
     LmCdl::I_ContextMenuItem &contextMenuItem_;
     std::vector<std::vector<QGeoCoordinate>> pois_;
     LmCdl::I_PointOfInterestApi &poiApi_;
