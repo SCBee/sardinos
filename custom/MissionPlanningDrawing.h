@@ -22,8 +22,6 @@ public:
 
     [[nodiscard]] const QSet<LmCdl::I_VectorDataPolygonDrawing *> &polygonDrawings(const QGeoRectangle &area) const override;
 
-    [[nodiscard]] const QSet<LmCdl::I_VectorDataPolygonDrawing *> &polygonDrawings() const;
-
     void addPolygon(MissionPlanningPolygon *polygon);
 
     void addPolygons(QList<MissionPlanningPolygon*> polygon);

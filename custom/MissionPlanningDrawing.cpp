@@ -20,9 +20,6 @@ const QSet<LmCdl::I_VectorDataPolygonDrawing *> &MissionPlanningDrawing::polygon
     return polygons_;
 }
 
-const QSet<LmCdl::I_VectorDataPolygonDrawing *> &MissionPlanningDrawing::polygonDrawings() const {
-    return polygons_;
-}
 
 void MissionPlanningDrawing::addPolygon(MissionPlanningPolygon *polygon) {
     polygons_.insert(polygon);
