@@ -51,19 +51,17 @@ private:
 
     void updateDrawing();
 
-    void clearDrawing();
-
-    void clearDrawing();
-
     void removePoi(LmCdl::VcsiPointOfInterestId id);
 
-    void testEmitSignal();
+    void cvhull();
+
+    std::vector<double> sqPolar(QGeoCoordinate &point, QGeoCoordinate &com);
 
     void delay(int ms);
 
     LmCdl::I_ContextMenuItem &contextMenuItem_;
-    QHash<LmCdl::VcsiPointOfInterestId, LmCdl::VcsiPointOfInterestProperties> pois_;
-    
+    std::vector<std::vector<QGeoCoordinate>> pois_;
+
     LmCdl::I_PointOfInterestApi &poiApi_;
     LmCdl::I_VcsiUserNotificationApi &notApi_;
     LmCdl::I_VectorDataDrawingApi &drawApi_;

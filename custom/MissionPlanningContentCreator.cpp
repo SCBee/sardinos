@@ -17,17 +17,14 @@
 #include <LmCdl/I_VectorDataDrawingApi.h>
 #include <QTime>
 #include <QCoreApplication>
+#include <cmath>
 
 MissionPlanningContentCreator::MissionPlanningContentCreator(LmCdl::I_VcsiMapExtensionApi &mapApi,
                                                              LmCdl::I_PointOfInterestApi &poiApi,
                                                              LmCdl::I_VcsiUserNotificationApi &notApi,
                                                              LmCdl::I_VectorDataDrawingApi &drawApi)
-        : contextMenuItem_(mapApi.terrainContextMenu().registerMenuItem())
-        , poiApi_(poiApi)
-        , notApi_(notApi)
-        , drawApi_(drawApi)
-        , notification_(nullptr) 
-{
+        : contextMenuItem_(mapApi.terrainContextMenu().registerMenuItem()), poiApi_(poiApi), notApi_(notApi),
+          drawApi_(drawApi), notification_(nullptr) {
     contextMenuItem_.setBackgroundColor(*new QColor(235, 12, 12, 180));
     contextMenuItem_.setDescription("Add Mission Bound");
     contextMenuItem_.setGrouping(LmCdl::ContextMenuItemGrouping::Bottom);
@@ -70,7 +67,7 @@ void MissionPlanningContentCreator::getPoiProperties(const LmCdl::ContextMenuEve
     label->setText(xString.c_str());
 
     auto removeTimer = new QTimer();
-    removeTimer->setInterval(100);
+    removeTimer->setInterval(5000);
     connect(removeTimer, &QTimer::timeout, this, &MissionPlanningContentCreator::removeNotification);
     removeTimer->start();
     notification_ = &notApi_.addNotification(label);
@@ -86,32 +83,77 @@ void MissionPlanningContentCreator::publishAndMapPointOfInterest(LmCdl::VcsiPoin
     auto mapIds = [this, sourceId](const LmCdl::VcsiPointOfInterestId &cloneId) {};
 
     poiApi_.addPointOfInterest(pointOfInterest, mapIds);
-
-    pois_.insert(sourceId, pointOfInterest);
+    pois_.push_back({pointOfInterest.location()});
 
     updateDrawing();
 }
 
-void MissionPlanningContentCreator::removePoi(LmCdl::VcsiPointOfInterestId id) 
-{
-    pois_.remove(id);
-
+void MissionPlanningContentCreator::removePoi(LmCdl::VcsiPointOfInterestId id) {
     updateDrawing();
+}
+
+std::vector<double>
+MissionPlanningContentCreator::sqPolar(QGeoCoordinate &point, QGeoCoordinate &com) {
+    double angle = atan2(point.latitude() - com.latitude(), point.longitude() - com.longitude());
+    double distance = std::pow(point.longitude() - com.longitude(), 2) + std::pow(point.latitude() - com.latitude(), 2);
+
+    return {angle, distance};
+}
+
+bool
+Comparator(const std::vector<QGeoCoordinate> &a, const std::vector<QGeoCoordinate> &b) {
+    if (a[1].longitude() != b[1].longitude()) {
+        return a[1].longitude() < b[1].longitude();
+    } else {
+        return a[1].latitude() < b[1].latitude();
+    }
+}
+
+void MissionPlanningContentCreator::cvhull() {
+
+    double sumY = 0; // latitude
+    double sumX = 0; // longitude
+    for (const auto &poi: pois_) {
+        sumX += poi[0].longitude(); // long
+        sumY += poi[0].latitude(); // lat
+    }
+    double comLat = sumY / (double) pois_.size(); // y
+    double comLong = sumX / (double) pois_.size(); // x
+    auto com = QGeoCoordinate(comLat, comLong);
+
+    for (auto &poi: pois_) {
+        auto polarCoords = sqPolar(poi[0], com);
+        auto tmp = QGeoCoordinate(polarCoords[1], polarCoords[0]);
+        poi.push_back(tmp);
+    }
+
+    std::sort(pois_.begin(), pois_.end(), Comparator);
 }
 
 Q_SLOT void MissionPlanningContentCreator::updateDrawing() {
-    
     delay(20);
 
-    auto points = poiApi_.pointsOfInterest();
+    auto lines = *new QList<MissionPlanningLine *>();
 
-    auto lines = *new QList<MissionPlanningLine*>();
+    cvhull();
 
-    for (auto i = 0; i < points.size(); i ++) {
-        if (i == points.size() - 1)
-            lines.append(new MissionPlanningLine(points[i].pointOfInterest().location(), points[0].pointOfInterest().location()));
-        else 
-            lines.append(new MissionPlanningLine(points[i].pointOfInterest().location(), points[i+1].pointOfInterest().location()));
+    for (auto i = 1; i < pois_.size(); i++) {
+        lines.push_back(new MissionPlanningLine(pois_[i][0], pois_[i - 1][0]));
+        if (pois_.size() == pois_.size() - 1) {
+            lines.push_back(new MissionPlanningLine(pois_[i][0], pois_[0][0]));
+        }
+        auto label = new QLabel();
+        label->setText(
+                QString("{%1, %2} to").arg(pois_[i][0].longitude(), 0, 'f', 5).arg(
+                        pois_[i][0].latitude(),
+                        0,
+                        'f', 5));
+        notApi_.addNotification(new QLabel(label));
+
+        label->setText(
+                QString("%1, %2").arg(pois_[i - 1][0].longitude(), 0, 'f', 5).arg(pois_[i - 1][0].latitude(), 0, 'f',
+                                                                                  5));
+        notApi_.addNotification(new QLabel(label));
     }
 
     drawing_->clear();
@@ -119,12 +161,12 @@ Q_SLOT void MissionPlanningContentCreator::updateDrawing() {
     drawing_->update();
 
     drawApi_.removeDrawingForVectorData(*drawing_);
-    drawApi_.addDrawingForVectorData(*drawing_, LmCdl::I_VectorDataDrawingApi::DrawingMode::OptimizedForFrequentChanges);
+    drawApi_.addDrawingForVectorData(*drawing_,
+                                     LmCdl::I_VectorDataDrawingApi::DrawingMode::OptimizedForFrequentChanges);
 }
 
-void MissionPlanningContentCreator::delay(int ms)
-{
-    QTime dieTime= QTime::currentTime().addMSecs(ms);
+void MissionPlanningContentCreator::delay(int ms) {
+    QTime dieTime = QTime::currentTime().addMSecs(ms);
     while (QTime::currentTime() < dieTime)
         QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
 }
