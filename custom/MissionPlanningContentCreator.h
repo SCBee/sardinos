@@ -64,9 +64,14 @@ private:
 
     void cvhull();
 
+    void cvhull();
+
+    std::vector<double> sqPolar(QGeoCoordinate &point, QGeoCoordinate &com);
+
+    void delay(int ms);
+
     LmCdl::I_ContextMenuItem &contextMenuItem_;
     std::vector<std::vector<QGeoCoordinate>> pois_;
-    
     LmCdl::I_PointOfInterestApi &poiApi_;
     LmCdl::I_VcsiUserNotificationApi &notApi_;
     LmCdl::I_VectorDataDrawingApi &drawApi_;

@@ -17,18 +17,14 @@
 #include <LmCdl/I_VectorDataDrawingApi.h>
 #include <QTime>
 #include <QCoreApplication>
-#include <algorithm>
+#include <cmath>
 
 MissionPlanningContentCreator::MissionPlanningContentCreator(LmCdl::I_VcsiMapExtensionApi &mapApi,
                                                              LmCdl::I_PointOfInterestApi &poiApi,
                                                              LmCdl::I_VcsiUserNotificationApi &notApi,
                                                              LmCdl::I_VectorDataDrawingApi &drawApi)
-        : contextMenuItem_(mapApi.terrainContextMenu().registerMenuItem())
-        , poiApi_(poiApi)
-        , notApi_(notApi)
-        , drawApi_(drawApi)
-        , notification_(nullptr) 
-{
+        : contextMenuItem_(mapApi.terrainContextMenu().registerMenuItem()), poiApi_(poiApi), notApi_(notApi),
+          drawApi_(drawApi), notification_(nullptr) {
     contextMenuItem_.setBackgroundColor(*new QColor(235, 12, 12, 180));
     contextMenuItem_.setDescription("Add Mission Bound");
     contextMenuItem_.setGrouping(LmCdl::ContextMenuItemGrouping::Bottom);
@@ -75,6 +71,10 @@ void MissionPlanningContentCreator::publishAndMapPointOfInterest(LmCdl::VcsiPoin
     updateDrawing();
 }
 
+void MissionPlanningContentCreator::removePoi(LmCdl::VcsiPointOfInterestId id) {
+    updateDrawing();
+}
+
 std::vector<double>
 MissionPlanningContentCreator::sqPolar(QGeoCoordinate &point, QGeoCoordinate &com) {
     double angle = atan2(point.latitude() - com.latitude(), point.longitude() - com.longitude());
@@ -118,16 +118,6 @@ Q_SLOT void MissionPlanningContentCreator::updateDrawing() {
 
     auto lines = *new QList<MissionPlanningLine *>();
 
-    auto polygons = *new QList<MissionPlanningPolygon *>();
-
-    auto locations = QList<QGeoCoordinate>();
-
-    for (auto p: pois_) locations.append(p[0]);
-
-    auto polygon = new MissionPlanningPolygon(QGeoPolygon(findSmallestBoundingBox(locations)));
-
-    polygons.append(polygon);
-
     cvhull();
 
     for (auto i = 1; i < pois_.size(); i++) {
@@ -147,36 +137,12 @@ void MissionPlanningContentCreator::draw(QList<MissionPlanningPolygon*> polygons
     drawing_->update();
 
     drawApi_.removeDrawingForVectorData(*drawing_);
-    drawApi_.addDrawingForVectorData(*drawing_, LmCdl::I_VectorDataDrawingApi::DrawingMode::OptimizedForFrequentChanges);
+    drawApi_.addDrawingForVectorData(*drawing_,
+                                     LmCdl::I_VectorDataDrawingApi::DrawingMode::OptimizedForFrequentChanges);
 }
 
-void MissionPlanningContentCreator::delay(int ms)
-{
-    QTime dieTime= QTime::currentTime().addMSecs(ms);
+void MissionPlanningContentCreator::delay(int ms) {
+    QTime dieTime = QTime::currentTime().addMSecs(ms);
     while (QTime::currentTime() < dieTime)
         QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
-}
-
-QList<QGeoCoordinate> MissionPlanningContentCreator::findSmallestBoundingBox(const QList<QGeoCoordinate>& points) {
-    
-    if (points.empty()) return QList<QGeoCoordinate>();
-    
-    QGeoCoordinate southwest, northeast, southeast, northwest;
-    southwest = northeast = southeast = northwest = points[0]; 
-
-    for (const auto& point : points) {
-        southwest.setLatitude(std::min(southwest.latitude(), point.latitude()));
-        southwest.setLongitude(std::min(southwest.longitude(), point.longitude()));
-
-        northeast.setLatitude(std::max(northeast.latitude(), point.latitude()));
-        northeast.setLongitude(std::max(northeast.longitude(), point.longitude()));
-    }
-
-    southeast.setLatitude(southwest.latitude());
-    southeast.setLongitude(northeast.longitude());
-
-    northwest.setLatitude(northeast.latitude());
-    northwest.setLongitude(southwest.longitude());
-
-    return  {southwest,  southeast, northeast, northwest};
 }
