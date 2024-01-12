@@ -139,21 +139,9 @@ Q_SLOT void MissionPlanningContentCreator::updateDrawing() {
 
     for (auto i = 1; i < pois_.size(); i++) {
         lines.push_back(new MissionPlanningLine(pois_[i][0], pois_[i - 1][0]));
-        if (pois_.size() == pois_.size() - 1) {
+        if (i == pois_.size() - 1) {
             lines.push_back(new MissionPlanningLine(pois_[i][0], pois_[0][0]));
         }
-        auto label = new QLabel();
-        label->setText(
-                QString("{%1, %2} to").arg(pois_[i][0].longitude(), 0, 'f', 5).arg(
-                        pois_[i][0].latitude(),
-                        0,
-                        'f', 5));
-        notApi_.addNotification(new QLabel(label));
-
-        label->setText(
-                QString("%1, %2").arg(pois_[i - 1][0].longitude(), 0, 'f', 5).arg(pois_[i - 1][0].latitude(), 0, 'f',
-                                                                                  5));
-        notApi_.addNotification(new QLabel(label));
     }
 
     drawing_->clear();
