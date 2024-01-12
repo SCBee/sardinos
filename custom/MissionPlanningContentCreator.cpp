@@ -18,34 +18,46 @@
 #include <QTime>
 #include <QCoreApplication>
 #include <cmath>
+#include <FlightPather.h>
 
 MissionPlanningContentCreator::MissionPlanningContentCreator(LmCdl::I_VcsiMapExtensionApi &mapApi,
                                                              LmCdl::I_PointOfInterestApi &poiApi,
                                                              LmCdl::I_VcsiUserNotificationApi &notApi,
                                                              LmCdl::I_VectorDataDrawingApi &drawApi)
-        : contextMenuItem_(mapApi.terrainContextMenu().registerMenuItem()), poiApi_(poiApi), notApi_(notApi),
+        : missionBoundMenuItem_(mapApi.terrainContextMenu().registerMenuItem())
+        , submitMissionMenuItem_(mapApi.terrainContextMenu().registerMenuItem())
+        , poiApi_(poiApi), notApi_(notApi),
           drawApi_(drawApi), notification_(nullptr) {
 
-    contextMenuItem_.setBackgroundColor(QColor(235, 12, 12, 180));
-    contextMenuItem_.setDescription("Add Mission Bound");
-    contextMenuItem_.setGrouping(LmCdl::ContextMenuItemGrouping::Bottom);
-    contextMenuItem_.setIcon(":/MissionPlanning/missionPlanningDinoIcon");
-    contextMenuItem_.setVisible(true);
+    missionBoundMenuItem_.setBackgroundColor(QColor(235, 12, 12, 180));
+    missionBoundMenuItem_.setDescription("Add Mission Bound");
+    missionBoundMenuItem_.setGrouping(LmCdl::ContextMenuItemGrouping::Bottom);
+    missionBoundMenuItem_.setIcon(":/MissionPlanning/missionPlanningDinoIcon");
+    missionBoundMenuItem_.setVisible(true);
+
+    submitMissionMenuItem_.setBackgroundColor(QColor(12, 235, 12, 180));
+    submitMissionMenuItem_.setDescription("Submit Mission");
+    submitMissionMenuItem_.setGrouping(LmCdl::ContextMenuItemGrouping::Top);
+    submitMissionMenuItem_.setIcon(":/MissionPlanning/UCIcon");
+    submitMissionMenuItem_.setVisible(false);
 
     connectToApiSignals();
 
-    updateDrawing();
+    updateState();
 }
 
 MissionPlanningContentCreator::~MissionPlanningContentCreator() = default;
 
 void MissionPlanningContentCreator::connectToApiSignals() {
 
-    connect(&contextMenuItem_, &LmCdl::I_ContextMenuItem::clicked, this,
+    connect(&missionBoundMenuItem_, &LmCdl::I_ContextMenuItem::clicked, this,
             &MissionPlanningContentCreator::getPoiProperties);
 
+    connect(&submitMissionMenuItem_, &LmCdl::I_ContextMenuItem::clicked, this,
+            &MissionPlanningContentCreator::getFlightPath);
+
     connect(&poiApi_, &LmCdl::I_PointOfInterestApi::pointOfInterestRemoved, this,
-            &MissionPlanningContentCreator::updateDrawing);
+            &MissionPlanningContentCreator::updateState);
 }
 
 void MissionPlanningContentCreator::getPoiProperties(const LmCdl::ContextMenuEvent &event) {
@@ -68,7 +80,7 @@ void MissionPlanningContentCreator::removeNotification() {
 void MissionPlanningContentCreator::publishAndMapPointOfInterest(LmCdl::VcsiPointOfInterestId sourceId,
                                                                  const LmCdl::VcsiPointOfInterestProperties &pointOfInterest) {
 
-    auto draw = [this, sourceId](const LmCdl::VcsiPointOfInterestId &cloneId) { updateDrawing(); };
+    auto draw = [this, sourceId](const LmCdl::VcsiPointOfInterestId &cloneId) { updateState(); };
 
     poiApi_.addPointOfInterest(pointOfInterest, draw);
 }
@@ -113,13 +125,42 @@ void MissionPlanningContentCreator::cvhull() {
     std::sort(pois_.begin(), pois_.end(), Comparator);
 }
 
-Q_SLOT void MissionPlanningContentCreator::updateDrawing() {
+void MissionPlanningContentCreator::getFlightPath() {
+    
+    updateState();
+    
+    auto flightPather = FlightPather(10, 20);
 
+    auto longSpread = flightPather.getDistance(missionBounds_.SW, missionBounds_.SE);
+
+    auto latSpread = flightPather.getDistance(missionBounds_.SW, missionBounds_.NW);
+
+    notApi_.addNotification(new QLabel(QString(("long spread: " + std::to_string(longSpread)).c_str())));
+    notApi_.addNotification(new QLabel(QString(("lat spread: " + std::to_string(latSpread)).c_str())));
+
+}
+
+void MissionPlanningContentCreator::updateState() {
+    
     delay(20);
 
     auto points = poiApi_.pointsOfInterest();
 
-    auto polygon = new QGeoPolygon(findSmallestBoundingBox(points));
+    missionBounds_ = findSmallestBoundingBox(points);
+
+    pois_.clear();
+
+    for (auto p : points) pois_.push_back({p.pointOfInterest().location()});
+
+    if (pois_.size() > 2) submitMissionMenuItem_.setVisible(true);
+    else submitMissionMenuItem_.setVisible(false);
+    
+    updateDrawing(points);
+}
+
+Q_SLOT void MissionPlanningContentCreator::updateDrawing(QList<LmCdl::VcsiIdentifiedPointOfInterest> points) {
+
+    auto polygon = new QGeoPolygon(missionBounds_.list());
 
     auto polygons = *new QList<MissionPlanningPolygon*>();
 
@@ -127,9 +168,6 @@ Q_SLOT void MissionPlanningContentCreator::updateDrawing() {
 
     auto lines = QList<MissionPlanningLine *>();
 
-    pois_.clear();
-
-    for (auto p : points) pois_.push_back({p.pointOfInterest().location()});
 
     cvhull();
 
@@ -160,9 +198,9 @@ void MissionPlanningContentCreator::delay(int ms) {
         QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
 }
 
-QList<QGeoCoordinate> MissionPlanningContentCreator::findSmallestBoundingBox(const QList<LmCdl::VcsiIdentifiedPointOfInterest>& points) {
+BoundingBox MissionPlanningContentCreator::findSmallestBoundingBox(const QList<LmCdl::VcsiIdentifiedPointOfInterest>& points) {
     
-    if (points.empty()) return QList<QGeoCoordinate>();
+    if (points.empty()) return BoundingBox();
     
     QGeoCoordinate southwest, northeast, southeast, northwest;
     southwest = northeast = southeast = northwest = points[0].pointOfInterest().location(); 
@@ -181,5 +219,5 @@ QList<QGeoCoordinate> MissionPlanningContentCreator::findSmallestBoundingBox(con
     northwest.setLatitude(northeast.latitude());
     northwest.setLongitude(southwest.longitude());
 
-    return  {southwest,  southeast, northeast, northwest};
+    return  {southwest,  northwest, southeast, northeast};
 }
