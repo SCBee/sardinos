@@ -20,6 +20,7 @@
 #include <MissionPlanningPolygon.h>
 #include <MissionPlanningLine.h>
 #include<QList>
+#include <vector>
 
 namespace LmCdl {
     class I_VcsiMapExtensionApi;
@@ -56,11 +57,15 @@ private:
     void testEmitSignal();
 
     void delay(int ms);
+
+    std::vector<double> sqPolar(QGeoCoordinate &point, QGeoCoordinate &com);
     
-    QList<QGeoCoordinate> findSmallestBoundingBox(const QList<LmCdl::VcsiIdentifiedPointOfInterest>& points);
+    QList<QGeoCoordinate> findSmallestBoundingBox(const QList<QGeoCoordinate>& points);
+
+    void cvhull();
 
     LmCdl::I_ContextMenuItem &contextMenuItem_;
-    QHash<LmCdl::VcsiPointOfInterestId, LmCdl::VcsiPointOfInterestProperties> pois_;
+    std::vector<std::vector<QGeoCoordinate>> pois_;
     
     LmCdl::I_PointOfInterestApi &poiApi_;
     LmCdl::I_VcsiUserNotificationApi &notApi_;

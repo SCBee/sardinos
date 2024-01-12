@@ -70,31 +70,71 @@ void MissionPlanningContentCreator::publishAndMapPointOfInterest(LmCdl::VcsiPoin
     auto mapIds = [this, sourceId](const LmCdl::VcsiPointOfInterestId &cloneId) {};
 
     poiApi_.addPointOfInterest(pointOfInterest, mapIds);
-
-    pois_.insert(sourceId, pointOfInterest);
+    pois_.push_back({pointOfInterest.location()});
 
     updateDrawing();
 }
 
+std::vector<double>
+MissionPlanningContentCreator::sqPolar(QGeoCoordinate &point, QGeoCoordinate &com) {
+    double angle = atan2(point.latitude() - com.latitude(), point.longitude() - com.longitude());
+    double distance = std::pow(point.longitude() - com.longitude(), 2) + std::pow(point.latitude() - com.latitude(), 2);
+
+    return {angle, distance};
+}
+
+bool
+Comparator(const std::vector<QGeoCoordinate> &a, const std::vector<QGeoCoordinate> &b) {
+    if (a[1].longitude() != b[1].longitude()) {
+        return a[1].longitude() < b[1].longitude();
+    } else {
+        return a[1].latitude() < b[1].latitude();
+    }
+}
+
+void MissionPlanningContentCreator::cvhull() {
+
+    double sumY = 0; // latitude
+    double sumX = 0; // longitude
+    for (const auto &poi: pois_) {
+        sumX += poi[0].longitude(); // long
+        sumY += poi[0].latitude(); // lat
+    }
+    double comLat = sumY / (double) pois_.size(); // y
+    double comLong = sumX / (double) pois_.size(); // x
+    auto com = QGeoCoordinate(comLat, comLong);
+
+    for (auto &poi: pois_) {
+        auto polarCoords = sqPolar(poi[0], com);
+        auto tmp = QGeoCoordinate(polarCoords[1], polarCoords[0]);
+        poi.push_back(tmp);
+    }
+
+    std::sort(pois_.begin(), pois_.end(), Comparator);
+}
+
 Q_SLOT void MissionPlanningContentCreator::updateDrawing() {
-    
     delay(20);
 
-    auto points = poiApi_.pointsOfInterest();
+    auto lines = *new QList<MissionPlanningLine *>();
 
-    auto polygon = new QGeoPolygon(findSmallestBoundingBox(points));
+    auto polygons = *new QList<MissionPlanningPolygon *>();
 
-    auto polygons = *new QList<MissionPlanningPolygon*>();
+    auto locations = QList<QGeoCoordinate>();
 
-    polygons.append(new MissionPlanningPolygon(*polygon));
+    for (auto p: pois_) locations.append(p[0]);
 
-    auto lines = *new QList<MissionPlanningLine*>();
+    auto polygon = new MissionPlanningPolygon(QGeoPolygon(findSmallestBoundingBox(locations)));
 
-    for (auto i = 0; i < points.size(); i ++) {
-        if (i == points.size() - 1)
-            lines.append(new MissionPlanningLine(points[i].pointOfInterest().location(), points[0].pointOfInterest().location()));
-        else 
-            lines.append(new MissionPlanningLine(points[i].pointOfInterest().location(), points[i+1].pointOfInterest().location()));
+    polygons.append(polygon);
+
+    cvhull();
+
+    for (auto i = 1; i < pois_.size(); i++) {
+        lines.push_back(new MissionPlanningLine(pois_[i][0], pois_[i - 1][0]));
+        if (i == pois_.size() - 1) {
+            lines.push_back(new MissionPlanningLine(pois_[i][0], pois_[0][0]));
+        }
     }
 
     draw(polygons, lines);
@@ -117,19 +157,19 @@ void MissionPlanningContentCreator::delay(int ms)
         QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
 }
 
-QList<QGeoCoordinate> MissionPlanningContentCreator::findSmallestBoundingBox(const QList<LmCdl::VcsiIdentifiedPointOfInterest>& points) {
+QList<QGeoCoordinate> MissionPlanningContentCreator::findSmallestBoundingBox(const QList<QGeoCoordinate>& points) {
     
     if (points.empty()) return QList<QGeoCoordinate>();
     
     QGeoCoordinate southwest, northeast, southeast, northwest;
-    southwest = northeast = southeast = northwest = points[0].pointOfInterest().location(); 
+    southwest = northeast = southeast = northwest = points[0]; 
 
     for (const auto& point : points) {
-        southwest.setLatitude(std::min(southwest.latitude(), point.pointOfInterest().location().latitude()));
-        southwest.setLongitude(std::min(southwest.longitude(), point.pointOfInterest().location().longitude()));
+        southwest.setLatitude(std::min(southwest.latitude(), point.latitude()));
+        southwest.setLongitude(std::min(southwest.longitude(), point.longitude()));
 
-        northeast.setLatitude(std::max(northeast.latitude(), point.pointOfInterest().location().latitude()));
-        northeast.setLongitude(std::max(northeast.longitude(), point.pointOfInterest().location().longitude()));
+        northeast.setLatitude(std::max(northeast.latitude(), point.latitude()));
+        northeast.setLongitude(std::max(northeast.longitude(), point.longitude()));
     }
 
     southeast.setLatitude(southwest.latitude());
