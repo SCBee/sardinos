@@ -25,7 +25,8 @@ MissionPlanningContentCreator::MissionPlanningContentCreator(LmCdl::I_VcsiMapExt
                                                              LmCdl::I_VectorDataDrawingApi &drawApi)
         : contextMenuItem_(mapApi.terrainContextMenu().registerMenuItem()), poiApi_(poiApi), notApi_(notApi),
           drawApi_(drawApi), notification_(nullptr) {
-    contextMenuItem_.setBackgroundColor(*new QColor(235, 12, 12, 180));
+
+    contextMenuItem_.setBackgroundColor(QColor(235, 12, 12, 180));
     contextMenuItem_.setDescription("Add Mission Bound");
     contextMenuItem_.setGrouping(LmCdl::ContextMenuItemGrouping::Bottom);
     contextMenuItem_.setIcon(":/MissionPlanning/missionPlanningDinoIcon");
@@ -39,6 +40,7 @@ MissionPlanningContentCreator::MissionPlanningContentCreator(LmCdl::I_VcsiMapExt
 MissionPlanningContentCreator::~MissionPlanningContentCreator() = default;
 
 void MissionPlanningContentCreator::connectToApiSignals() {
+
     connect(&contextMenuItem_, &LmCdl::I_ContextMenuItem::clicked, this,
             &MissionPlanningContentCreator::getPoiProperties);
 
@@ -47,9 +49,10 @@ void MissionPlanningContentCreator::connectToApiSignals() {
 }
 
 void MissionPlanningContentCreator::getPoiProperties(const LmCdl::ContextMenuEvent &event) {
+
     const auto &location = event.worldLocation();
 
-    auto properties = new LmCdl::VcsiPointOfInterestProperties(*new QString("Mission Bound"), location);
+    auto properties = new LmCdl::VcsiPointOfInterestProperties(QString("Mission Bound"), location);
 
     auto id = new LmCdl::VcsiPointOfInterestId();
 
@@ -57,20 +60,22 @@ void MissionPlanningContentCreator::getPoiProperties(const LmCdl::ContextMenuEve
 }
 
 void MissionPlanningContentCreator::removeNotification() {
+
     notApi_.removeNotification(*notification_);
     notification_ = nullptr;
 }
 
 void MissionPlanningContentCreator::publishAndMapPointOfInterest(LmCdl::VcsiPointOfInterestId sourceId,
                                                                  const LmCdl::VcsiPointOfInterestProperties &pointOfInterest) {
-    auto draw = [this, sourceId](const LmCdl::VcsiPointOfInterestId &cloneId) { return updateDrawing(); };
+
+    auto draw = [this, sourceId](const LmCdl::VcsiPointOfInterestId &cloneId) { updateDrawing(); };
 
     poiApi_.addPointOfInterest(pointOfInterest, draw);
-    pois_.push_back({pointOfInterest.location()});
 }
 
 std::vector<double>
 MissionPlanningContentCreator::sqPolar(QGeoCoordinate &point, QGeoCoordinate &com) {
+
     double angle = atan2(point.latitude() - com.latitude(), point.longitude() - com.longitude());
     double distance = std::pow(point.longitude() - com.longitude(), 2) + std::pow(point.latitude() - com.latitude(), 2);
 
@@ -79,6 +84,7 @@ MissionPlanningContentCreator::sqPolar(QGeoCoordinate &point, QGeoCoordinate &co
 
 bool
 Comparator(const std::vector<QGeoCoordinate> &a, const std::vector<QGeoCoordinate> &b) {
+
     if (a[1].longitude() != b[1].longitude()) {
         return a[1].longitude() < b[1].longitude();
     } else {
@@ -109,9 +115,15 @@ void MissionPlanningContentCreator::cvhull() {
 
 Q_SLOT void MissionPlanningContentCreator::updateDrawing() {
 
-    auto polygons = *new QList<MissionPlanningPolygon *>();
+    delay(20);
 
-    auto lines = *new QList<MissionPlanningLine *>();
+    auto polygons = QList<MissionPlanningPolygon *>();
+
+    auto lines = QList<MissionPlanningLine *>();
+
+    pois_.clear();
+
+    for (auto p : poiApi_.pointsOfInterest()) pois_.push_back({p.pointOfInterest().location()});
 
     cvhull();
 

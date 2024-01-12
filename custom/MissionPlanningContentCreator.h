@@ -41,8 +41,7 @@ public:
 private:
     Q_DISABLE_COPY(MissionPlanningContentCreator);
 
-    void publishAndMapPointOfInterest(LmCdl::VcsiPointOfInterestId sourceId,
-                                      const LmCdl::VcsiPointOfInterestProperties &pointOfInterest);
+    void publishAndMapPointOfInterest(LmCdl::VcsiPointOfInterestId sourceId, const LmCdl::VcsiPointOfInterestProperties &pointOfInterest);
 
     void getPoiProperties(const LmCdl::ContextMenuEvent &event);
 
@@ -54,11 +53,11 @@ private:
 
     void draw(QList<MissionPlanningPolygon*> polygons, QList<MissionPlanningLine*> lines);
 
-    void delay(int ms);
-
     std::vector<double> sqPolar(QGeoCoordinate &point, QGeoCoordinate &com);
     
     void cvhull();
+
+    void delay(int ms);
 
     LmCdl::I_ContextMenuItem &contextMenuItem_;
     std::vector<std::vector<QGeoCoordinate>> pois_;
