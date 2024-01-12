@@ -54,21 +54,11 @@ private:
 
     void draw(QList<MissionPlanningPolygon*> polygons, QList<MissionPlanningLine*> lines);
 
-    void testEmitSignal();
-
     void delay(int ms);
 
     std::vector<double> sqPolar(QGeoCoordinate &point, QGeoCoordinate &com);
     
-    QList<QGeoCoordinate> findSmallestBoundingBox(const QList<QGeoCoordinate>& points);
-
     void cvhull();
-
-    void cvhull();
-
-    std::vector<double> sqPolar(QGeoCoordinate &point, QGeoCoordinate &com);
-
-    void delay(int ms);
 
     LmCdl::I_ContextMenuItem &contextMenuItem_;
     std::vector<std::vector<QGeoCoordinate>> pois_;

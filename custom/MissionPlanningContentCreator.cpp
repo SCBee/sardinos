@@ -63,16 +63,10 @@ void MissionPlanningContentCreator::removeNotification() {
 
 void MissionPlanningContentCreator::publishAndMapPointOfInterest(LmCdl::VcsiPointOfInterestId sourceId,
                                                                  const LmCdl::VcsiPointOfInterestProperties &pointOfInterest) {
-    auto mapIds = [this, sourceId](const LmCdl::VcsiPointOfInterestId &cloneId) {};
+    auto draw = [this, sourceId](const LmCdl::VcsiPointOfInterestId &cloneId) { return updateDrawing(); };
 
-    poiApi_.addPointOfInterest(pointOfInterest, mapIds);
+    poiApi_.addPointOfInterest(pointOfInterest, draw);
     pois_.push_back({pointOfInterest.location()});
-
-    updateDrawing();
-}
-
-void MissionPlanningContentCreator::removePoi(LmCdl::VcsiPointOfInterestId id) {
-    updateDrawing();
 }
 
 std::vector<double>
@@ -114,7 +108,8 @@ void MissionPlanningContentCreator::cvhull() {
 }
 
 Q_SLOT void MissionPlanningContentCreator::updateDrawing() {
-    delay(20);
+
+    auto polygons = *new QList<MissionPlanningPolygon *>();
 
     auto lines = *new QList<MissionPlanningLine *>();
 
