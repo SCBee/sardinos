@@ -116,7 +116,8 @@ void MissionPlanningContentCreator::cvhull() {
 Q_SLOT void MissionPlanningContentCreator::updateDrawing() {
     delay(20);
 
-    auto lines = *new QList<MissionPlanningLine *>();
+    auto polygons = QList<MissionPlanningPolygon *>();
+    auto lines = QList<MissionPlanningLine *>();
 
     cvhull();
 

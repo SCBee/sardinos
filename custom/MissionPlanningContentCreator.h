@@ -60,15 +60,9 @@ private:
 
     std::vector<double> sqPolar(QGeoCoordinate &point, QGeoCoordinate &com);
     
-    QList<QGeoCoordinate> findSmallestBoundingBox(const QList<QGeoCoordinate>& points);
-
     void cvhull();
 
-    void cvhull();
-
-    std::vector<double> sqPolar(QGeoCoordinate &point, QGeoCoordinate &com);
-
-    void delay(int ms);
+    void removePoi(LmCdl::VcsiPointOfInterestId id);
 
     LmCdl::I_ContextMenuItem &contextMenuItem_;
     std::vector<std::vector<QGeoCoordinate>> pois_;
