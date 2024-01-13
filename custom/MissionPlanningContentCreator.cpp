@@ -20,6 +20,9 @@
 #include <cmath>
 #include <FlightPather.h>
 
+const auto SCANWIDTHMETERS = 20; 
+const auto MAXDISTANCEMETERS = 2000; 
+
 MissionPlanningContentCreator::MissionPlanningContentCreator(LmCdl::I_VcsiMapExtensionApi &mapApi,
                                                              LmCdl::I_PointOfInterestApi &poiApi,
                                                              LmCdl::I_VcsiUserNotificationApi &notApi,
@@ -129,59 +132,23 @@ void MissionPlanningContentCreator::getFlightPath() {
     
     updateState();
 
-    auto scanWidthMeters = 20; //meters
-    
-    auto flightPather = FlightPather(10, scanWidthMeters);
+    auto flightPather = FlightPather(10, SCANWIDTHMETERS);
 
-    auto longSpreadMeters = flightPather.getDistance(missionBounds_.NE, missionBounds_.NW);
+    auto distance = 0.0;
 
-    auto longSpread = abs(missionBounds_.NE.longitude() - missionBounds_.NW.longitude());
-
-    auto steps = longSpreadMeters / scanWidthMeters;
-
-    auto stepLongitude = longSpread / steps;
-
-    auto currentLocation = missionBounds_.SW;
-
-    currentLocation.setLongitude(currentLocation.longitude() + (stepLongitude / 2.0));
-
-    auto wayPoints = QList<QGeoCoordinate>();
-    
-    auto goingUp = true;
-
-    while (currentLocation.longitude() < missionBounds_.NE.longitude()){
-        wayPoints.append(currentLocation);
-
-        if (goingUp && currentLocation.latitude() == missionBounds_.SW.latitude()){
-            currentLocation.setLatitude(missionBounds_.NW.latitude());
-            continue;
-        }
-
-        if (goingUp && currentLocation.latitude() == missionBounds_.NW.latitude()){
-            currentLocation.setLongitude(currentLocation.longitude() + stepLongitude);
-            goingUp = false;
-            continue;
-        }
-
-        if (!goingUp && currentLocation.latitude() == missionBounds_.NW.latitude()){
-            currentLocation.setLatitude(missionBounds_.SW.latitude());
-            continue;
-        }
-
-        if (!goingUp && currentLocation.latitude() == missionBounds_.SW.latitude()){
-            currentLocation.setLongitude(currentLocation.longitude() + stepLongitude);
-            goingUp = true;
-            continue;
-        }
-    }
-
-    notApi_.addNotification(new QLabel(QString(wayPoints.size())));
-    notApi_.addNotification(new QLabel(QString(std::to_string(stepLongitude).c_str())));
+    auto wayPoints = flightPather.getFlightPath(missionBounds_);
 
     auto polygons = QList<MissionPlanningPolygon*>();
     auto lines = QList<MissionPlanningLine*>();
     for (auto i = 0; i < wayPoints.size() - 1; i ++) {
-        lines.append(new MissionPlanningLine(wayPoints[i], wayPoints[i+1]));
+        auto p1 = wayPoints[i];
+        auto p2 = wayPoints[i+1];
+        lines.append(new MissionPlanningLine(p1, p2));
+        distance += flightPather.getDistance(p1, p2);
+    }
+
+    if (distance > MAXDISTANCEMETERS) {
+        notApi_.addNotification(new QLabel(QString("Search area too big")));
     }
 
     draw(polygons, lines);
