@@ -48,6 +48,10 @@ private:
 
     void getFlightPath();
 
+    void beginMission();
+
+    void cancelMission();
+
     void connectToApiSignals();
 
     void removeNotification();

@@ -38,8 +38,8 @@ MissionPlanningContentCreator::MissionPlanningContentCreator(LmCdl::I_VcsiMapExt
     missionBoundMenuItem_.setIcon(":/MissionPlanning/missionPlanningDinoIcon");
     missionBoundMenuItem_.setVisible(true);
 
-    submitMissionMenuItem_.setBackgroundColor(QColor(12, 235, 12, 180));
-    submitMissionMenuItem_.setDescription("Submit Mission");
+    submitMissionMenuItem_.setBackgroundColor(QColor(50, 100, 235, 180));
+    submitMissionMenuItem_.setDescription("Get Flight Path");
     submitMissionMenuItem_.setGrouping(LmCdl::ContextMenuItemGrouping::Top);
     submitMissionMenuItem_.setIcon(":/MissionPlanning/UCIcon");
     submitMissionMenuItem_.setVisible(false);
@@ -152,7 +152,46 @@ void MissionPlanningContentCreator::getFlightPath() {
 
     if (distance > MAXDISTANCEMETERS) {
         notApi_.addNotification(new QLabel(QString("Search area too big")));
-    } else draw(polygons, lines);
+    } else {
+        
+        draw(polygons, lines);
+
+        submitMissionMenuItem_.setBackgroundColor(QColor(12, 235, 12, 180));
+        submitMissionMenuItem_.setDescription("Begin Mission");
+
+        disconnect(&submitMissionMenuItem_, &LmCdl::I_ContextMenuItem::clicked, this, &MissionPlanningContentCreator::getFlightPath);
+
+        connect(&submitMissionMenuItem_, &LmCdl::I_ContextMenuItem::clicked, this, &MissionPlanningContentCreator::beginMission);
+    }
+}
+
+void MissionPlanningContentCreator::beginMission(){
+
+    notApi_.addNotification(new QLabel(QString("Starting Mission")));
+
+    missionBoundMenuItem_.setVisible(false);
+    submitMissionMenuItem_.setBackgroundColor(QColor(235, 12, 12, 180));
+    submitMissionMenuItem_.setDescription("Cancel Mission");
+
+    disconnect(&submitMissionMenuItem_, &LmCdl::I_ContextMenuItem::clicked, this, &MissionPlanningContentCreator::beginMission);
+
+    connect(&submitMissionMenuItem_, &LmCdl::I_ContextMenuItem::clicked, this, &MissionPlanningContentCreator::cancelMission);
+
+}
+
+void MissionPlanningContentCreator::cancelMission(){
+
+    notApi_.addNotification(new QLabel(QString("Cancelling Mission")));
+    
+    missionBoundMenuItem_.setVisible(true);
+    submitMissionMenuItem_.setBackgroundColor(QColor(50, 100, 235, 180));
+    submitMissionMenuItem_.setDescription("Get Flight Path");
+
+    disconnect(&submitMissionMenuItem_, &LmCdl::I_ContextMenuItem::clicked, this, &MissionPlanningContentCreator::cancelMission);
+
+    connect(&submitMissionMenuItem_, &LmCdl::I_ContextMenuItem::clicked, this, &MissionPlanningContentCreator::getFlightPath);
+
+    updateState();
 }
 
 void MissionPlanningContentCreator::updateState() {
