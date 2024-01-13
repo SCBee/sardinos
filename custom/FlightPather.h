@@ -1,16 +1,18 @@
 #pragma once
 
 #include <QGeoCoordinate>
+#include <BoundingBox.h>
 
 class FlightPather {
 
 public:
-    FlightPather(double turnRadius, double scanWidth);
+    FlightPather(double turnRadiusMeters, double scanWidthMeters);
     ~FlightPather();
 
     double getDistance(QGeoCoordinate c1, QGeoCoordinate c2);
+    QList<QGeoCoordinate> getFlightPath(BoundingBox missionBounds);
 
 private:
-    double turnRadius_;
-    double scanWidth_;
+    double turnRadiusMeters_;
+    double scanWidthMeters_;
 };

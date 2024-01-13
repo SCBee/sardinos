@@ -21,7 +21,7 @@
 #include <MissionPlanningLine.h>
 #include<QList>
 #include <vector>
-#include <BoundingBox.cpp>
+#include <BoundingBox.h>
 
 namespace LmCdl {
     class I_VcsiMapExtensionApi;
