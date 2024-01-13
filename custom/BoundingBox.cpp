@@ -8,6 +8,6 @@ struct BoundingBox {
     QGeoCoordinate NE;
 
     QList<QGeoCoordinate> list(){
-        return { SW, NW, SE, NE };
+        return { SW, SE, NE, NW };
     }
 };

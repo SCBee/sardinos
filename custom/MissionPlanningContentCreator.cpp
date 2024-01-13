@@ -128,16 +128,63 @@ void MissionPlanningContentCreator::cvhull() {
 void MissionPlanningContentCreator::getFlightPath() {
     
     updateState();
+
+    auto scanWidthMeters = 20; //meters
     
-    auto flightPather = FlightPather(10, 20);
+    auto flightPather = FlightPather(10, scanWidthMeters);
 
-    auto longSpread = flightPather.getDistance(missionBounds_.SW, missionBounds_.SE);
+    auto longSpreadMeters = flightPather.getDistance(missionBounds_.NE, missionBounds_.NW);
 
-    auto latSpread = flightPather.getDistance(missionBounds_.SW, missionBounds_.NW);
+    auto longSpread = abs(missionBounds_.NE.longitude() - missionBounds_.NW.longitude());
 
-    notApi_.addNotification(new QLabel(QString(("long spread: " + std::to_string(longSpread)).c_str())));
-    notApi_.addNotification(new QLabel(QString(("lat spread: " + std::to_string(latSpread)).c_str())));
+    auto steps = longSpreadMeters / scanWidthMeters;
 
+    auto stepLongitude = longSpread / steps;
+
+    auto currentLocation = missionBounds_.SW;
+
+    currentLocation.setLongitude(currentLocation.longitude() + (stepLongitude / 2.0));
+
+    auto wayPoints = QList<QGeoCoordinate>();
+    
+    auto goingUp = true;
+
+    while (currentLocation.longitude() < missionBounds_.NE.longitude()){
+        wayPoints.append(currentLocation);
+
+        if (goingUp && currentLocation.latitude() == missionBounds_.SW.latitude()){
+            currentLocation.setLatitude(missionBounds_.NW.latitude());
+            continue;
+        }
+
+        if (goingUp && currentLocation.latitude() == missionBounds_.NW.latitude()){
+            currentLocation.setLongitude(currentLocation.longitude() + stepLongitude);
+            goingUp = false;
+            continue;
+        }
+
+        if (!goingUp && currentLocation.latitude() == missionBounds_.NW.latitude()){
+            currentLocation.setLatitude(missionBounds_.SW.latitude());
+            continue;
+        }
+
+        if (!goingUp && currentLocation.latitude() == missionBounds_.SW.latitude()){
+            currentLocation.setLongitude(currentLocation.longitude() + stepLongitude);
+            goingUp = true;
+            continue;
+        }
+    }
+
+    notApi_.addNotification(new QLabel(QString(wayPoints.size())));
+    notApi_.addNotification(new QLabel(QString(std::to_string(stepLongitude).c_str())));
+
+    auto polygons = QList<MissionPlanningPolygon*>();
+    auto lines = QList<MissionPlanningLine*>();
+    for (auto i = 0; i < wayPoints.size() - 1; i ++) {
+        lines.append(new MissionPlanningLine(wayPoints[i], wayPoints[i+1]));
+    }
+
+    draw(polygons, lines);
 }
 
 void MissionPlanningContentCreator::updateState() {
@@ -167,7 +214,6 @@ Q_SLOT void MissionPlanningContentCreator::updateDrawing(QList<LmCdl::VcsiIdenti
     polygons.append(new MissionPlanningPolygon(*polygon));
 
     auto lines = QList<MissionPlanningLine *>();
-
 
     cvhull();
 
