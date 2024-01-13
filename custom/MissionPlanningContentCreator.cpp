@@ -136,7 +136,10 @@ void MissionPlanningContentCreator::getFlightPath() {
 
     auto distance = 0.0;
 
-    auto wayPoints = flightPather.getFlightPath(missionBounds_);
+    QList<QGeoCoordinate> wayPoints;
+    
+    if (missionBounds_.isVertical()) wayPoints = flightPather.getVerticalFlightPath(missionBounds_);
+    else wayPoints = flightPather.getHorizontalFlightPath(missionBounds_);
 
     auto polygons = QList<MissionPlanningPolygon*>();
     auto lines = QList<MissionPlanningLine*>();
@@ -149,9 +152,7 @@ void MissionPlanningContentCreator::getFlightPath() {
 
     if (distance > MAXDISTANCEMETERS) {
         notApi_.addNotification(new QLabel(QString("Search area too big")));
-    }
-
-    draw(polygons, lines);
+    } else draw(polygons, lines);
 }
 
 void MissionPlanningContentCreator::updateState() {

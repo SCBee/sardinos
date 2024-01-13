@@ -20,11 +20,11 @@ double FlightPather::getDistance(QGeoCoordinate c1, QGeoCoordinate c2){
     return d * 1000; 
 }
 
-QList<QGeoCoordinate> FlightPather::getFlightPath(BoundingBox missionBounds){
+QList<QGeoCoordinate> FlightPather::getVerticalFlightPath(BoundingBox missionBounds){
 
     auto longSpreadMeters = getDistance(missionBounds.NE, missionBounds.NW);
 
-    auto longSpread = abs(missionBounds.NE.longitude() - missionBounds.NW.longitude());
+    auto longSpread = abs(missionBounds.eastBound() - missionBounds.westBound());
 
     auto steps = longSpreadMeters / scanWidthMeters_;
 
@@ -38,29 +38,78 @@ QList<QGeoCoordinate> FlightPather::getFlightPath(BoundingBox missionBounds){
     
     auto goingUp = true;
 
-    while (currentLocation.longitude() < missionBounds.NE.longitude()){
+    while (currentLocation.longitude() < missionBounds.eastBound()){
         wayPoints.append(currentLocation);
 
-        if (goingUp && currentLocation.latitude() == missionBounds.SW.latitude()){
-            currentLocation.setLatitude(missionBounds.NW.latitude());
+        if (goingUp && currentLocation.latitude() == missionBounds.southBound()){
+            currentLocation.setLatitude(missionBounds.northBound());
             continue;
         }
 
-        if (goingUp && currentLocation.latitude() == missionBounds.NW.latitude()){
+        if (goingUp && currentLocation.latitude() == missionBounds.northBound()){
             currentLocation.setLongitude(currentLocation.longitude() + stepLongitude);
             goingUp = false;
             continue;
         }
 
-        if (!goingUp && currentLocation.latitude() == missionBounds.NW.latitude()){
-            currentLocation.setLatitude(missionBounds.SW.latitude());
+        if (!goingUp && currentLocation.latitude() == missionBounds.northBound()){
+            currentLocation.setLatitude(missionBounds.southBound());
             continue;
         }
 
-        if (!goingUp && currentLocation.latitude() == missionBounds.SW.latitude()){
+        if (!goingUp && currentLocation.latitude() == missionBounds.southBound()){
             currentLocation.setLongitude(currentLocation.longitude() + stepLongitude);
             goingUp = true;
             continue;
         }
     }
+
+    return wayPoints;
+}
+
+QList<QGeoCoordinate> FlightPather::getHorizontalFlightPath(BoundingBox missionBounds){
+
+    auto latSpreadMeters = getDistance(missionBounds.NE, missionBounds.SE);
+
+    auto latSpread = abs(missionBounds.northBound() - missionBounds.southBound());
+
+    auto steps = latSpreadMeters / scanWidthMeters_;
+
+    auto stepLatitude = latSpread / steps;
+
+    auto currentLocation = missionBounds.SW;
+
+    currentLocation.setLatitude(currentLocation.latitude() + (stepLatitude / 2.0));
+
+    auto wayPoints = QList<QGeoCoordinate>();
+    
+    auto goingRight = true;
+
+    while (currentLocation.latitude() < missionBounds.northBound()){
+        wayPoints.append(currentLocation);
+
+        if (goingRight && currentLocation.longitude() == missionBounds.westBound()){
+            currentLocation.setLongitude(missionBounds.eastBound());
+            continue;
+        }
+
+        if (goingRight && currentLocation.longitude() == missionBounds.eastBound()){
+            currentLocation.setLatitude(currentLocation.latitude() + stepLatitude);
+            goingRight = false;
+            continue;
+        }
+
+        if (!goingRight && currentLocation.longitude() == missionBounds.eastBound()){
+            currentLocation.setLongitude(missionBounds.westBound());
+            continue;
+        }
+
+        if (!goingRight && currentLocation.longitude() == missionBounds.westBound()){
+            currentLocation.setLatitude(currentLocation.latitude() + stepLatitude);
+            goingRight = true;
+            continue;
+        }
+    }
+
+    return wayPoints;
 }
