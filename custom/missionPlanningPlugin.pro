@@ -15,14 +15,16 @@ SOURCES += \
     MissionPlanningContentCreator.cpp \
     MissionPlanningPolygon.cpp \
     MissionPlanningDrawing.cpp \
-    MissionPlanningLine.cpp 
-
+    MissionPlanningLine.cpp \
+    FlightPather.cpp 
 HEADERS += \
     MissionPlanningPlugin.h \
     MissionPlanningContentCreator.h \
     MissionPlanningPolygon.h \
     MissionPlanningDrawing.h \
-    MissionPlanningLine.h
+    MissionPlanningLine.h \
+    FlightPather.h \
+    BoundingBox.h \
 
 
 INCLUDEPATH += $$EXAMPLES_ROOT_DIRECTORY/../include 
