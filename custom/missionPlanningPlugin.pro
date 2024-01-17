@@ -11,20 +11,22 @@ CONFIG -= app_bundle
 TEMPLATE = lib
 
 SOURCES += \
+    FlightPather.cpp \
     MissionPlanningPlugin.cpp \
     MissionPlanningContentCreator.cpp \
     MissionPlanningPolygon.cpp \
     MissionPlanningDrawing.cpp \
     MissionPlanningLine.cpp \
-    FlightPather.cpp 
+    MathExt.cpp
 HEADERS += \
+    FlightPather.h \
     MissionPlanningPlugin.h \
     MissionPlanningContentCreator.h \
     MissionPlanningPolygon.h \
     MissionPlanningDrawing.h \
     MissionPlanningLine.h \
-    FlightPather.h \
     BoundingBox.h \
+    MathExt.h
 
 
 INCLUDEPATH += $$EXAMPLES_ROOT_DIRECTORY/../include 

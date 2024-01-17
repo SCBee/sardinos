@@ -18,19 +18,19 @@
 #include <QTime>
 #include <QCoreApplication>
 #include <cmath>
-#include <FlightPather.h>
-
-const auto SCANWIDTHMETERS = 20; 
-const auto MAXDISTANCEMETERS = 2000; 
+#include <MathExt.cpp>
 
 MissionPlanningContentCreator::MissionPlanningContentCreator(LmCdl::I_VcsiMapExtensionApi &mapApi,
                                                              LmCdl::I_PointOfInterestApi &poiApi,
                                                              LmCdl::I_VcsiUserNotificationApi &notApi,
                                                              LmCdl::I_VectorDataDrawingApi &drawApi)
-        : missionBoundMenuItem_(mapApi.terrainContextMenu().registerMenuItem())
-        , submitMissionMenuItem_(mapApi.terrainContextMenu().registerMenuItem())
-        , poiApi_(poiApi), notApi_(notApi),
-          drawApi_(drawApi), notification_(nullptr) {
+    : missionBoundMenuItem_(mapApi.terrainContextMenu().registerMenuItem())
+    , submitMissionMenuItem_(mapApi.terrainContextMenu().registerMenuItem())
+    , poiApi_(poiApi)
+    , notApi_(notApi)
+    , drawApi_(drawApi)
+    , notification_(nullptr)
+{
 
     missionBoundMenuItem_.setBackgroundColor(QColor(235, 12, 12, 180));
     missionBoundMenuItem_.setDescription("Add Mission Bound");
@@ -46,231 +46,152 @@ MissionPlanningContentCreator::MissionPlanningContentCreator(LmCdl::I_VcsiMapExt
 
     connectToApiSignals();
 
-    updateState();
+    updatePois();
 }
 
-MissionPlanningContentCreator::~MissionPlanningContentCreator() = default;
+MissionPlanningContentCreator::~MissionPlanningContentCreator(){};
 
-void MissionPlanningContentCreator::connectToApiSignals() {
-
-    connect(&missionBoundMenuItem_, &LmCdl::I_ContextMenuItem::clicked, this,
-            &MissionPlanningContentCreator::getPoiProperties);
-
-    connect(&submitMissionMenuItem_, &LmCdl::I_ContextMenuItem::clicked, this,
-            &MissionPlanningContentCreator::getFlightPath);
-
-    connect(&poiApi_, &LmCdl::I_PointOfInterestApi::pointOfInterestRemoved, this,
-            &MissionPlanningContentCreator::updateState);
-}
-
-void MissionPlanningContentCreator::getPoiProperties(const LmCdl::ContextMenuEvent &event) {
-
-    const auto &location = event.worldLocation();
-
-    auto properties = new LmCdl::VcsiPointOfInterestProperties(QString("Mission Bound"), location);
-
-    auto id = new LmCdl::VcsiPointOfInterestId();
-
-    publishAndMapPointOfInterest(*id, *properties);
-}
-
-void MissionPlanningContentCreator::removeNotification() {
-
-    notApi_.removeNotification(*notification_);
-    notification_ = nullptr;
-}
-
-void MissionPlanningContentCreator::publishAndMapPointOfInterest(LmCdl::VcsiPointOfInterestId sourceId,
-                                                                 const LmCdl::VcsiPointOfInterestProperties &pointOfInterest) {
-
-    auto draw = [this, sourceId](const LmCdl::VcsiPointOfInterestId &cloneId) { updateState(); };
-
-    poiApi_.addPointOfInterest(pointOfInterest, draw);
-}
-
-std::vector<double>
-MissionPlanningContentCreator::sqPolar(QGeoCoordinate &point, QGeoCoordinate &com) {
-
-    double angle = atan2(point.latitude() - com.latitude(), point.longitude() - com.longitude());
-    double distance = std::pow(point.longitude() - com.longitude(), 2) + std::pow(point.latitude() - com.latitude(), 2);
-
-    return {angle, distance};
-}
-
-bool
-Comparator(const std::vector<QGeoCoordinate> &a, const std::vector<QGeoCoordinate> &b) {
-
-    if (a[1].longitude() != b[1].longitude()) {
-        return a[1].longitude() < b[1].longitude();
-    } else {
-        return a[1].latitude() < b[1].latitude();
-    }
-}
-
-void MissionPlanningContentCreator::cvhull() {
-
-    double sumY = 0; // latitude
-    double sumX = 0; // longitude
-    for (const auto &poi: pois_) {
-        sumX += poi[0].longitude(); // long
-        sumY += poi[0].latitude(); // lat
-    }
-    double comLat = sumY / (double) pois_.size(); // y
-    double comLong = sumX / (double) pois_.size(); // x
-    auto com = QGeoCoordinate(comLat, comLong);
-
-    for (auto &poi: pois_) {
-        auto polarCoords = sqPolar(poi[0], com);
-        auto tmp = QGeoCoordinate(polarCoords[1], polarCoords[0]);
-        poi.push_back(tmp);
-    }
-
-    std::sort(pois_.begin(), pois_.end(), Comparator);
-}
-
-void MissionPlanningContentCreator::getFlightPath() {
-    
-    updateState();
-
-    auto flightPather = FlightPather(10, SCANWIDTHMETERS);
-
-    auto distance = 0.0;
-
-    QList<QGeoCoordinate> wayPoints;
-    
-    if (missionBounds_.isVertical()) wayPoints = flightPather.getVerticalFlightPath(missionBounds_);
-    else wayPoints = flightPather.getHorizontalFlightPath(missionBounds_);
-
-    auto polygons = QList<MissionPlanningPolygon*>();
-    auto lines = QList<MissionPlanningLine*>();
-    for (auto i = 0; i < wayPoints.size() - 1; i ++) {
-        auto p1 = wayPoints[i];
-        auto p2 = wayPoints[i+1];
-        lines.append(new MissionPlanningLine(p1, p2));
-        distance += flightPather.getDistance(p1, p2);
-    }
-
-    if (distance > MAXDISTANCEMETERS) {
-        notApi_.addNotification(new QLabel(QString("Search area too big")));
-    } else {
-        
-        draw(polygons, lines);
-
-        submitMissionMenuItem_.setBackgroundColor(QColor(12, 235, 12, 180));
-        submitMissionMenuItem_.setDescription("Begin Mission");
-
-        disconnect(&submitMissionMenuItem_, &LmCdl::I_ContextMenuItem::clicked, this, &MissionPlanningContentCreator::getFlightPath);
-
-        connect(&submitMissionMenuItem_, &LmCdl::I_ContextMenuItem::clicked, this, &MissionPlanningContentCreator::beginMission);
-    }
-}
-
-void MissionPlanningContentCreator::beginMission(){
-
-    notApi_.addNotification(new QLabel(QString("Starting Mission")));
-
-    missionBoundMenuItem_.setVisible(false);
-    submitMissionMenuItem_.setBackgroundColor(QColor(235, 12, 12, 180));
-    submitMissionMenuItem_.setDescription("Cancel Mission");
-
-    disconnect(&submitMissionMenuItem_, &LmCdl::I_ContextMenuItem::clicked, this, &MissionPlanningContentCreator::beginMission);
-
-    connect(&submitMissionMenuItem_, &LmCdl::I_ContextMenuItem::clicked, this, &MissionPlanningContentCreator::cancelMission);
-
-}
-
-void MissionPlanningContentCreator::cancelMission(){
-
-    notApi_.addNotification(new QLabel(QString("Cancelling Mission")));
-    
-    missionBoundMenuItem_.setVisible(true);
-    submitMissionMenuItem_.setBackgroundColor(QColor(50, 100, 235, 180));
-    submitMissionMenuItem_.setDescription("Get Flight Path");
-
-    disconnect(&submitMissionMenuItem_, &LmCdl::I_ContextMenuItem::clicked, this, &MissionPlanningContentCreator::cancelMission);
+void MissionPlanningContentCreator::connectToApiSignals()
+{
+    connect(&missionBoundMenuItem_, &LmCdl::I_ContextMenuItem::clicked, this, &MissionPlanningContentCreator::getPoiProperties);
 
     connect(&submitMissionMenuItem_, &LmCdl::I_ContextMenuItem::clicked, this, &MissionPlanningContentCreator::getFlightPath);
 
-    updateState();
+    connect(&poiApi_, &LmCdl::I_PointOfInterestApi::pointOfInterestRemoved, this, &MissionPlanningContentCreator::updatePois);
 }
 
-void MissionPlanningContentCreator::updateState() {
-    
-    delay(20);
+void MissionPlanningContentCreator::getPoiProperties(const LmCdl::ContextMenuEvent &event)
+{
+    const auto &location = event.worldLocation();
+
+    auto properties = LmCdl::VcsiPointOfInterestProperties(QString("Mission Bound"), location);
+
+    poiApi_.addPointOfInterest(properties, [this](const LmCdl::VcsiPointOfInterestId){ updatePois(); });
+
+    setState(State::CanGetFlightPath);
+}
+
+void MissionPlanningContentCreator::getFlightPath()
+{
+    updatePois();
+
+    auto lines = flightPather_.getFlightPath(missionBounds_);
+
+    if (lines.isEmpty())
+    {
+        notApi_.addNotification(new QLabel(QString("Search area too big")));
+    }
+    else
+    {
+        draw(QList<MissionPlanningPolygon *>(), lines);
+
+        setState(State::CanRunMission);
+    }
+}
+
+void MissionPlanningContentCreator::runMission()
+{
+    notApi_.addNotification(new QLabel(QString("Starting Mission")));
+
+    setState(State::CanCancelMission);
+}
+
+void MissionPlanningContentCreator::cancelMission()
+{
+    notApi_.addNotification(new QLabel(QString("Cancelling Mission")));
+
+    setState(State::CanGetFlightPath);
+
+    updatePois();
+}
+
+void MissionPlanningContentCreator::updatePois()
+{
+    MathExt().delay(20);
 
     auto points = poiApi_.pointsOfInterest();
 
-    missionBounds_ = findSmallestBoundingBox(points);
+    missionBounds_ = MathExt().findSmallestBoundingBox(points);
 
     pois_.clear();
 
-    for (auto p : points) pois_.push_back({p.pointOfInterest().location()});
+    for (auto p : points)
+        pois_.push_back({p.pointOfInterest().location()});
 
-    if (pois_.size() > 2) submitMissionMenuItem_.setVisible(true);
-    else submitMissionMenuItem_.setVisible(false);
-    
-    updateDrawing(points);
+    if (pois_.size() > 2)
+        setState(State::CanGetFlightPath);
+    else
+        setState(State::CannotGetFlightPath);
+
+    drawMissionArea(points);
 }
 
-Q_SLOT void MissionPlanningContentCreator::updateDrawing(QList<LmCdl::VcsiIdentifiedPointOfInterest> points) {
+Q_SLOT void MissionPlanningContentCreator::drawMissionArea(QList<LmCdl::VcsiIdentifiedPointOfInterest> points)
+{
+    auto polygon = QGeoPolygon(missionBounds_.list());
 
-    auto polygon = new QGeoPolygon(missionBounds_.list());
+    auto polygons = QList<MissionPlanningPolygon *>();
 
-    auto polygons = *new QList<MissionPlanningPolygon*>();
-
-    polygons.append(new MissionPlanningPolygon(*polygon));
+    polygons.append(new MissionPlanningPolygon(polygon));
 
     auto lines = QList<MissionPlanningLine *>();
 
-    cvhull();
+    MathExt().cvhull(pois_);
 
-    for (auto i = 1; i < pois_.size(); i++) {
+    for (auto i = 1; i < pois_.size(); i++)
+    {
         lines.push_back(new MissionPlanningLine(pois_[i][0], pois_[i - 1][0]));
-        if (i == pois_.size() - 1) {
+        if (i == pois_.size() - 1)
             lines.push_back(new MissionPlanningLine(pois_[i][0], pois_[0][0]));
-        }
     }
 
     draw(polygons, lines);
 }
 
-void MissionPlanningContentCreator::draw(QList<MissionPlanningPolygon*> polygons, QList<MissionPlanningLine*> lines){
+void MissionPlanningContentCreator::draw(QList<MissionPlanningPolygon *> polygons, QList<MissionPlanningLine *> lines)
+{
     drawing_->clear();
     drawing_->addPolygons(polygons);
     drawing_->addLines(lines);
     drawing_->update();
 
     drawApi_.removeDrawingForVectorData(*drawing_);
-    drawApi_.addDrawingForVectorData(*drawing_,
-                                     LmCdl::I_VectorDataDrawingApi::DrawingMode::OptimizedForFrequentChanges);
+    drawApi_.addDrawingForVectorData(*drawing_, LmCdl::I_VectorDataDrawingApi::DrawingMode::OptimizedForFrequentChanges);
 }
 
-void MissionPlanningContentCreator::delay(int ms) {
-    QTime dieTime = QTime::currentTime().addMSecs(ms);
-    while (QTime::currentTime() < dieTime)
-        QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
-}
-
-BoundingBox MissionPlanningContentCreator::findSmallestBoundingBox(const QList<LmCdl::VcsiIdentifiedPointOfInterest>& points) {
-    
-    if (points.empty()) return BoundingBox();
-    
-    QGeoCoordinate southwest, northeast, southeast, northwest;
-    southwest = northeast = southeast = northwest = points[0].pointOfInterest().location(); 
-
-    for (const auto& point : points) {
-        southwest.setLatitude(std::min(southwest.latitude(), point.pointOfInterest().location().latitude()));
-        southwest.setLongitude(std::min(southwest.longitude(), point.pointOfInterest().location().longitude()));
-
-        northeast.setLatitude(std::max(northeast.latitude(), point.pointOfInterest().location().latitude()));
-        northeast.setLongitude(std::max(northeast.longitude(), point.pointOfInterest().location().longitude()));
-    }
-
-    southeast.setLatitude(southwest.latitude());
-    southeast.setLongitude(northeast.longitude());
-
-    northwest.setLatitude(northeast.latitude());
-    northwest.setLongitude(southwest.longitude());
-
-    return  {southwest,  northwest, southeast, northeast};
+void MissionPlanningContentCreator::setState(State state)
+{
+    switch (state)
+    {
+    case CanGetFlightPath:
+        missionBoundMenuItem_.setVisible(true);
+        submitMissionMenuItem_.setVisible(true);
+        submitMissionMenuItem_.setBackgroundColor(QColor(50, 100, 235, 180));
+        submitMissionMenuItem_.setDescription("Get Flight Path");
+        disconnect(&submitMissionMenuItem_, &LmCdl::I_ContextMenuItem::clicked, this, &MissionPlanningContentCreator::cancelMission);
+        disconnect(&submitMissionMenuItem_, &LmCdl::I_ContextMenuItem::clicked, this, &MissionPlanningContentCreator::runMission);
+        connect(&submitMissionMenuItem_, &LmCdl::I_ContextMenuItem::clicked, this, &MissionPlanningContentCreator::getFlightPath);
+        break;
+    case CannotGetFlightPath:
+        submitMissionMenuItem_.setVisible(false);
+        break;
+    case CanRunMission:
+        missionBoundMenuItem_.setVisible(true);
+        submitMissionMenuItem_.setVisible(true);
+        submitMissionMenuItem_.setBackgroundColor(QColor(12, 235, 12, 180));
+        submitMissionMenuItem_.setDescription("Begin Mission");
+        disconnect(&submitMissionMenuItem_, &LmCdl::I_ContextMenuItem::clicked, this, &MissionPlanningContentCreator::cancelMission);
+        disconnect(&submitMissionMenuItem_, &LmCdl::I_ContextMenuItem::clicked, this, &MissionPlanningContentCreator::getFlightPath);
+        connect(&submitMissionMenuItem_, &LmCdl::I_ContextMenuItem::clicked, this, &MissionPlanningContentCreator::runMission);
+        break;
+    case CanCancelMission:
+        missionBoundMenuItem_.setVisible(false);
+        submitMissionMenuItem_.setVisible(true);
+        submitMissionMenuItem_.setBackgroundColor(QColor(235, 12, 12, 180));
+        submitMissionMenuItem_.setDescription("Cancel Mission");
+        disconnect(&submitMissionMenuItem_, &LmCdl::I_ContextMenuItem::clicked, this, &MissionPlanningContentCreator::runMission);
+        disconnect(&submitMissionMenuItem_, &LmCdl::I_ContextMenuItem::clicked, this, &MissionPlanningContentCreator::getFlightPath);
+        connect(&submitMissionMenuItem_, &LmCdl::I_ContextMenuItem::clicked, this, &MissionPlanningContentCreator::cancelMission);
+        break;
+    };
 }
