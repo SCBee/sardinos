@@ -14,6 +14,7 @@
 #include <MissionPlanningContentCreator.h>
 #include <qicon.h>
 
+
 MissionPlanningContentCreator::MissionPlanningContentCreator(
     LmCdl::I_VcsiMapExtensionApi& mapApi,
     LmCdl::I_PointOfInterestApi& poiApi,
@@ -44,7 +45,7 @@ MissionPlanningContentCreator::MissionPlanningContentCreator(
     updatePois();
 }
 
-MissionPlanningContentCreator::~MissionPlanningContentCreator() = default;
+MissionPlanningContentCreator::~MissionPlanningContentCreator(){};
 
 void MissionPlanningContentCreator::connectToApiSignals()
 {
