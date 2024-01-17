@@ -21,7 +21,6 @@
 #include <MissionPlanningLine.h>
 #include<QList>
 #include <vector>
-#include <BoundingBox.cpp>
 
 namespace LmCdl {
     class I_VcsiMapExtensionApi;
@@ -42,38 +41,34 @@ public:
 private:
     Q_DISABLE_COPY(MissionPlanningContentCreator);
 
-    void publishAndMapPointOfInterest(LmCdl::VcsiPointOfInterestId sourceId, const LmCdl::VcsiPointOfInterestProperties &pointOfInterest);
+    void publishAndMapPointOfInterest(LmCdl::VcsiPointOfInterestId sourceId,
+                                      const LmCdl::VcsiPointOfInterestProperties &pointOfInterest);
 
     void getPoiProperties(const LmCdl::ContextMenuEvent &event);
-
-    void getFlightPath();
 
     void connectToApiSignals();
 
     void removeNotification();
 
-    void updateDrawing(QList<LmCdl::VcsiIdentifiedPointOfInterest> points);
-
-    void updateState();
+    void updateDrawing();
 
     void draw(QList<MissionPlanningPolygon*> polygons, QList<MissionPlanningLine*> lines);
+
+    void testEmitSignal();
+
+    void delay(int ms);
 
     std::vector<double> sqPolar(QGeoCoordinate &point, QGeoCoordinate &com);
     
     void cvhull();
 
-    void delay(int ms);
+    void removePoi(LmCdl::VcsiPointOfInterestId id);
 
-    BoundingBox findSmallestBoundingBox(const QList<LmCdl::VcsiIdentifiedPointOfInterest>& points);
-
-    LmCdl::I_ContextMenuItem &missionBoundMenuItem_;    
-    LmCdl::I_ContextMenuItem &submitMissionMenuItem_;
-
+    LmCdl::I_ContextMenuItem &contextMenuItem_;
     std::vector<std::vector<QGeoCoordinate>> pois_;
     LmCdl::I_PointOfInterestApi &poiApi_;
     LmCdl::I_VcsiUserNotificationApi &notApi_;
     LmCdl::I_VectorDataDrawingApi &drawApi_;
     LmCdl::I_UserNotification *notification_;
     MissionPlanningDrawing *drawing_ = new MissionPlanningDrawing();
-    BoundingBox missionBounds_;
 };
