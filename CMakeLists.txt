@@ -322,7 +322,12 @@ add_executable(examples
         test_plugin/TestContentCreator.cpp
         test_plugin/TestContentCreator.h
         custom/MissionPlanningPolygon.cpp
-        custom/MissionPlanningPolygonDrawing.cpp)
+        custom/MissionPlanningPolygonDrawing.cpp
+        custom/MathExt.cpp
+        custom/MathExt.h
+        custom/MissionPlanningPolygon.cpp
+        custom/MissionPlanningPolygon.cpp
+)
 
 
 # LMT and QT Base
