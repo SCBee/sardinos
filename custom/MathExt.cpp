@@ -9,7 +9,7 @@ bool Comparator(const std::vector<QGeoCoordinate> &a, const std::vector<QGeoCoor
     }
 }
 
-void MathExt::cvhull(std::vector<std::vector<QGeoCoordinate>> pois) {
+void MathExt::cvhull(std::vector<std::vector<QGeoCoordinate>> &pois) {
 
     double sumY = 0; // latitude
     double sumX = 0; // longitude

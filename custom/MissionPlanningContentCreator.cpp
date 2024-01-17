@@ -24,12 +24,7 @@ MissionPlanningContentCreator::MissionPlanningContentCreator(LmCdl::I_VcsiMapExt
                                                              LmCdl::I_PointOfInterestApi &poiApi,
                                                              LmCdl::I_VcsiUserNotificationApi &notApi,
                                                              LmCdl::I_VectorDataDrawingApi &drawApi)
-    : missionBoundMenuItem_(mapApi.terrainContextMenu().registerMenuItem())
-    , submitMissionMenuItem_(mapApi.terrainContextMenu().registerMenuItem())
-    , poiApi_(poiApi)
-    , notApi_(notApi)
-    , drawApi_(drawApi)
-    , notification_(nullptr)
+    : missionBoundMenuItem_(mapApi.terrainContextMenu().registerMenuItem()), submitMissionMenuItem_(mapApi.terrainContextMenu().registerMenuItem()), poiApi_(poiApi), notApi_(notApi), drawApi_(drawApi), notification_(nullptr)
 {
 
     missionBoundMenuItem_.setBackgroundColor(QColor(235, 12, 12, 180));
@@ -66,7 +61,8 @@ void MissionPlanningContentCreator::getPoiProperties(const LmCdl::ContextMenuEve
 
     auto properties = LmCdl::VcsiPointOfInterestProperties(QString("Mission Bound"), location);
 
-    poiApi_.addPointOfInterest(properties, [this](const LmCdl::VcsiPointOfInterestId){ updatePois(); });
+    poiApi_.addPointOfInterest(properties, [this](const LmCdl::VcsiPointOfInterestId)
+                               { updatePois(); });
 
     setState(State::CanGetFlightPath);
 }
@@ -75,17 +71,15 @@ void MissionPlanningContentCreator::getFlightPath()
 {
     updatePois();
 
-    auto lines = flightPather_.getFlightPath(missionBounds_);
-
-    if (lines.isEmpty())
+    if (flightPather_.canFly(missionBounds_))
     {
-        notApi_.addNotification(new QLabel(QString("Search area too big")));
+        draw(QList<MissionPlanningPolygon *>(), flightPather_.path());
+
+        setState(State::CanRunMission);
     }
     else
     {
-        draw(QList<MissionPlanningPolygon *>(), lines);
-
-        setState(State::CanRunMission);
+        notApi_.addNotification(new QLabel(QString("Search area too big")));
     }
 }
 
