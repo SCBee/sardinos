@@ -22,6 +22,7 @@
 #include<QList>
 #include <vector>
 #include <BoundingBox.h>
+#include <FlightPather.h>
 
 namespace LmCdl {
     class I_VcsiMapExtensionApi;
@@ -31,8 +32,20 @@ namespace LmCdl {
     class I_VcsiApplicationApi;
 }
 
+const auto SCANWIDTHMETERS = 20;
+const auto MAXDISTANCEMETERS = 2000;
+const auto TURNINGRADIUSMETERS = 10;
+
 class MissionPlanningContentCreator : public QObject {
 Q_OBJECT
+
+enum State {
+    CanGetFlightPath,
+    CannotGetFlightPath,
+    CanRunMission,
+    CanCancelMission,
+};
+
 public:
     MissionPlanningContentCreator(LmCdl::I_VcsiMapExtensionApi &mapApi, LmCdl::I_PointOfInterestApi &poiApi,
                                   LmCdl::I_VcsiUserNotificationApi &notApi, LmCdl::I_VectorDataDrawingApi &drawApi);
@@ -42,33 +55,23 @@ public:
 private:
     Q_DISABLE_COPY(MissionPlanningContentCreator);
 
-    void publishAndMapPointOfInterest(LmCdl::VcsiPointOfInterestId sourceId, const LmCdl::VcsiPointOfInterestProperties &pointOfInterest);
-
     void getPoiProperties(const LmCdl::ContextMenuEvent &event);
 
     void getFlightPath();
 
-    void beginMission();
+    void runMission();
 
     void cancelMission();
 
     void connectToApiSignals();
 
-    void removeNotification();
+    void drawMissionArea(QList<LmCdl::VcsiIdentifiedPointOfInterest> points);
 
-    void updateDrawing(QList<LmCdl::VcsiIdentifiedPointOfInterest> points);
+    void updatePois();
 
-    void updateState();
+    void setState(State state);
 
     void draw(QList<MissionPlanningPolygon*> polygons, QList<MissionPlanningLine*> lines);
-
-    std::vector<double> sqPolar(QGeoCoordinate &point, QGeoCoordinate &com);
-    
-    void cvhull();
-
-    void delay(int ms);
-
-    BoundingBox findSmallestBoundingBox(const QList<LmCdl::VcsiIdentifiedPointOfInterest>& points);
 
     LmCdl::I_ContextMenuItem &missionBoundMenuItem_;    
     LmCdl::I_ContextMenuItem &submitMissionMenuItem_;
@@ -77,7 +80,10 @@ private:
     LmCdl::I_PointOfInterestApi &poiApi_;
     LmCdl::I_VcsiUserNotificationApi &notApi_;
     LmCdl::I_VectorDataDrawingApi &drawApi_;
+
     LmCdl::I_UserNotification *notification_;
     MissionPlanningDrawing *drawing_ = new MissionPlanningDrawing();
     BoundingBox missionBounds_;
+
+    FlightPather flightPather_ = FlightPather(TURNINGRADIUSMETERS, SCANWIDTHMETERS, MAXDISTANCEMETERS);
 };
