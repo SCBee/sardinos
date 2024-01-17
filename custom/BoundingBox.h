@@ -11,6 +11,11 @@ struct BoundingBox {
         QGeoCoordinate NE;
 
         QList<QGeoCoordinate> list(){
+            SW.setAltitude(1000);
+            SE.setAltitude(1000);
+            NE.setAltitude(1000);
+            NW.setAltitude(1000);
+            
             return { SW, SE, NE, NW };
         }
 

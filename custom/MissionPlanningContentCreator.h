@@ -16,26 +16,38 @@
 #include <LmCdl/I_VcsiUserNotificationApi.h>
 #include <LmCdl/I_UserNotification.h>
 #include <LmCdl/I_VectorDataDrawingApi.h>
+#include <LmCdl/I_AreaSearchApi.h>
 #include <MissionPlanningDrawing.h>
 #include <MissionPlanningPolygon.h>
 #include <MissionPlanningLine.h>
-#include<QList>
+#include <QList>
 #include <vector>
 #include <BoundingBox.h>
+#include <LmCdl/Altitude.h>
+#include <LmCdl/Distance.h>
 
-namespace LmCdl {
+namespace LmCdl
+{
     class I_VcsiMapExtensionApi;
 
     class I_PointOfInterestApi;
 
     class I_VcsiApplicationApi;
+
+    class I_AreaSearchApi;
+
+    class Altitude;
+
+    class Distance;
 }
 
-class MissionPlanningContentCreator : public QObject {
-Q_OBJECT
+class MissionPlanningContentCreator : public QObject
+{
+    Q_OBJECT
 public:
     MissionPlanningContentCreator(LmCdl::I_VcsiMapExtensionApi &mapApi, LmCdl::I_PointOfInterestApi &poiApi,
-                                  LmCdl::I_VcsiUserNotificationApi &notApi, LmCdl::I_VectorDataDrawingApi &drawApi);
+                                  LmCdl::I_VcsiUserNotificationApi &notApi, LmCdl::I_VectorDataDrawingApi &drawApi,
+                                  LmCdl::I_AreaSearchApi &areaSearchApi_);
 
     virtual ~MissionPlanningContentCreator();
 
@@ -60,23 +72,28 @@ private:
 
     void updateState();
 
-    void draw(QList<MissionPlanningPolygon*> polygons, QList<MissionPlanningLine*> lines);
+    void draw(QList<MissionPlanningPolygon *> polygons, QList<MissionPlanningLine *> lines);
 
     std::vector<double> sqPolar(QGeoCoordinate &point, QGeoCoordinate &com);
-    
+
     void cvhull();
 
     void delay(int ms);
 
-    BoundingBox findSmallestBoundingBox(const QList<LmCdl::VcsiIdentifiedPointOfInterest>& points);
+    BoundingBox findSmallestBoundingBox(const QList<LmCdl::VcsiIdentifiedPointOfInterest> &points);
 
-    LmCdl::I_ContextMenuItem &missionBoundMenuItem_;    
+    void planningFail(LmCdl::AreaSearchPlanningId id, const QString& reason);
+
+    void planningSuccess(LmCdl::AreaSearchPlanningId id, const LmCdl::AreaSearchOutput& output);
+
+    LmCdl::I_ContextMenuItem &missionBoundMenuItem_;
     LmCdl::I_ContextMenuItem &submitMissionMenuItem_;
 
     std::vector<std::vector<QGeoCoordinate>> pois_;
     LmCdl::I_PointOfInterestApi &poiApi_;
     LmCdl::I_VcsiUserNotificationApi &notApi_;
     LmCdl::I_VectorDataDrawingApi &drawApi_;
+    LmCdl::I_AreaSearchApi &areaSearchApi_;
     LmCdl::I_UserNotification *notification_;
     MissionPlanningDrawing *drawing_ = new MissionPlanningDrawing();
     BoundingBox missionBounds_;

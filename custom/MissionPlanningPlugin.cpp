@@ -14,11 +14,13 @@
 #include <qcolor.h>
 #include <qwidget.h>
 #include <LmCdl/I_VectorDataDrawingApi.h>
+#include <LmCdl/I_AreaSearchApi.h>
 
 MissionPlanningPlugin::MissionPlanningPlugin()
     : pointOfInterestApi_(nullptr)
     , applicationApi_(nullptr)
     , vectorDrawingApi_(nullptr)
+    , areaSearchApi_(nullptr)
 {
 }
 
@@ -30,7 +32,7 @@ QList<LmCdl::PluginRequirement> MissionPlanningPlugin::requiredApis() const
                 LmCdl::PluginRequirement(POINT_OF_INTEREST_API_CAPABILITY_NAME, 1, 0, 0),
                 LmCdl::PluginRequirement(VCSI_APPLICATION_API_CAPABILITY_NAME, 1, 0, 0),
                 LmCdl::PluginRequirement(VECTOR_DATA_DRAWING_API_CAPABILITY_NAME, 1, 0, 0),
-
+                LmCdl::PluginRequirement(AREA_SEARCH_API_CAPABILITY_NAME, 1, 0, 0),
             };
 }
 
@@ -58,17 +60,22 @@ bool MissionPlanningPlugin::setRequiredApi(LmCdl::PluginCapabilityIdentifier id,
         capabilityFound = true;
     }
 
+    else if (id.capabilityName() == AREA_SEARCH_API_CAPABILITY_NAME) {
+        areaSearchApi_ = dynamic_cast<LmCdl::I_AreaSearchApi*>(api);
+        capabilityFound = true;
+    }
+
     startPluginIfInitialized();
     return capabilityFound;
 }
 
 QObject* MissionPlanningPlugin::getProvidedApi() { return nullptr; }
 
-bool MissionPlanningPlugin::isFullyInitialized() const {  return (pointOfInterestApi_ && applicationApi_ && vectorDrawingApi_); }
+bool MissionPlanningPlugin::isFullyInitialized() const {  return (pointOfInterestApi_ && applicationApi_ && vectorDrawingApi_ && areaSearchApi_); }
 
 void MissionPlanningPlugin::startPluginIfInitialized()
 {
     if (isFullyInitialized()) {
-        pluginContentCreator_.reset(new MissionPlanningContentCreator(applicationApi_->widgetExtensionApi().mapApi(), *pointOfInterestApi_, applicationApi_->userNotificationApi(), *vectorDrawingApi_));
+        pluginContentCreator_.reset(new MissionPlanningContentCreator(applicationApi_->widgetExtensionApi().mapApi(), *pointOfInterestApi_, applicationApi_->userNotificationApi(), *vectorDrawingApi_, *areaSearchApi_));
     }
 }

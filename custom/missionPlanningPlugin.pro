@@ -28,8 +28,12 @@ HEADERS += \
 
 
 INCLUDEPATH += $$EXAMPLES_ROOT_DIRECTORY/../include 
+INCLUDEPATH += D:/boost_1_84_0/boost_1_84_0
+
 win32:INCLUDEPATH += .
+
 LIBS += -L$$EXAMPLES_ROOT_DIRECTORY/../lib -lvcsiapi
+LIBS += -LD:/boost_1_84_0/boost_1_84_0/libs
 
 release:DESTDIR = $$BUILD_DIR
 debug:DESTDIR = $$BUILD_DIR
