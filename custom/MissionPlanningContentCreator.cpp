@@ -24,9 +24,8 @@ MissionPlanningContentCreator::MissionPlanningContentCreator(LmCdl::I_VcsiMapExt
                                                              LmCdl::I_PointOfInterestApi &poiApi,
                                                              LmCdl::I_VcsiUserNotificationApi &notApi,
                                                              LmCdl::I_VectorDataDrawingApi &drawApi)
-        : missionBoundMenuItem_(mapApi.terrainContextMenu().registerMenuItem())
-        , submitMissionMenuItem_(mapApi.terrainContextMenu().registerMenuItem())
-        , poiApi_(poiApi), notApi_(notApi),
+        : missionBoundMenuItem_(mapApi.terrainContextMenu().registerMenuItem()),
+          submitMissionMenuItem_(mapApi.terrainContextMenu().registerMenuItem()), poiApi_(poiApi), notApi_(notApi),
           drawApi_(drawApi), notification_(nullptr) {
 
     missionBoundMenuItem_.setBackgroundColor(QColor(235, 12, 12, 180));
@@ -126,9 +125,9 @@ void MissionPlanningContentCreator::cvhull() {
 }
 
 void MissionPlanningContentCreator::getFlightPath() {
-    
+
     updateState();
-    
+
     auto flightPather = FlightPather(10, 20);
 
     auto longSpread = flightPather.getDistance(missionBounds_.SW, missionBounds_.SE);
@@ -137,11 +136,10 @@ void MissionPlanningContentCreator::getFlightPath() {
 
     notApi_.addNotification(new QLabel(QString(("long spread: " + std::to_string(longSpread)).c_str())));
     notApi_.addNotification(new QLabel(QString(("lat spread: " + std::to_string(latSpread)).c_str())));
-
 }
 
 void MissionPlanningContentCreator::updateState() {
-    
+
     delay(20);
 
     auto points = poiApi_.pointsOfInterest();
@@ -150,11 +148,11 @@ void MissionPlanningContentCreator::updateState() {
 
     pois_.clear();
 
-    for (auto p : points) pois_.push_back({p.pointOfInterest().location()});
+    for (auto p: points) pois_.push_back({p.pointOfInterest().location()});
 
     if (pois_.size() > 2) submitMissionMenuItem_.setVisible(true);
     else submitMissionMenuItem_.setVisible(false);
-    
+
     updateDrawing(points);
 }
 
@@ -162,7 +160,7 @@ Q_SLOT void MissionPlanningContentCreator::updateDrawing(QList<LmCdl::VcsiIdenti
 
     auto polygon = new QGeoPolygon(missionBounds_.list());
 
-    auto polygons = *new QList<MissionPlanningPolygon*>();
+    auto polygons = *new QList<MissionPlanningPolygon *>();
 
     polygons.append(new MissionPlanningPolygon(*polygon));
 
@@ -181,7 +179,7 @@ Q_SLOT void MissionPlanningContentCreator::updateDrawing(QList<LmCdl::VcsiIdenti
     draw(polygons, lines);
 }
 
-void MissionPlanningContentCreator::draw(QList<MissionPlanningPolygon*> polygons, QList<MissionPlanningLine*> lines){
+void MissionPlanningContentCreator::draw(QList<MissionPlanningPolygon *> polygons, QList<MissionPlanningLine *> lines) {
     drawing_->clear();
     drawing_->addPolygons(polygons);
     drawing_->addLines(lines);
@@ -198,14 +196,15 @@ void MissionPlanningContentCreator::delay(int ms) {
         QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
 }
 
-BoundingBox MissionPlanningContentCreator::findSmallestBoundingBox(const QList<LmCdl::VcsiIdentifiedPointOfInterest>& points) {
-    
-    if (points.empty()) return BoundingBox();
-    
-    QGeoCoordinate southwest, northeast, southeast, northwest;
-    southwest = northeast = southeast = northwest = points[0].pointOfInterest().location(); 
+BoundingBox
+MissionPlanningContentCreator::findSmallestBoundingBox(const QList<LmCdl::VcsiIdentifiedPointOfInterest> &points) {
 
-    for (const auto& point : points) {
+    if (points.empty()) return {};
+
+    QGeoCoordinate southwest, northeast, southeast, northwest;
+    southwest = northeast = southeast = northwest = points[0].pointOfInterest().location();
+
+    for (const auto &point: points) {
         southwest.setLatitude(std::min(southwest.latitude(), point.pointOfInterest().location().latitude()));
         southwest.setLongitude(std::min(southwest.longitude(), point.pointOfInterest().location().longitude()));
 
@@ -219,5 +218,5 @@ BoundingBox MissionPlanningContentCreator::findSmallestBoundingBox(const QList<L
     northwest.setLatitude(northeast.latitude());
     northwest.setLongitude(southwest.longitude());
 
-    return  {southwest,  northwest, southeast, northeast};
+    return {southwest, northwest, southeast, northeast};
 }
