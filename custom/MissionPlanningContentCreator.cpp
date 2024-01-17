@@ -79,7 +79,7 @@ void MissionPlanningContentCreator::getFlightPath()
     }
     else
     {
-        notApi_.addNotification(new QLabel(QString("Search area too big")));
+        //notApi_.addNotification(new QLabel(QString("Search area too big"))); spamming?
     }
 }
 
