@@ -86,6 +86,14 @@ void MissionPlanningContentCreator::publishAndMapPointOfInterest(LmCdl::VcsiPoin
     auto draw = [this, sourceId](const LmCdl::VcsiPointOfInterestId &cloneId) { updateState(); };
 
     poiApi_.addPointOfInterest(pointOfInterest, draw);
+
+    submitMissionMenuItem_.setBackgroundColor(QColor(50, 100, 235, 180));
+    submitMissionMenuItem_.setDescription("Get Flight Path");
+
+    disconnect(&submitMissionMenuItem_, &LmCdl::I_ContextMenuItem::clicked, this, &MissionPlanningContentCreator::beginMission);    
+    disconnect(&submitMissionMenuItem_, &LmCdl::I_ContextMenuItem::clicked, this, &MissionPlanningContentCreator::cancelMission);
+
+    connect(&submitMissionMenuItem_, &LmCdl::I_ContextMenuItem::clicked, this,&MissionPlanningContentCreator::getFlightPath);
 }
 
 std::vector<double>
