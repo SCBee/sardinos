@@ -10,6 +10,7 @@ namespace LmCdl {
 class I_VectorDataDrawingApi;
 class I_PointOfInterestApi;
 class I_VcsiApplicationApi;
+class I_MissionDrawingApi;
 }
 
 class MissionPlanningPlugin : public QObject, public LmCdl::I_Plugin {
@@ -43,6 +44,8 @@ private:
     LmCdl::I_VcsiApplicationApi* applicationApi_;
 
     LmCdl::I_VectorDataDrawingApi* vectorDrawingApi_;
+
+    LmCdl::I_MissionDrawingApi* missionDrawingApi_;
 
     QScopedPointer<MissionPlanningContentCreator> pluginContentCreator_;
 };

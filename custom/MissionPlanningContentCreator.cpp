@@ -14,17 +14,18 @@
 #include <MissionPlanningContentCreator.h>
 #include <qicon.h>
 
-
 MissionPlanningContentCreator::MissionPlanningContentCreator(
     LmCdl::I_VcsiMapExtensionApi& mapApi,
     LmCdl::I_PointOfInterestApi& poiApi,
     LmCdl::I_VcsiUserNotificationApi& notApi,
-    LmCdl::I_VectorDataDrawingApi& drawApi)
+    LmCdl::I_VectorDataDrawingApi& drawApi,
+    LmCdl::I_MissionDrawingApi& missionApi)
     : missionBoundMenuItem_(mapApi.terrainContextMenu().registerMenuItem())
     , submitMissionMenuItem_(mapApi.terrainContextMenu().registerMenuItem())
     , poiApi_(poiApi)
     , notApi_(notApi)
     , drawApi_(drawApi)
+    , missionApi_(missionApi)
     , notification_(nullptr)
     , m_state(STARTUP)
 {
@@ -45,7 +46,7 @@ MissionPlanningContentCreator::MissionPlanningContentCreator(
     updatePois();
 }
 
-MissionPlanningContentCreator::~MissionPlanningContentCreator(){};
+MissionPlanningContentCreator::~MissionPlanningContentCreator() {};
 
 void MissionPlanningContentCreator::connectToApiSignals()
 {
@@ -86,7 +87,7 @@ void MissionPlanningContentCreator::getFlightPath()
 
     if (flightPather_.canFly(missionBounds_)) {
         notify("Building Flight Path.");
-        draw(QList<MissionPlanningPolygon*>(), flightPather_.path());
+        drawFlightPath(flightPather_.path());
         updateUIState(State::CanRunMission);
     } else {
         notify("Area is too large.");
@@ -162,6 +163,18 @@ void MissionPlanningContentCreator::draw(
         *drawing_,
         LmCdl::I_VectorDataDrawingApi::DrawingMode::
             OptimizedForFrequentChanges);
+}
+
+void MissionPlanningContentCreator::drawFlightPath(
+    QList<MissionPlanningWaypoint> waypoints)
+{
+    drawing_->clear();
+
+    for (auto i = 0; i < waypoints.size(); i++) {
+        missionApi_.addDrawingForWaypoint(waypoints[i]);
+        if (i != waypoints.size() - 1) missionApi_.addDrawingForWaypointConnector(MissionPlanningWaypointConnector(waypoints[i].location(), waypoints[i+1].location()));
+    }
+
 }
 
 void MissionPlanningContentCreator::changeUI(
