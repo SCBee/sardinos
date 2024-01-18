@@ -2,7 +2,7 @@
 
 #include <QGeoCoordinate>
 #include <BoundingBox.h>
-#include <MissionPlanningLine.h>
+#include <MissionPlanningWaypoint.h>
 
 class FlightPather {
 
@@ -14,12 +14,12 @@ public:
     QList<QGeoCoordinate> getVerticalFlightPath(BoundingBox missionBounds);
     QList<QGeoCoordinate> getHorizontalFlightPath(BoundingBox missionBounds);
     bool canFly(BoundingBox missionBounds);
-    QList<MissionPlanningLine*> path();
+    QList<MissionPlanningWaypoint> path();
 
 private:
     double turnRadiusMeters_;
     double scanWidthMeters_;
     double maxDistanceMeters_;
 
-    QList<MissionPlanningLine*> lines_ = QList<MissionPlanningLine*>();
+    QList<MissionPlanningWaypoint> lines_ = QList<MissionPlanningWaypoint>();
 };

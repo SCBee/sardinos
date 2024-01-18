@@ -143,7 +143,7 @@ bool FlightPather::canFly(BoundingBox missionBounds)
     {
         auto p1 = wayPoints[i];
         auto p2 = wayPoints[i + 1];
-        lines_.append(new MissionPlanningLine(p1, p2));
+        lines_.append(MissionPlanningWaypoint(p1, QString(i)));
         distance += getDistance(p1, p2);
     }
 
@@ -151,4 +151,4 @@ bool FlightPather::canFly(BoundingBox missionBounds)
     else return true;
 }
 
-QList<MissionPlanningLine*> FlightPather::path() { return lines_; };
+QList<MissionPlanningWaypoint> FlightPather::path() { return lines_; };

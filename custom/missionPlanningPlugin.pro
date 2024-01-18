@@ -17,7 +17,9 @@ SOURCES += \
     MissionPlanningPolygon.cpp \
     MissionPlanningDrawing.cpp \
     MissionPlanningLine.cpp \
-    MathExt.cpp
+    MathExt.cpp \
+    MissionPlanningWaypoint.cpp \
+    MissionPlanningWaypointConnector.cpp
 HEADERS += \
     FlightPather.h \
     MissionPlanningPlugin.h \
@@ -26,7 +28,9 @@ HEADERS += \
     MissionPlanningDrawing.h \
     MissionPlanningLine.h \
     BoundingBox.h \
-    MathExt.h
+    MathExt.h \
+    MissionPlanningWaypoint.h \
+    MissionPlanningWaypointConnector.h
 
 
 INCLUDEPATH += $$EXAMPLES_ROOT_DIRECTORY/../include 
