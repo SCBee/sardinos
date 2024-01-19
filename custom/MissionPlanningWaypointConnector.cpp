@@ -1,3 +1,4 @@
+#include <LmCdl/I_SimpleWaypointConnector.h>
 #include <MissionplanningWaypointConnector.h>
 #include <qcolor.h>
 
@@ -5,6 +6,13 @@ MissionPlanningWaypointConnector::MissionPlanningWaypointConnector(
     QGeoCoordinate start, QGeoCoordinate end)
     : start_(start)
     , end_(end)
+{
+}
+
+MissionPlanningWaypointConnector::MissionPlanningWaypointConnector(
+    const MissionPlanningWaypointConnector& connector)
+    : start_(connector.startLocation())
+    , end_(connector.endLocation())
 {
 }
 

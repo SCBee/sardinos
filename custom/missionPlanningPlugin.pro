@@ -1,6 +1,6 @@
 include(../config.pri)
 
-QT += core widgets positioning
+QT += core widgets positioning gui
 
 unix:QMAKE_CXXFLAGS += -std=c++20
 
@@ -19,7 +19,8 @@ SOURCES += \
     MissionPlanningLine.cpp \
     MathExt.cpp \
     MissionPlanningWaypoint.cpp \
-    MissionPlanningWaypointConnector.cpp
+    MissionplanningWaypointConnector.cpp 
+
 HEADERS += \
     FlightPather.h \
     MissionPlanningPlugin.h \
@@ -30,7 +31,8 @@ HEADERS += \
     BoundingBox.h \
     MathExt.h \
     MissionPlanningWaypoint.h \
-    MissionPlanningWaypointConnector.h
+    MissionplanningWaypointConnector.h 
+
 
 
 INCLUDEPATH += $$EXAMPLES_ROOT_DIRECTORY/../include 
