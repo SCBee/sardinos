@@ -1,10 +1,11 @@
 #pragma once
 
-#include <LmCdl/VectorDataPolygonDrawing.h>
 #include <QGeoPolygon>
 
-class MissionPlanningPolygon : public LmCdl::I_VectorDataPolygonDrawing {
+#include <LmCdl/VectorDataPolygonDrawing.h>
 
+class MissionPlanningPolygon : public LmCdl::I_VectorDataPolygonDrawing
+{
 public:
     MissionPlanningPolygon(QGeoPolygon polygon);
     virtual ~MissionPlanningPolygon();

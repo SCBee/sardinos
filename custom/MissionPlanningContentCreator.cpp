@@ -172,7 +172,7 @@ void MissionPlanningContentCreator::drawFlightPath(
 
     for (auto i = 0; i < waypoints.size(); i++) {
         missionApi_.addDrawingForWaypoint(waypoints[i]);
-        if (i != waypoints.size() - 1) missionApi_.addDrawingForWaypointConnector(MissionPlanningWaypointConnector(waypoints[i].location(), waypoints[i+1].location()));
+        if (i != waypoints.size() - 1) missionApi_.addDrawingForWaypointConnector(*new MissionPlanningWaypointConnector(waypoints[i].location(), waypoints[i+1].location()));
     }
 
 }
