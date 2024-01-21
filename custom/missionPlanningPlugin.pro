@@ -19,7 +19,8 @@ SOURCES += \
     MissionPlanningLine.cpp \
     MathExt.cpp \
     MissionPlanningWaypoint.cpp \
-    MissionplanningWaypointConnector.cpp 
+    MissionplanningWaypointConnector.cpp \
+    MissionDomain.cpp
 
 HEADERS += \
     FlightPather.h \
@@ -31,7 +32,8 @@ HEADERS += \
     BoundingBox.h \
     MathExt.h \
     MissionPlanningWaypoint.h \
-    MissionplanningWaypointConnector.h 
+    MissionplanningWaypointConnector.h \
+    MissionDomain.h
 
 
 

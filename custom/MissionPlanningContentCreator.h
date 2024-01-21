@@ -27,6 +27,7 @@
 #include <qgeocoordinate.h>
 #include <MissionPlanningWaypoint.h>
 #include <MissionplanningWaypointConnector.h>
+#include <MissionDomain.h>
 
 namespace LmCdl
 {
@@ -110,11 +111,9 @@ private:
     MissionPlanningDrawing* drawing_ = new MissionPlanningDrawing();
     BoundingBox missionBounds_;
 
-    FlightPather flightPather_ =
-        FlightPather(TURNINGRADIUSMETERS, SCANWIDTHMETERS, MAXDISTANCEMETERS);
+    FlightPather flightPather_ = FlightPather(TURNINGRADIUSMETERS, SCANWIDTHMETERS, MAXDISTANCEMETERS);
 
-    QList<MissionPlanningWaypoint> waypoints_;
-    QList<MissionPlanningWaypointConnector> connectors_;
+    MissionDomain mission_;
 
     int m_state;
 };
