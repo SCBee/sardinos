@@ -89,7 +89,11 @@ void MissionPlanningContentCreator::getFlightPath()
 
     if (flightPather_.canFly(missionBounds_)) {
         notify("Building Flight Path.");
-        mission_.setPath(flightPather_.path());
+        try {
+            mission_.setPath(flightPather_.path());
+        } catch (const std::exception& e) {
+            notify(e.what());
+        }
         drawFlightPath();
         updateUIState(State::CanRunMission);
     } else {
