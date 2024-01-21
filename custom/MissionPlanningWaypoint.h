@@ -45,28 +45,6 @@ public:
     
     static QSize size();
 
-signals:
-
-    void locationChanged(const QGeoCoordinate& location);
-
-    void shapeChanged(const LmCdl::I_GeospatialSimpleWaypoint::Shape& shape);
-
-    void labelChanged(const QString& label);
-
-    void labelOffsetChanged(const QVector2D& labelOffset);
-
-    void colorChanged(const QColor& color);
-
-    void visibilityChanged(bool visible);
-
-    void relativeZOrderChanged(int relativeZOrder);
-
-    void selectionEnabledChanged(bool selectionEnabled);
-
-    void highlightChanged(bool highlighted);
-
-    void draggingEnabledChanged(bool dragEnabled);
-
 private:
     QGeoCoordinate location_;
     QString label_;

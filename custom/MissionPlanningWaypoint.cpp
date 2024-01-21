@@ -36,7 +36,7 @@ QString MissionPlanningWaypoint::label() const
 
 QColor MissionPlanningWaypoint::color() const
 {
-    return QColor(255, 255, 255, 180);
+    return QColor(0, 0, 255, 255);
 }
 
 bool MissionPlanningWaypoint::visible() const
