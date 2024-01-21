@@ -1,49 +1,91 @@
-#include <LmCdl/I_SimpleWaypointConnector.h>
-#include <MissionplanningWaypointConnector.h>
-#include <qcolor.h>
+#include <MissionPlanningWaypointConnector.h>
 
-MissionPlanningWaypointConnector::MissionPlanningWaypointConnector(
-    QGeoCoordinate start, QGeoCoordinate end)
-    : start_(start)
-    , end_(end)
+MissionPlanningWaypointConnector::MissionPlanningWaypointConnector()
+    : color_(Qt::white)
+    , visible_(false)
+    , directionalIndicatorVisible_(false)
+    , relativeZOrder_(0)
 {
 }
-
-MissionPlanningWaypointConnector::MissionPlanningWaypointConnector(
-    const MissionPlanningWaypointConnector& connector)
-    : start_(connector.startLocation())
-    , end_(connector.endLocation())
-{
-}
-
-MissionPlanningWaypointConnector::~MissionPlanningWaypointConnector() {}
 
 QGeoCoordinate MissionPlanningWaypointConnector::startLocation() const
 {
-    return start_;
+    return startLocation_;
+}
+
+void MissionPlanningWaypointConnector::setStartLocation(
+    const QGeoCoordinate& location)
+{
+    if (startLocation_ != location) {
+        startLocation_ = location;
+        emit startLocationChanged(startLocation_);
+    }
 }
 
 QGeoCoordinate MissionPlanningWaypointConnector::endLocation() const
 {
-    return end_;
+    return endLocation_;
+}
+
+void MissionPlanningWaypointConnector::setEndLocation(
+    const QGeoCoordinate& location)
+{
+    if (endLocation_ != location) {
+        endLocation_ = location;
+        emit startLocationChanged(endLocation_);
+    }
 }
 
 QColor MissionPlanningWaypointConnector::color() const
 {
-    return QColor(255, 0, 0, 255);
+    return color_;
+}
+
+void MissionPlanningWaypointConnector::setColor(QColor color)
+{
+    if (color != color_) {
+        color_ = color;
+        emit colorChanged(color_);
+    }
 }
 
 bool MissionPlanningWaypointConnector::visible() const
 {
-    return true;
+    return visible_;
+}
+
+void MissionPlanningWaypointConnector::setVisible(bool isVisible)
+{
+    if (isVisible != visible_) {
+        visible_ = isVisible;
+        emit visibilityChanged(visible_);
+    }
 }
 
 bool MissionPlanningWaypointConnector::directionalIndicatorVisible() const
 {
-    return true;
+    return directionalIndicatorVisible_;
+}
+
+void MissionPlanningWaypointConnector::setDirectionalIndicatorVisible(
+    bool isVisible)
+{
+    if (isVisible != directionalIndicatorVisible_) {
+        directionalIndicatorVisible_ = isVisible;
+        emit directionalIndicatorVisibilityChanged(
+            directionalIndicatorVisible_);
+    }
 }
 
 int MissionPlanningWaypointConnector::relativeZOrder() const
 {
-    return 0;
+    return relativeZOrder_;
+}
+
+void MissionPlanningWaypointConnector::setRelativeZOrder(int order)
+{
+    if (order != relativeZOrder_) {
+        relativeZOrder_ = order;
+        emit relativeZOrderChanged(relativeZOrder_);
+    }
 }

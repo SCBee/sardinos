@@ -13,6 +13,7 @@
 #include <MathExt.cpp>
 #include <MissionPlanningContentCreator.h>
 #include <qicon.h>
+#include <MissionDomain.h>
 
 MissionPlanningContentCreator::MissionPlanningContentCreator(
     LmCdl::I_VcsiMapExtensionApi& mapApi,
@@ -28,6 +29,7 @@ MissionPlanningContentCreator::MissionPlanningContentCreator(
     , missionApi_(missionApi)
     , notification_(nullptr)
     , m_state(STARTUP)
+    , mission_()
 {
     missionBoundMenuItem_.setBackgroundColor(QColor(235, 12, 12, 180));
     missionBoundMenuItem_.setDescription("Add Mission Bound");
@@ -87,8 +89,7 @@ void MissionPlanningContentCreator::getFlightPath()
 
     if (flightPather_.canFly(missionBounds_)) {
         notify("Building Flight Path.");
-        waypoints_ = flightPather_.path().first;
-        connectors_ = flightPather_.path().second;
+        mission_.setPath(flightPather_.path());
         drawFlightPath();
         updateUIState(State::CanRunMission);
     } else {
@@ -175,26 +176,22 @@ void MissionPlanningContentCreator::clearMissionArea()
 
 void MissionPlanningContentCreator::clearFlightPath()
 {
-    for (auto i = 0; i < waypoints_.size(); i++) {
-        missionApi_.removeDrawingForWaypoint(waypoints_[i]);
+    foreach (LmCdl::I_SimpleWaypointConnector* waypointConnector, mission_.waypointConnectors()) {
+        missionApi_.removeDrawingForWaypointConnector(*waypointConnector);
+    }
+    foreach (MissionPlanningWaypoint* waypoint, mission_.waypoints()) {
+        missionApi_.removeDrawingForWaypoint(*waypoint);
     }
 
-    for (auto i = 0; i < connectors_.size(); i++) {
-        missionApi_.removeDrawingForWaypointConnector(connectors_[i]);
-    }
-
-    waypoints_.clear();
-    connectors_.clear();
 }
 
 void MissionPlanningContentCreator::drawFlightPath()
 {
-    for (auto i = 0; i < waypoints_.size(); i++) {
-        missionApi_.addDrawingForWaypoint(waypoints_[i]);
+    foreach (MissionPlanningWaypoint* waypoint, mission_.waypoints()) {
+        missionApi_.addDrawingForWaypoint(*waypoint);
     }
-
-    for (auto i = 0; i < connectors_.size(); i++) {
-        missionApi_.addDrawingForWaypointConnector(connectors_[i]);
+    foreach (LmCdl::I_SimpleWaypointConnector* waypointConnector, mission_.waypointConnectors()) {
+        missionApi_.addDrawingForWaypointConnector(*waypointConnector);
     }
 }
 
