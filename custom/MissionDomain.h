@@ -70,6 +70,8 @@ private:
     void abortDrag(ConnectedWaypointRef waypointAndConnectors);
 
     std::vector<std::pair<MissionPlanningWaypoint*, QList<MissionPlanningWaypointConnector*>>> waypoints_;
-    
+    QScopedPointer<MissionPlanningWaypoint> waypoint_;
+    QScopedPointer<MissionPlanningWaypointConnector> connector_;
+
     DragInProgress dragInProgress_;
 };
