@@ -21,19 +21,6 @@ public:
 
     int relativeZOrder() const override;
 
-signals:
-    void startLocationChanged(const QGeoCoordinate& startLocation);
-
-    void endLocationChanged(const QGeoCoordinate& endLocation);
-
-    void colorChanged(const QColor& color);
-
-    void visibilityChanged(bool visible);
-
-    void directionalIndicatorVisibilityChanged(bool visible);
-
-    void relativeZOrderChanged(int relativeZOrder);
-
 private:
     QGeoCoordinate start_;
     QGeoCoordinate end_;

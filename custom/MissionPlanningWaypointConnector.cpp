@@ -30,7 +30,7 @@ QGeoCoordinate MissionPlanningWaypointConnector::endLocation() const
 
 QColor MissionPlanningWaypointConnector::color() const
 {
-    return QColor(255, 255, 255, 180);
+    return QColor(255, 0, 0, 255);
 }
 
 bool MissionPlanningWaypointConnector::visible() const

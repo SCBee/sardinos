@@ -21,7 +21,7 @@ double FlightPather::getDistance(QGeoCoordinate c1, QGeoCoordinate c2)
     return d * 1000;
 }
 
-QList<QGeoCoordinate> FlightPather::getVerticalFlightPath(BoundingBox missionBounds)
+QList<MissionPlanningWaypoint> FlightPather::getVerticalFlightPath(BoundingBox missionBounds)
 {
 
     auto longSpreadMeters = getDistance(missionBounds.NE, missionBounds.NW);
@@ -36,13 +36,16 @@ QList<QGeoCoordinate> FlightPather::getVerticalFlightPath(BoundingBox missionBou
 
     currentLocation.setLongitude(currentLocation.longitude() + (stepLongitude / 2.0));
 
-    auto wayPoints = QList<QGeoCoordinate>();
+    auto wayPoints = QList<MissionPlanningWaypoint>();
 
     auto goingUp = true;
 
+    auto count = -1;
+
     while (currentLocation.longitude() < missionBounds.eastBound())
     {
-        wayPoints.append(currentLocation);
+        count++;
+        wayPoints.append(MissionPlanningWaypoint(currentLocation, QString(count)));
 
         if (goingUp && currentLocation.latitude() == missionBounds.southBound())
         {
@@ -74,7 +77,7 @@ QList<QGeoCoordinate> FlightPather::getVerticalFlightPath(BoundingBox missionBou
     return wayPoints;
 }
 
-QList<QGeoCoordinate> FlightPather::getHorizontalFlightPath(BoundingBox missionBounds)
+QList<MissionPlanningWaypoint> FlightPather::getHorizontalFlightPath(BoundingBox missionBounds)
 {
 
     auto latSpreadMeters = getDistance(missionBounds.NE, missionBounds.SE);
@@ -89,13 +92,16 @@ QList<QGeoCoordinate> FlightPather::getHorizontalFlightPath(BoundingBox missionB
 
     currentLocation.setLatitude(currentLocation.latitude() + (stepLatitude / 2.0));
 
-    auto wayPoints = QList<QGeoCoordinate>();
+    auto wayPoints = QList<MissionPlanningWaypoint>();
 
     auto goingRight = true;
 
+    auto count = -1;
+
     while (currentLocation.latitude() < missionBounds.northBound())
     {
-        wayPoints.append(currentLocation);
+        count++;
+        wayPoints.append(MissionPlanningWaypoint(currentLocation, QString(count)));
 
         if (goingRight && currentLocation.longitude() == missionBounds.westBound())
         {
@@ -131,24 +137,22 @@ bool FlightPather::canFly(BoundingBox missionBounds)
 {
     auto distance = 0.0;
 
-    QList<QGeoCoordinate> wayPoints;
-
     if (missionBounds.isVertical())
-        wayPoints = getVerticalFlightPath(missionBounds);
+        waypoints_ = getVerticalFlightPath(missionBounds);
     else
-        wayPoints = getHorizontalFlightPath(missionBounds);
+        waypoints_ = getHorizontalFlightPath(missionBounds);
 
-    lines_.clear();
-    for (auto i = 0; i < wayPoints.size() - 1; i++)
+    connectors_.clear();
+    for (auto i = 0; i < waypoints_.size() - 1; i++)
     {
-        auto p1 = wayPoints[i];
-        auto p2 = wayPoints[i + 1];
-        lines_.append(MissionPlanningWaypoint(p1, QString(i)));
+        auto p1 = waypoints_[i].location();
+        auto p2 = waypoints_[i+1].location();
         distance += getDistance(p1, p2);
+        connectors_.append(MissionPlanningWaypointConnector(p1, p2));
     }
 
     if (distance > maxDistanceMeters_) return false;
     else return true;
 }
 
-QList<MissionPlanningWaypoint> FlightPather::path() { return lines_; };
+std::pair<QList<MissionPlanningWaypoint>, QList<MissionPlanningWaypointConnector>> FlightPather::path() { return std::make_pair(waypoints_, connectors_); };

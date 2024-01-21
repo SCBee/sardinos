@@ -38,7 +38,7 @@ class I_VcsiApplicationApi;
 }  // namespace LmCdl
 
 const auto SCANWIDTHMETERS = 20;
-const auto MAXDISTANCEMETERS = 2000;
+const auto MAXDISTANCEMETERS = 20000;
 const auto TURNINGRADIUSMETERS = 10;
 
 class MissionPlanningContentCreator : public QObject
@@ -91,7 +91,11 @@ private:
     void draw(QList<MissionPlanningPolygon*> polygons,
               QList<MissionPlanningLine*> lines);
 
-    void drawFlightPath(QList<MissionPlanningWaypoint> waypoints);
+    void drawFlightPath();
+
+    void clearMissionArea();
+
+    void clearFlightPath();
 
     LmCdl::I_ContextMenuItem& missionBoundMenuItem_;
     LmCdl::I_ContextMenuItem& submitMissionMenuItem_;
@@ -108,6 +112,9 @@ private:
 
     FlightPather flightPather_ =
         FlightPather(TURNINGRADIUSMETERS, SCANWIDTHMETERS, MAXDISTANCEMETERS);
+
+    QList<MissionPlanningWaypoint> waypoints_;
+    QList<MissionPlanningWaypointConnector> connectors_;
 
     int m_state;
 };

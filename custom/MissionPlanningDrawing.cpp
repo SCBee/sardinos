@@ -42,6 +42,8 @@ void MissionPlanningDrawing::addLines(QList<MissionPlanningLine*> lines) {
 void MissionPlanningDrawing::clear() {
     polygons_.clear();
     lines_.clear();
+
+    update();
 }
 
 void MissionPlanningDrawing::update() {
