@@ -4,81 +4,108 @@
 
 QList<MissionPlanningWaypoint*> MissionDomain::waypoints() const
 {
-    return waypoints_;
+    auto waypoints = QList<MissionPlanningWaypoint*>();
+    for (auto pair : waypoints_) {
+        waypoints.append(pair.first);
+    }
+
+    return waypoints;
 }
 
-QList<LmCdl::I_SimpleWaypointConnector*> MissionDomain::waypointConnectors() const
+QList<MissionPlanningWaypointConnector*> MissionDomain::waypointConnectors()
+    const
 {
-    return connectors_;
+    auto connectors = QList<MissionPlanningWaypointConnector*>();
+    for (auto pair : waypoints_) {
+        connectors.append(pair.second);
+    }
+
+    return connectors;
 }
 
 void MissionDomain::setPath(QList<QGeoCoordinate> coordinates)
 {
     setupWaypoints(coordinates);
-    setupConnectors(coordinates);
+    setupConnectors();
+    connectDraggingForWaypoints();
 }
 
 void MissionDomain::setupWaypoints(QList<QGeoCoordinate> coordinates)
 {
     waypoints_.clear();
     for (auto i = 0; i < coordinates.size(); i++) {
+        // QScopedPointer<MissionPlanningWaypoint> waypoint;
+        // waypoint.reset(new MissionPlanningWaypoint);
         auto waypoint = new MissionPlanningWaypoint();
         waypoint->setColor(QColor(255, 255, 255));
+        waypoint->setShape(LmCdl::I_GeospatialSimpleWaypoint::Shape::Triangle);
         waypoint->setLabel(QString(i));
         waypoint->setLocation(coordinates[i]);
         waypoint->setSelectionEnabled(true);
         waypoint->setDraggingEnabled(true);
         waypoint->setVisible(true);
-        waypoints_.append(waypoint);
+        waypoints_.push_back(std::make_pair(
+            waypoint, QList<MissionPlanningWaypointConnector*>()));
     }
 }
 
-void MissionDomain::setupConnectors(QList<QGeoCoordinate> coordinates)
+void MissionDomain::setupConnectors()
 {
-    connectors_.clear();
-    for (auto i = 0; i < coordinates.size() - 1; i++) {
-        auto p1 = coordinates[i];
-        auto p2 = coordinates[i + 1];
+    for (auto i = 0; i < waypoints_.size() - 1; i++) {
+        auto p1 = waypoints_[i].first;
+        auto p2 = waypoints_[i + 1].first;
+        // QScopedPointer<MissionPlanningWaypointConnector> connector;
+        // connector.reset(new MissionPlanningWaypointConnector);
         auto connector = new MissionPlanningWaypointConnector();
-        connector->setStartLocation(p1);
-        connector->setEndLocation(p2);
+        connector->setStartLocation(p1->location());
+        connector->setEndLocation(p2->location());
         connector->setColor(QColor(255, 0, 0));
         connector->setVisible(true);
         connector->setDirectionalIndicatorVisible(true);
-        connectors_.append(connector);
+        waypoints_[i].second.append(connector);
+        waypoints_[i + 1].second.append(connector);
     }
 }
 
-// void MissionDomain::connectDraggingForWaypoint(
-//     MissionPlanningWaypoint& waypoint,
-//     MissionPlanningWaypointConnector& connectorEndingAtWaypoint,
-//     MissionPlanningWaypointConnector& connectorStartingAtWaypoint)
-// {
-//     ConnectedWaypointRef connectedWaypoint(
-//         waypoint, connectorEndingAtWaypoint, connectorStartingAtWaypoint);
+void MissionDomain::connectDraggingForWaypoints()
+{
+    for (auto i = 0; i < waypoints_.size(); i++) {
+        if (i == 0) connectDraggingForWaypoint(*(waypoints_[i].first), *new MissionPlanningWaypointConnector(), *(waypoints_[i]).second[0]);
+        else if (i == waypoints_.size() - 1) connectDraggingForWaypoint(*(waypoints_[i].first), *(waypoints_[i]).second[0], *new MissionPlanningWaypointConnector());
+        else  connectDraggingForWaypoint(*(waypoints_[i].first), *(waypoints_[i]).second[0], *(waypoints_[i]).second[1]);
+    }
+}
 
-//     connect(&waypoint,
-//             &MissionPlanningWaypoint::dragStartedFromDrawing,
-//             this,
-//             [this, &waypoint]() { initializeDragging(waypoint); });
+void MissionDomain::connectDraggingForWaypoint(
+    MissionPlanningWaypoint& waypoint,
+    MissionPlanningWaypointConnector& connectorEndingAtWaypoint,
+    MissionPlanningWaypointConnector& connectorStartingAtWaypoint)
+{
+    ConnectedWaypointRef connectedWaypoint(
+        waypoint, connectorEndingAtWaypoint, connectorStartingAtWaypoint);
 
-//     connect(&waypoint,
-//             &MissionPlanningWaypoint::draggingOccuredFromDrawing,
-//             this,
-//             [this, connectedWaypoint](const QGeoCoordinate& dragLocation)
-//             { dragWaypointAndConnectors(dragLocation, connectedWaypoint); });
+    connect(&waypoint,
+            &MissionPlanningWaypoint::dragStartedFromDrawing,
+            this,
+            [this, &waypoint]() { initializeDragging(waypoint); });
 
-//     connect(&waypoint,
-//             &MissionPlanningWaypoint::dragConfirmedFromDrawing,
-//             this,
-//             [this, connectedWaypoint](const QGeoCoordinate& dragLocation)
-//             { completeDrag(dragLocation, connectedWaypoint); });
+    connect(&waypoint,
+            &MissionPlanningWaypoint::draggingOccuredFromDrawing,
+            this,
+            [this, connectedWaypoint](const QGeoCoordinate& dragLocation)
+            { dragWaypointAndConnectors(dragLocation, connectedWaypoint); });
 
-//     connect(&waypoint,
-//             &MissionPlanningWaypoint::dragCancelledFromDrawing,
-//             this,
-//             [this, connectedWaypoint]() { abortDrag(connectedWaypoint); });
-// }
+    connect(&waypoint,
+            &MissionPlanningWaypoint::dragConfirmedFromDrawing,
+            this,
+            [this, connectedWaypoint](const QGeoCoordinate& dragLocation)
+            { completeDrag(dragLocation, connectedWaypoint); });
+
+    connect(&waypoint,
+            &MissionPlanningWaypoint::dragCancelledFromDrawing,
+            this,
+            [this, connectedWaypoint]() { abortDrag(connectedWaypoint); });
+}
 
 void MissionDomain::initializeDragging(MissionPlanningWaypoint& waypoint)
 {
