@@ -4,10 +4,10 @@
 
 MissionPlanningWaypoint::MissionPlanningWaypoint()
     : location_()
-    , shape_(LmCdl::I_GeospatialSimpleWaypoint::Shape::Circle)
+    , shape_(LmCdl::I_GeospatialSimpleWaypoint::Shape::Triangle)
     , label_()
     , labelOffset_(QVector2D(0, 0))
-    , color_()
+    , color_(Qt::red)
     , visible_(true)
     , relativeZOrder_(0)
     , highlighted_(true)
@@ -15,7 +15,6 @@ MissionPlanningWaypoint::MissionPlanningWaypoint()
     , draggingEnabled_(false)
 {
 }
-
 
 MissionPlanningWaypoint::~MissionPlanningWaypoint() {}
 
