@@ -39,7 +39,7 @@ class I_VcsiApplicationApi;
 }  // namespace LmCdl
 
 const auto SCANWIDTHMETERS = 20;
-const auto MAXDISTANCEMETERS = 20000000;
+const auto MAXDISTANCEMETERS = 2000;
 const auto TURNINGRADIUSMETERS = 10;
 
 class MissionPlanningContentCreator : public QObject

@@ -1,7 +1,7 @@
 #include <MissionPlanningWaypointConnector.h>
 
 MissionPlanningWaypointConnector::MissionPlanningWaypointConnector()
-    : color_(Qt::white)
+    : color_(Qt::red)
     , visible_(false)
     , directionalIndicatorVisible_(false)
     , relativeZOrder_(0)

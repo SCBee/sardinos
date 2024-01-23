@@ -2,6 +2,9 @@
 
 #include <MissionDomain.h>
 
+const double LATITUDE_IN_CALGARY = 51;
+const double LONGITUDE_IN_CALGARY = -114;
+
 QList<MissionPlanningWaypoint*> MissionDomain::waypoints() const
 {
     auto waypoints = QList<MissionPlanningWaypoint*>();
@@ -12,12 +15,13 @@ QList<MissionPlanningWaypoint*> MissionDomain::waypoints() const
     return waypoints;
 }
 
-QList<MissionPlanningWaypointConnector*> MissionDomain::waypointConnectors()
+QList<LmCdl::I_SimpleWaypointConnector*> MissionDomain::waypointConnectors()
     const
 {
-    auto connectors = QList<MissionPlanningWaypointConnector*>();
+    auto connectors = QList<LmCdl::I_SimpleWaypointConnector*>();
     for (auto pair : waypoints_) {
-        connectors.append(pair.second);
+        for (auto c : pair.second)
+            connectors.append(c);
     }
 
     return connectors;
@@ -34,17 +38,16 @@ void MissionDomain::setupWaypoints(QList<QGeoCoordinate> coordinates)
 {
     waypoints_.clear();
     for (auto i = 0; i < coordinates.size(); i++) {
-        //waypoint_.reset(new MissionPlanningWaypoint);
-        // auto waypoint = new MissionPlanningWaypoint();
-        waypoint_->setColor(QColor(255, 255, 255));
-        waypoint_->setShape(LmCdl::I_GeospatialSimpleWaypoint::Shape::Triangle);
-        waypoint_->setLabel(QString(i));
-        waypoint_->setLocation(coordinates[i]);
-        waypoint_->setSelectionEnabled(true);
-        waypoint_->setDraggingEnabled(true);
-        waypoint_->setVisible(true);
+        auto waypoint = new MissionPlanningWaypoint();
+        waypoint->setColor(QColor(0, 0, 255));
+        waypoint->setShape(LmCdl::I_GeospatialSimpleWaypoint::Shape::Circle);
+        waypoint->setLabel(QString(std::to_string(i).c_str()));
+        waypoint->setLocation(coordinates[i]);
+        waypoint->setSelectionEnabled(true);
+        waypoint->setDraggingEnabled(true);
+        waypoint->setVisible(true);
         waypoints_.push_back(std::make_pair(
-            waypoint_.data(), QList<MissionPlanningWaypointConnector*>()));
+            waypoint, QList<MissionPlanningWaypointConnector*>()));
     }
 }
 
@@ -53,15 +56,14 @@ void MissionDomain::setupConnectors()
     for (auto i = 0; i < waypoints_.size() - 1; i++) {
         auto p1 = waypoints_[i].first;
         auto p2 = waypoints_[i + 1].first;
-        //connector_.reset(new MissionPlanningWaypointConnector);
-        // auto connector = new MissionPlanningWaypointConnector();
-        connector_->setStartLocation(p1->location());
-        connector_->setEndLocation(p2->location());
-        connector_->setColor(QColor(255, 0, 0));
-        connector_->setVisible(true);
-        connector_->setDirectionalIndicatorVisible(true);
-        waypoints_[i].second.append(connector_.data());
-        waypoints_[i + 1].second.append(connector_.data());
+        auto connector = new MissionPlanningWaypointConnector();
+        connector->setStartLocation(p1->location());
+        connector->setEndLocation(p2->location());
+        connector->setColor(QColor(0, 255, 0));
+        connector->setVisible(true);
+        connector->setDirectionalIndicatorVisible(true);
+        waypoints_[i].second.append(connector);
+        waypoints_[i + 1].second.append(connector);
     }
 }
 
