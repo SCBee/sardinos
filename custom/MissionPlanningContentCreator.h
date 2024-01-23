@@ -16,6 +16,7 @@
 #include <LmCdl/I_VcsiMapExtensionApi.h>
 #include <LmCdl/I_VcsiUserNotificationApi.h>
 #include <LmCdl/I_VectorDataDrawingApi.h>
+#include <LmCdl/I_MissionDrawingApi.h>
 #include <LmCdl/UniqueIdentifier.h>
 #include <LmCdl/VcsiIdentifiedPointOfInterest.h>
 #include <LmCdl/VcsiMilStdCode.h>
@@ -24,6 +25,9 @@
 #include <MissionPlanningLine.h>
 #include <MissionPlanningPolygon.h>
 #include <qgeocoordinate.h>
+#include <MissionPlanningWaypoint.h>
+#include <MissionplanningWaypointConnector.h>
+#include <MissionDomain.h>
 
 namespace LmCdl
 {
@@ -55,7 +59,8 @@ public:
     MissionPlanningContentCreator(LmCdl::I_VcsiMapExtensionApi& mapApi,
                                   LmCdl::I_PointOfInterestApi& poiApi,
                                   LmCdl::I_VcsiUserNotificationApi& notApi,
-                                  LmCdl::I_VectorDataDrawingApi& drawApi);
+                                  LmCdl::I_VectorDataDrawingApi& drawApi,
+                                  LmCdl::I_MissionDrawingApi& missionApi);
 
     virtual ~MissionPlanningContentCreator();
 
@@ -87,6 +92,12 @@ private:
     void draw(QList<MissionPlanningPolygon*> polygons,
               QList<MissionPlanningLine*> lines);
 
+    void drawFlightPath();
+
+    void clearMissionArea();
+
+    void clearFlightPath();
+
     LmCdl::I_ContextMenuItem& missionBoundMenuItem_;
     LmCdl::I_ContextMenuItem& submitMissionMenuItem_;
 
@@ -94,13 +105,15 @@ private:
     LmCdl::I_PointOfInterestApi& poiApi_;
     LmCdl::I_VcsiUserNotificationApi& notApi_;
     LmCdl::I_VectorDataDrawingApi& drawApi_;
+    LmCdl::I_MissionDrawingApi& missionApi_;
 
     LmCdl::I_UserNotification* notification_;
     MissionPlanningDrawing* drawing_ = new MissionPlanningDrawing();
     BoundingBox missionBounds_;
 
-    FlightPather flightPather_ =
-        FlightPather(TURNINGRADIUSMETERS, SCANWIDTHMETERS, MAXDISTANCEMETERS);
+    FlightPather flightPather_ = FlightPather(TURNINGRADIUSMETERS, SCANWIDTHMETERS, MAXDISTANCEMETERS);
+
+    MissionDomain mission_;
 
     int m_state;
 };

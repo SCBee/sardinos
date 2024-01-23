@@ -1,12 +1,13 @@
 #pragma once
 
-#include <LmCdl/VectorDataLineDrawing.h>
+#include <QGeoCoordinate>
 #include <QGeoPolygon>
 #include <QList>
-#include <QGeoCoordinate>
 
-class MissionPlanningLine : public LmCdl::I_VectorDataLineDrawing {
+#include <LmCdl/VectorDataLineDrawing.h>
 
+class MissionPlanningLine : public LmCdl::I_VectorDataLineDrawing
+{
 public:
     MissionPlanningLine(QGeoCoordinate start, QGeoCoordinate end);
     virtual ~MissionPlanningLine();

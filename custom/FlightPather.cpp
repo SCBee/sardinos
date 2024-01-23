@@ -131,19 +131,15 @@ bool FlightPather::canFly(BoundingBox missionBounds)
 {
     auto distance = 0.0;
 
-    QList<QGeoCoordinate> wayPoints;
-
     if (missionBounds.isVertical())
-        wayPoints = getVerticalFlightPath(missionBounds);
+        waypoints_ = getVerticalFlightPath(missionBounds);
     else
-        wayPoints = getHorizontalFlightPath(missionBounds);
+        waypoints_ = getHorizontalFlightPath(missionBounds);
 
-    lines_.clear();
-    for (auto i = 0; i < wayPoints.size() - 1; i++)
+    for (auto i = 0; i < waypoints_.size() - 1; i++)
     {
-        auto p1 = wayPoints[i];
-        auto p2 = wayPoints[i + 1];
-        lines_.append(new MissionPlanningLine(p1, p2));
+        auto p1 = waypoints_[i];
+        auto p2 = waypoints_[i+1];
         distance += getDistance(p1, p2);
     }
 
@@ -151,4 +147,4 @@ bool FlightPather::canFly(BoundingBox missionBounds)
     else return true;
 }
 
-QList<MissionPlanningLine*> FlightPather::path() { return lines_; };
+QList<QGeoCoordinate> FlightPather::path() { return waypoints_; };

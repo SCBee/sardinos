@@ -1,6 +1,6 @@
 include(../config.pri)
 
-QT += core widgets positioning
+QT += core widgets positioning gui
 
 unix:QMAKE_CXXFLAGS += -std=c++20
 
@@ -17,7 +17,11 @@ SOURCES += \
     MissionPlanningPolygon.cpp \
     MissionPlanningDrawing.cpp \
     MissionPlanningLine.cpp \
-    MathExt.cpp
+    MathExt.cpp \
+    MissionPlanningWaypoint.cpp \
+    MissionplanningWaypointConnector.cpp \
+    MissionDomain.cpp
+
 HEADERS += \
     FlightPather.h \
     MissionPlanningPlugin.h \
@@ -26,12 +30,16 @@ HEADERS += \
     MissionPlanningDrawing.h \
     MissionPlanningLine.h \
     BoundingBox.h \
-    MathExt.h
+    MathExt.h \
+    MissionPlanningWaypoint.h \
+    MissionplanningWaypointConnector.h \
+    MissionDomain.h
+
 
 
 INCLUDEPATH += $$EXAMPLES_ROOT_DIRECTORY/../include 
 win32:INCLUDEPATH += .
-LIBS += -L$$EXAMPLES_ROOT_DIRECTORY/../lib -lvcsiapi
+LIBS += -L$$EXAMPLES_ROOT_DIRECTORY/../lib -lvcsiapi -lGroundControlStationDrawings_Mission
 
 release:DESTDIR = $$BUILD_DIR
 debug:DESTDIR = $$BUILD_DIR

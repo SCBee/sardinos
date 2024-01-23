@@ -13,20 +13,23 @@
 #include <MathExt.cpp>
 #include <MissionPlanningContentCreator.h>
 #include <qicon.h>
-
+#include <MissionDomain.h>
 
 MissionPlanningContentCreator::MissionPlanningContentCreator(
     LmCdl::I_VcsiMapExtensionApi& mapApi,
     LmCdl::I_PointOfInterestApi& poiApi,
     LmCdl::I_VcsiUserNotificationApi& notApi,
-    LmCdl::I_VectorDataDrawingApi& drawApi)
+    LmCdl::I_VectorDataDrawingApi& drawApi,
+    LmCdl::I_MissionDrawingApi& missionApi)
     : missionBoundMenuItem_(mapApi.terrainContextMenu().registerMenuItem())
     , submitMissionMenuItem_(mapApi.terrainContextMenu().registerMenuItem())
     , poiApi_(poiApi)
     , notApi_(notApi)
     , drawApi_(drawApi)
+    , missionApi_(missionApi)
     , notification_(nullptr)
     , m_state(STARTUP)
+    , mission_()
 {
     missionBoundMenuItem_.setBackgroundColor(QColor(235, 12, 12, 180));
     missionBoundMenuItem_.setDescription("Add Mission Bound");
@@ -45,7 +48,7 @@ MissionPlanningContentCreator::MissionPlanningContentCreator(
     updatePois();
 }
 
-MissionPlanningContentCreator::~MissionPlanningContentCreator(){};
+MissionPlanningContentCreator::~MissionPlanningContentCreator() {};
 
 void MissionPlanningContentCreator::connectToApiSignals()
 {
@@ -86,7 +89,8 @@ void MissionPlanningContentCreator::getFlightPath()
 
     if (flightPather_.canFly(missionBounds_)) {
         notify("Building Flight Path.");
-        draw(QList<MissionPlanningPolygon*>(), flightPather_.path());
+        mission_.setPath(flightPather_.path());
+        drawFlightPath();
         updateUIState(State::CanRunMission);
     } else {
         notify("Area is too large.");
@@ -124,6 +128,7 @@ void MissionPlanningContentCreator::updatePois()
 
     if (pois_.size() > 2)
         updateUIState(State::CanGetFlightPath);
+    else updateUIState(State::CannotGetFlightPath);
 
     drawMissionArea();
 }
@@ -164,6 +169,32 @@ void MissionPlanningContentCreator::draw(
             OptimizedForFrequentChanges);
 }
 
+void MissionPlanningContentCreator::clearMissionArea()
+{
+    draw(QList<MissionPlanningPolygon*>(), QList<MissionPlanningLine*>());
+}
+
+void MissionPlanningContentCreator::clearFlightPath()
+{
+    foreach (LmCdl::I_SimpleWaypointConnector* waypointConnector, mission_.waypointConnectors()) {
+        missionApi_.removeDrawingForWaypointConnector(*waypointConnector);
+    }
+    foreach (MissionPlanningWaypoint* waypoint, mission_.waypoints()) {
+        missionApi_.removeDrawingForWaypoint(*waypoint);
+    }
+
+}
+
+void MissionPlanningContentCreator::drawFlightPath()
+{
+    foreach (MissionPlanningWaypoint* waypoint, mission_.waypoints()) {
+        missionApi_.addDrawingForWaypoint(*waypoint);
+    }
+    foreach (LmCdl::I_SimpleWaypointConnector* waypointConnector, mission_.waypointConnectors()) {
+        missionApi_.addDrawingForWaypointConnector(*waypointConnector);
+    }
+}
+
 void MissionPlanningContentCreator::changeUI(
     MissionPlanningContentCreator::State newState)
 {
@@ -171,31 +202,35 @@ void MissionPlanningContentCreator::changeUI(
         case CanGetFlightPath:
             missionBoundMenuItem_.setVisible(true);
             submitMissionMenuItem_.setVisible(true);
-            submitMissionMenuItem_.setBackgroundColor(
-                QColor(50, 100, 235, 180));
+            submitMissionMenuItem_.setBackgroundColor(QColor(50, 100, 235, 180));
             submitMissionMenuItem_.setDescription("Get Flight Path");
+            clearFlightPath();
             break;
         case CannotGetFlightPath:
+            missionBoundMenuItem_.setVisible(true);
             submitMissionMenuItem_.setVisible(false);
+            clearFlightPath();
             break;
         case CanRunMission:
             missionBoundMenuItem_.setVisible(true);
             submitMissionMenuItem_.setVisible(true);
             submitMissionMenuItem_.setBackgroundColor(QColor(12, 235, 12, 180));
             submitMissionMenuItem_.setDescription("Begin Mission");
+            clearMissionArea();
             break;
         case CanCancelMission:
             missionBoundMenuItem_.setVisible(false);
             submitMissionMenuItem_.setVisible(true);
             submitMissionMenuItem_.setBackgroundColor(QColor(235, 12, 12, 180));
             submitMissionMenuItem_.setDescription("Cancel Mission");
+            clearMissionArea();
             break;
         default:
             missionBoundMenuItem_.setVisible(true);
             submitMissionMenuItem_.setVisible(true);
-            submitMissionMenuItem_.setBackgroundColor(
-                QColor(50, 100, 235, 180));
+            submitMissionMenuItem_.setBackgroundColor(QColor(50, 100, 235, 180));
             submitMissionMenuItem_.setDescription("Get Flight Path");
+            clearFlightPath();
             break;
     };
 }
