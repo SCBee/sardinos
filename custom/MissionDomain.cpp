@@ -2,9 +2,6 @@
 
 #include <MissionDomain.h>
 
-const double LATITUDE_IN_CALGARY = 51;
-const double LONGITUDE_IN_CALGARY = -114;
-
 QList<MissionPlanningWaypoint*> MissionDomain::waypoints() const
 {
     auto waypoints = QList<MissionPlanningWaypoint*>();
