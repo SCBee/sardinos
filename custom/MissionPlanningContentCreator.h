@@ -17,6 +17,7 @@
 #include <LmCdl/I_VcsiUserNotificationApi.h>
 #include <LmCdl/I_VectorDataDrawingApi.h>
 #include <LmCdl/I_MissionDrawingApi.h>
+#include <LmCdl/I_RouteApi.h>
 #include <LmCdl/UniqueIdentifier.h>
 #include <LmCdl/VcsiIdentifiedPointOfInterest.h>
 #include <LmCdl/VcsiMilStdCode.h>
@@ -60,7 +61,8 @@ public:
                                   LmCdl::I_PointOfInterestApi& poiApi,
                                   LmCdl::I_VcsiUserNotificationApi& notApi,
                                   LmCdl::I_VectorDataDrawingApi& drawApi,
-                                  LmCdl::I_MissionDrawingApi& missionApi);
+                                  LmCdl::I_MissionDrawingApi& missionApi,
+                                  LmCdl::I_RouteApi& routeApi);
 
     virtual ~MissionPlanningContentCreator();
 
@@ -98,6 +100,8 @@ private:
 
     void clearFlightPath();
 
+    void routeAdded();
+
     LmCdl::I_ContextMenuItem& missionBoundMenuItem_;
     LmCdl::I_ContextMenuItem& submitMissionMenuItem_;
 
@@ -106,6 +110,7 @@ private:
     LmCdl::I_VcsiUserNotificationApi& notApi_;
     LmCdl::I_VectorDataDrawingApi& drawApi_;
     LmCdl::I_MissionDrawingApi& missionApi_;
+    LmCdl::I_RouteApi& routeApi_;
 
     LmCdl::I_UserNotification* notification_;
     MissionPlanningDrawing* drawing_ = new MissionPlanningDrawing();

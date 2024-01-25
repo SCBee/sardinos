@@ -10,26 +10,27 @@
 #include <LmCdl/VcsiPointOfInterestProperties.h>
 #include <LmCdl/VectorDataPolygonDrawing.h>
 #include <MathExt.cpp>
+#include <MissionDomain.h>
 #include <MissionPlanningContentCreator.h>
 #include <qicon.h>
-#include <MissionDomain.h>
-#include <mavsdk/mavsdk.h>
-#include <mavsdk/plugins/action/action.h>
-#include <mavsdk/plugins/mission/mission.h>
-#include <mavsdk/plugins/telemetry/telemetry.h>
+#include <LmCdl/I_PlannedRouteCollection.h>
+#include <LmCdl/StanagRoute.h>
+#include <LmCdl/StanagWaypoint.h>
 
 MissionPlanningContentCreator::MissionPlanningContentCreator(
     LmCdl::I_VcsiMapExtensionApi& mapApi,
     LmCdl::I_PointOfInterestApi& poiApi,
     LmCdl::I_VcsiUserNotificationApi& notApi,
     LmCdl::I_VectorDataDrawingApi& drawApi,
-    LmCdl::I_MissionDrawingApi& missionApi)
+    LmCdl::I_MissionDrawingApi& missionApi,
+    LmCdl::I_RouteApi& routeApi)
     : missionBoundMenuItem_(mapApi.terrainContextMenu().registerMenuItem())
     , submitMissionMenuItem_(mapApi.terrainContextMenu().registerMenuItem())
     , poiApi_(poiApi)
     , notApi_(notApi)
     , drawApi_(drawApi)
     , missionApi_(missionApi)
+    , routeApi_(routeApi)
     , notification_(nullptr)
     , m_state(STARTUP)
     , mission_()
@@ -69,6 +70,10 @@ void MissionPlanningContentCreator::connectToApiSignals()
             &LmCdl::I_PointOfInterestApi::pointOfInterestRemoved,
             this,
             &MissionPlanningContentCreator::updatePois);
+    }
+
+void MissionPlanningContentCreator::routeAdded(){
+    notify("route added");
 }
 
 void MissionPlanningContentCreator::getPoiProperties(
@@ -90,6 +95,14 @@ void MissionPlanningContentCreator::getFlightPath()
 {
     updatePois();
 
+    
+    auto route = new LmCdl::StanagRoute();
+    auto waypoint = new LmCdl::StanagWaypoint();
+    waypoint->location = QGeoCoordinate(51, -114);
+    route->waypoints.append(waypoint->waypointId);
+
+    routeApi_.plannedRoutes().routes().append(LmCdl::UniqueIdentifier());
+
     if (flightPather_.canFly(missionBounds_)) {
         notify("Building Flight Path.");
         mission_.setPath(flightPather_.path());
@@ -103,8 +116,6 @@ void MissionPlanningContentCreator::getFlightPath()
 void MissionPlanningContentCreator::runMission()
 {
     notify("Starting Mission.");
-
-
 
     updateUIState(State::CanCancelMission);
 }
@@ -133,7 +144,8 @@ void MissionPlanningContentCreator::updatePois()
 
     if (pois_.size() > 2)
         updateUIState(State::CanGetFlightPath);
-    else updateUIState(State::CannotGetFlightPath);
+    else
+        updateUIState(State::CannotGetFlightPath);
 
     drawMissionArea();
 }
@@ -181,22 +193,26 @@ void MissionPlanningContentCreator::clearMissionArea()
 
 void MissionPlanningContentCreator::clearFlightPath()
 {
-    foreach (LmCdl::I_SimpleWaypointConnector* waypointConnector, mission_.waypointConnectors()) {
+    foreach(LmCdl::I_SimpleWaypointConnector* waypointConnector,
+            mission_.waypointConnectors())
+    {
         missionApi_.removeDrawingForWaypointConnector(*waypointConnector);
     }
-    foreach (MissionPlanningWaypoint* waypoint, mission_.waypoints()) {
+    foreach(MissionPlanningWaypoint* waypoint, mission_.waypoints()) {
         missionApi_.removeDrawingForWaypoint(*waypoint);
     }
-
 }
 
 void MissionPlanningContentCreator::drawFlightPath()
 {
-    foreach (MissionPlanningWaypoint* waypoint, mission_.waypoints()) {
+    foreach(MissionPlanningWaypoint* waypoint, mission_.waypoints()) {
         missionApi_.addDrawingForWaypoint(*waypoint);
     }
-    foreach (LmCdl::I_SimpleWaypointConnector* waypointConnector, mission_.waypointConnectors()) {
+    foreach(LmCdl::I_SimpleWaypointConnector* waypointConnector,
+            mission_.waypointConnectors())
+    {
         missionApi_.addDrawingForWaypointConnector(*waypointConnector);
+
     }
 }
 
@@ -207,7 +223,8 @@ void MissionPlanningContentCreator::changeUI(
         case CanGetFlightPath:
             missionBoundMenuItem_.setVisible(true);
             submitMissionMenuItem_.setVisible(true);
-            submitMissionMenuItem_.setBackgroundColor(QColor(50, 100, 235, 180));
+            submitMissionMenuItem_.setBackgroundColor(
+                QColor(50, 100, 235, 180));
             submitMissionMenuItem_.setDescription("Get Flight Path");
             clearFlightPath();
             break;
@@ -233,7 +250,8 @@ void MissionPlanningContentCreator::changeUI(
         default:
             missionBoundMenuItem_.setVisible(true);
             submitMissionMenuItem_.setVisible(true);
-            submitMissionMenuItem_.setBackgroundColor(QColor(50, 100, 235, 180));
+            submitMissionMenuItem_.setBackgroundColor(
+                QColor(50, 100, 235, 180));
             submitMissionMenuItem_.setDescription("Get Flight Path");
             clearFlightPath();
             break;

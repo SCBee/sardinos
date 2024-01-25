@@ -1,12 +1,13 @@
 #include <QList>
 
 #include <LmCdl/I_Billboard.h>
+#include <LmCdl/I_MissionDrawingApi.h>
 #include <LmCdl/I_PointOfInterestApi.h>
+#include <LmCdl/I_RouteApi.h>
 #include <LmCdl/I_VcsiApplicationApi.h>
 #include <LmCdl/I_VcsiMapExtensionApi.h>
 #include <LmCdl/I_VcsiWidgetExtensionApi.h>
 #include <LmCdl/I_VectorDataDrawingApi.h>
-#include <LmCdl/I_MissionDrawingApi.h>
 #include <LmCdl/PluginCapabilityIdentifier.h>
 #include <LmCdl/PluginRequirement.h>
 #include <MissionPlanningContentCreator.h>
@@ -21,6 +22,7 @@ MissionPlanningPlugin::MissionPlanningPlugin()
     , applicationApi_(nullptr)
     , vectorDrawingApi_(nullptr)
     , missionDrawingApi_(nullptr)
+    , routeApi_(nullptr)
 {
 }
 
@@ -33,6 +35,7 @@ QList<LmCdl::PluginRequirement> MissionPlanningPlugin::requiredApis() const
         LmCdl::PluginRequirement(VCSI_APPLICATION_API_CAPABILITY_NAME, 1, 0, 0),
         LmCdl::PluginRequirement(VECTOR_DATA_DRAWING_API_CAPABILITY_NAME, 1, 0, 0),
         LmCdl::PluginRequirement(MISSION_DRAWING_API_CAPABILITY_NAME, 1, 0, 0),
+        LmCdl::PluginRequirement(ROUTE_API_CAPABILITY_NAME, 1, 0, 0),
     };
 }
 
@@ -69,6 +72,12 @@ bool MissionPlanningPlugin::setRequiredApi(LmCdl::PluginCapabilityIdentifier id,
         capabilityFound = true;
     }
 
+    else if (id.capabilityName() == ROUTE_API_CAPABILITY_NAME)
+    {
+        routeApi_ = dynamic_cast<LmCdl::I_RouteApi*>(api);
+        capabilityFound = true;
+    }
+
     startPluginIfInitialized();
     return capabilityFound;
 }
@@ -80,7 +89,7 @@ QObject* MissionPlanningPlugin::getProvidedApi()
 
 bool MissionPlanningPlugin::isFullyInitialized() const
 {
-    return (pointOfInterestApi_ && applicationApi_ && vectorDrawingApi_ && missionDrawingApi_);
+    return (pointOfInterestApi_ && applicationApi_ && vectorDrawingApi_ && missionDrawingApi_ && routeApi_);
 }
 
 void MissionPlanningPlugin::startPluginIfInitialized()
@@ -90,7 +99,8 @@ void MissionPlanningPlugin::startPluginIfInitialized()
             applicationApi_->widgetExtensionApi().mapApi(),
             *pointOfInterestApi_,
             applicationApi_->userNotificationApi(),
-            *vectorDrawingApi_, 
-            *missionDrawingApi_));
+            *vectorDrawingApi_,
+            *missionDrawingApi_,
+            *routeApi_));
     }
 }
