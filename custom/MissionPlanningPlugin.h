@@ -11,6 +11,7 @@ class I_VectorDataDrawingApi;
 class I_PointOfInterestApi;
 class I_VcsiApplicationApi;
 class I_MissionDrawingApi;
+class I_RouteApi;
 }
 
 class MissionPlanningPlugin : public QObject, public LmCdl::I_Plugin {
@@ -46,6 +47,8 @@ private:
     LmCdl::I_VectorDataDrawingApi* vectorDrawingApi_;
 
     LmCdl::I_MissionDrawingApi* missionDrawingApi_;
+
+    LmCdl::I_RouteApi* routeApi_;
 
     QScopedPointer<MissionPlanningContentCreator> pluginContentCreator_;
 };
