@@ -37,9 +37,9 @@ HEADERS += \
 
 
 
-INCLUDEPATH += $$EXAMPLES_ROOT_DIRECTORY/../include 
+INCLUDEPATH += $$EXAMPLES_ROOT_DIRECTORY/../include D:/mavsdk-windows-x64-release/include D:/mavsdk-windows-x64-release/include/mavsdk
 win32:INCLUDEPATH += .
-LIBS += -L$$EXAMPLES_ROOT_DIRECTORY/../lib -lvcsiapi -lGroundControlStationDrawings_Mission
+LIBS += -L$$EXAMPLES_ROOT_DIRECTORY/../lib -Lvcsiapi -LGroundControlStationDrawings_Mission -LD:/mavsdk-windows-x64-release/lib
 
 release:DESTDIR = $$BUILD_DIR
 debug:DESTDIR = $$BUILD_DIR
