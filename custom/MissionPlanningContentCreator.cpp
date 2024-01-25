@@ -3,7 +3,6 @@
 #include <QLabel>
 #include <QTime>
 #include <cmath>
-
 #include <LmCdl/ContextMenuEvent.h>
 #include <LmCdl/I_Billboard.h>
 #include <LmCdl/I_VcsiUserNotificationApi.h>
@@ -14,6 +13,10 @@
 #include <MissionPlanningContentCreator.h>
 #include <qicon.h>
 #include <MissionDomain.h>
+#include <mavsdk/mavsdk.h>
+#include <mavsdk/plugins/action/action.h>
+#include <mavsdk/plugins/mission/mission.h>
+#include <mavsdk/plugins/telemetry/telemetry.h>
 
 MissionPlanningContentCreator::MissionPlanningContentCreator(
     LmCdl::I_VcsiMapExtensionApi& mapApi,
@@ -100,6 +103,8 @@ void MissionPlanningContentCreator::getFlightPath()
 void MissionPlanningContentCreator::runMission()
 {
     notify("Starting Mission.");
+
+
 
     updateUIState(State::CanCancelMission);
 }
