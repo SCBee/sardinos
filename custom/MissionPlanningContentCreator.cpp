@@ -137,9 +137,7 @@ void MissionPlanningContentCreator::runMission()
 
     auto connectStr = "udp://127.0.0.1:8004";
 
-    Mavsdk mavsdk = Mavsdk();
-    mavsdk.set_configuration(Mavsdk::Configuration {Mavsdk::Configuration::UsageType::GroundStation});
-    
+    Mavsdk mavsdk{Mavsdk::Configuration{Mavsdk::ComponentType::GroundStation}};
     ConnectionResult connection_result = mavsdk.add_any_connection(connectStr);
 
     if (connection_result != ConnectionResult::Success) {
