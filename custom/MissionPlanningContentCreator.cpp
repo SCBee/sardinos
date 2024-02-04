@@ -140,7 +140,7 @@ void MissionPlanningContentCreator::runMission()
 {
     notify("Starting Mission.");
 
-    auto connectStr = "";
+    auto connectStr = "tcp//:127.0.0.1:8004";
 
     Mavsdk mavsdk = Mavsdk();
     mavsdk.set_configuration(Mavsdk::Configuration {Mavsdk::Configuration::UsageType::GroundStation});
