@@ -35,9 +35,9 @@ HEADERS += \
     MissionplanningWaypointConnector.h \
     MissionDomain.h
 
-INCLUDEPATH += $$EXAMPLES_ROOT_DIRECTORY/../include d:\mavsdk-windows-x64-release\include d:\mavsdk-windows-x64-release\include\mavsdk
+INCLUDEPATH += $$EXAMPLES_ROOT_DIRECTORY/../include C:\Users\dev\Documents\mavsdk\include C:\Users\dev\Documents\mavsdk\include\mavsdk
 win32:INCLUDEPATH += .
-LIBS += -L$$EXAMPLES_ROOT_DIRECTORY/../lib -lvcsiapi -lGroundControlStationDrawings_Mission -ld:\mavsdk-windows-x64-release\lib\mavsdk
+LIBS += -L$$EXAMPLES_ROOT_DIRECTORY/../lib -lvcsiapi -lGroundControlStationDrawings_Mission -lC:\Users\dev\Documents\mavsdk\lib\mavsdk
 
 release:DESTDIR = $$BUILD_DIR
 debug:DESTDIR = $$BUILD_DIR
