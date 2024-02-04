@@ -17,8 +17,8 @@ class MissionDomain : public QObject
 {
     Q_OBJECT
 public:
-    MissionDomain(){}
-    ~MissionDomain(){}
+    MissionDomain() {}
+    ~MissionDomain() override {}
 
     QList<MissionPlanningWaypoint*> waypoints() const;
     QList<LmCdl::I_SimpleWaypointConnector*> waypointConnectors() const;
@@ -59,16 +59,24 @@ private:
     void setupConnectors();
 
     void connectDraggingForWaypoints();
-    void connectDraggingForWaypoint(MissionPlanningWaypoint& waypoint,  MissionPlanningWaypointConnector& connectorEndingAtWaypoint, MissionPlanningWaypointConnector& connectorStartingAtWaypoint);
-    
+    void connectDraggingForWaypoint(
+        MissionPlanningWaypoint& waypoint,
+        MissionPlanningWaypointConnector& connectorEndingAtWaypoint,
+        MissionPlanningWaypointConnector& connectorStartingAtWaypoint);
+
     void initializeDragging(MissionPlanningWaypoint& waypoint);
-    
-    void dragWaypointAndConnectors( const QGeoCoordinate& dragCoordinate, ConnectedWaypointRef waypointAndConnectors) const;
-    
-    void completeDrag(const QGeoCoordinate& dragCoordinate, ConnectedWaypointRef waypointAndConnectors);
-    
+
+    void dragWaypointAndConnectors(
+        const QGeoCoordinate& dragCoordinate,
+        ConnectedWaypointRef waypointAndConnectors) const;
+
+    void completeDrag(const QGeoCoordinate& dragCoordinate,
+                      ConnectedWaypointRef waypointAndConnectors);
+
     void abortDrag(ConnectedWaypointRef waypointAndConnectors);
 
-    std::vector<std::pair<MissionPlanningWaypoint*, QList<MissionPlanningWaypointConnector*>>> waypoints_;
+    std::vector<std::pair<MissionPlanningWaypoint*,
+                          QList<MissionPlanningWaypointConnector*>>>
+        waypoints_;
     DragInProgress dragInProgress_;
 };

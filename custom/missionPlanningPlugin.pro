@@ -24,6 +24,7 @@ SOURCES += \
 
 HEADERS += \
     FlightPather.h \
+    mavsdkMissionPublisher.h \
     MissionPlanningPlugin.h \
     MissionPlanningContentCreator.h \
     MissionPlanningPolygon.h \

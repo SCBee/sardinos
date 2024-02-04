@@ -8,6 +8,10 @@ set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTORCC ON)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
+include_directories("C:/Users/dev/Documents/mavsdk/include")
+include_directories("C:/Users/dev/Documents/mavsdk/include/mavsdk")
+include_directories("C:/Users/dev/Documents/mavsdk/include/mavsdk/mavlink")
+include_directories("C:/Users/dev/Documents/mavsdk/include/mavsdk/plugins/*")
 include_directories(actions)
 include_directories(audio)
 include_directories(build/obj)
@@ -317,16 +321,12 @@ add_executable(examples
         zeroizeGcsData/ZeroizeGcsDataExampleContent.h
         zeroizeGcsData/ZeroizeGcsDataExamplePlugin.cxx
         zeroizeGcsData/ZeroizeGcsDataExamplePlugin.h
-        test_plugin/TestPlugin.cpp
-        test_plugin/TestPlugin.h
-        test_plugin/TestContentCreator.cpp
-        test_plugin/TestContentCreator.h
         custom/MissionPlanningPolygon.cpp
-        custom/MissionPlanningPolygonDrawing.cpp
         custom/MathExt.cpp
         custom/MathExt.h
         custom/MissionPlanningPolygon.cpp
-        custom/MissionPlanningPolygon.cpp
+        custom/mavsdkMissionPublisher.cpp
+        custom/mavsdkMissionPublisher.h
 )
 
 
