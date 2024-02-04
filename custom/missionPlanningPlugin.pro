@@ -5,7 +5,7 @@ QT += core widgets positioning gui
 unix:QMAKE_CXXFLAGS += -std=c++20
 
 TARGET = MissionPlanningPlugin
-CONFIG += console
+CONFIG += console c++1z
 CONFIG -= app_bundle
 
 TEMPLATE = lib
@@ -35,11 +35,9 @@ HEADERS += \
     MissionplanningWaypointConnector.h \
     MissionDomain.h
 
-
-
-INCLUDEPATH += $$EXAMPLES_ROOT_DIRECTORY/../include d:/mavsdk-windows-x64-release/include d:/mavsdk-windows-x64-release/include/mavsdk
+INCLUDEPATH += $$EXAMPLES_ROOT_DIRECTORY/../include d:\mavsdk-windows-x64-release\include
 win32:INCLUDEPATH += .
-LIBS += -L$$EXAMPLES_ROOT_DIRECTORY/../lib -lvcsiapi -lGroundControlStationDrawings_Mission -lD:/mavsdk-windows-x64-release/lib
+LIBS += -L$$EXAMPLES_ROOT_DIRECTORY/../lib -lvcsiapi -lGroundControlStationDrawings_Mission -ld:\mavsdk-windows-x64-release\lib\mavsdk
 
 release:DESTDIR = $$BUILD_DIR
 debug:DESTDIR = $$BUILD_DIR
