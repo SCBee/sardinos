@@ -125,22 +125,17 @@ void MissionPlanningContentCreator::getFlightPath()
     }
 }
 
-void usage(const std::string& bin_name)
-{
-    std::cerr
-        << "Usage : " << bin_name << " <connection_url>\n"
-        << "Connection URL format should be :\n"
-        << " For TCP : tcp://[server_host][:server_port]\n"
-        << " For UDP : udp://[bind_host][:bind_port]\n"
-        << " For Serial : serial:///path/to/serial/dev[:baudrate]\n"
-        << "For example, to connect to the simulator use URL: udp://:14540\n";
-}
+// " Connection URL format should be :"
+// " For TCP : tcp://[server_host][:server_port]"
+// " For UDP : udp://[bind_host][:bind_port]"
+// " For Serial : serial:///path/to/serial/dev[:baudrate]"
+// " For example, to connect to the simulator use URL: udp://:14540";
 
 void MissionPlanningContentCreator::runMission()
 {
     notify("Starting Mission.");
 
-    auto connectStr = "tcp://127.0.0.1:8004";
+    auto connectStr = "udp://127.0.0.1:8004";
 
     Mavsdk mavsdk = Mavsdk();
     mavsdk.set_configuration(Mavsdk::Configuration {Mavsdk::Configuration::UsageType::GroundStation});
