@@ -123,7 +123,5 @@ private:
 
     MissionDomain mission_;
 
-    MissionDomain mission_;
-
     int m_state;
 };
