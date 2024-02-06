@@ -18,8 +18,6 @@
 #include <LmCdl/I_VcsiMapExtensionApi.h>
 #include <LmCdl/I_VcsiUserNotificationApi.h>
 #include <LmCdl/I_VectorDataDrawingApi.h>
-#include <LmCdl/I_MissionDrawingApi.h>
-#include <LmCdl/I_RouteApi.h>
 #include <LmCdl/UniqueIdentifier.h>
 #include <LmCdl/VcsiIdentifiedPointOfInterest.h>
 #include <LmCdl/VcsiMilStdCode.h>
@@ -30,10 +28,8 @@
 #include <MissionPlanningPolygon.h>
 #include <MissionPlanningWaypoint.h>
 #include <MissionPlanningWaypointConnector.h>
-#include <qgeocoordinate.h>
-#include <MissionPlanningWaypoint.h>
 #include <MissionplanningWaypointConnector.h>
-#include <MissionDomain.h>
+#include <qgeocoordinate.h>
 
 namespace LmCdl
 {
@@ -119,9 +115,8 @@ private:
     MissionPlanningDrawing* drawing_ = new MissionPlanningDrawing();
     BoundingBox missionBounds_;
 
-    FlightPather flightPather_ = FlightPather(TURNINGRADIUSMETERS, SCANWIDTHMETERS, MAXDISTANCEMETERS);
-
-    MissionDomain mission_;
+    FlightPather flightPather_ =
+        FlightPather(TURNINGRADIUSMETERS, SCANWIDTHMETERS, MAXDISTANCEMETERS);
 
     int m_state;
 };
