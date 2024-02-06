@@ -2,6 +2,13 @@ include(../config.pri)
 
 QT += core widgets positioning gui
 
+QMAKE_CXXFLAGS += /Z7 /FS /FC /MD
+QMAKE_CXXFLAGS -= -O2
+QMAKE_CXXFLAGS_RELEASE -= -O2
+QMAKE_LFLAGS += /DEBUG /OPT:REF /OPT:NOICF
+QMAKE_LFLAGS -= -O2
+QMAKE_LFLAGS_RELEASE -= -O2
+
 unix:QMAKE_CXXFLAGS += -std=c++20 
 
 
@@ -20,12 +27,12 @@ SOURCES += \
     MissionPlanningLine.cpp \
     MathExt.cpp \
     MissionPlanningWaypoint.cpp \
-    MissionplanningWaypointConnector.cpp \
+    MissionPlanningWaypointConnector.cpp \
     MissionDomain.cpp
 
 HEADERS += \
     FlightPather.h \
-    mavsdkMissionPublisher.h \
+    SardinosPublisher.h \
     MissionPlanningPlugin.h \
     MissionPlanningContentCreator.h \
     MissionPlanningPolygon.h \
@@ -34,7 +41,7 @@ HEADERS += \
     BoundingBox.h \
     MathExt.h \
     MissionPlanningWaypoint.h \
-    MissionplanningWaypointConnector.h \
+    MissionPlanningWaypointConnector.h \
     MissionDomain.h
 
 INCLUDEPATH += $$EXAMPLES_ROOT_DIRECTORY/../include d:\mavsdk-windows-x64-release\include d:\mavsdk-windows-x64-release\include\mavsdk
