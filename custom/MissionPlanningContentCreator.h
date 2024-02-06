@@ -11,24 +11,24 @@
 #include <FlightPather.h>
 #include <LmCdl/I_ContextMenu.h>
 #include <LmCdl/I_ContextMenuItem.h>
+#include <LmCdl/I_MissionDrawingApi.h>
 #include <LmCdl/I_PointOfInterestApi.h>
+#include <LmCdl/I_RouteApi.h>
 #include <LmCdl/I_UserNotification.h>
 #include <LmCdl/I_VcsiMapExtensionApi.h>
 #include <LmCdl/I_VcsiUserNotificationApi.h>
 #include <LmCdl/I_VectorDataDrawingApi.h>
-#include <LmCdl/I_MissionDrawingApi.h>
-#include <LmCdl/I_RouteApi.h>
 #include <LmCdl/UniqueIdentifier.h>
 #include <LmCdl/VcsiIdentifiedPointOfInterest.h>
 #include <LmCdl/VcsiMilStdCode.h>
 #include <LmCdl/VcsiPointOfInterestProperties.h>
+#include <MissionDomain.h>
 #include <MissionPlanningDrawing.h>
 #include <MissionPlanningLine.h>
 #include <MissionPlanningPolygon.h>
-#include <qgeocoordinate.h>
 #include <MissionPlanningWaypoint.h>
-#include <MissionplanningWaypointConnector.h>
-#include <MissionDomain.h>
+#include <MissionPlanningWaypointConnector.h>
+#include <qgeocoordinate.h>
 
 namespace LmCdl
 {
@@ -100,8 +100,6 @@ private:
 
     void clearFlightPath();
 
-    void routeAdded();
-
     LmCdl::I_ContextMenuItem& missionBoundMenuItem_;
     LmCdl::I_ContextMenuItem& submitMissionMenuItem_;
 
@@ -116,7 +114,8 @@ private:
     MissionPlanningDrawing* drawing_ = new MissionPlanningDrawing();
     BoundingBox missionBounds_;
 
-    FlightPather flightPather_ = FlightPather(TURNINGRADIUSMETERS, SCANWIDTHMETERS, MAXDISTANCEMETERS);
+    FlightPather flightPather_ =
+        FlightPather(TURNINGRADIUSMETERS, SCANWIDTHMETERS, MAXDISTANCEMETERS);
 
     MissionDomain mission_;
 

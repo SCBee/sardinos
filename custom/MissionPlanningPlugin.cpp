@@ -31,9 +31,11 @@ MissionPlanningPlugin::~MissionPlanningPlugin() {}
 QList<LmCdl::PluginRequirement> MissionPlanningPlugin::requiredApis() const
 {
     return {
-        LmCdl::PluginRequirement(POINT_OF_INTEREST_API_CAPABILITY_NAME, 1, 0, 0),
+        LmCdl::PluginRequirement(
+            POINT_OF_INTEREST_API_CAPABILITY_NAME, 1, 0, 0),
         LmCdl::PluginRequirement(VCSI_APPLICATION_API_CAPABILITY_NAME, 1, 0, 0),
-        LmCdl::PluginRequirement(VECTOR_DATA_DRAWING_API_CAPABILITY_NAME, 1, 0, 0),
+        LmCdl::PluginRequirement(
+            VECTOR_DATA_DRAWING_API_CAPABILITY_NAME, 1, 0, 0),
         LmCdl::PluginRequirement(MISSION_DRAWING_API_CAPABILITY_NAME, 1, 0, 0),
         LmCdl::PluginRequirement(ROUTE_API_CAPABILITY_NAME, 1, 0, 0),
     };
@@ -89,11 +91,27 @@ QObject* MissionPlanningPlugin::getProvidedApi()
 
 bool MissionPlanningPlugin::isFullyInitialized() const
 {
-    return (pointOfInterestApi_ && applicationApi_ && vectorDrawingApi_ && missionDrawingApi_ && routeApi_);
+    return (pointOfInterestApi_ && applicationApi_ && vectorDrawingApi_
+            && missionDrawingApi_ && routeApi_);
 }
 
 void MissionPlanningPlugin::startPluginIfInitialized()
 {
+    // Some preproc stuff for debugging using a console window :)
+    // we can delete this when we finish everything
+    // -- zach
+#ifdef DEBUG
+    FreeConsole();
+
+    AllocConsole();
+
+    AttachConsole(GetCurrentProcessId());
+
+    freopen("CON", "w", stdout);
+    freopen("CON", "w", stderr);
+    freopen("CON", "r", stdin);
+#endif
+
     if (isFullyInitialized()) {
         pluginContentCreator_.reset(new MissionPlanningContentCreator(
             applicationApi_->widgetExtensionApi().mapApi(),

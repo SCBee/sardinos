@@ -2,8 +2,8 @@
 // Created by dev on 2/3/2024.
 //
 
-#ifndef VCSI_SARDINOS_MAVSDKMISSIONPUBLISHER_H
-#define VCSI_SARDINOS_MAVSDKMISSIONPUBLISHER_H
+#ifndef VCSI_SARDINOS_SARDINOSPUBLISHER_H
+#define VCSI_SARDINOS_SARDINOSPUBLISHER_H
 
 #include <chrono>
 #include <functional>
@@ -42,18 +42,7 @@ Mission::MissionItem make_mission_item(
     return new_item;
 }
 
-void usage(const std::string& bin_name)
-{
-    std::cerr
-        << "Usage : " << bin_name << " <connection_url>\n"
-        << "Connection URL format should be :\n"
-        << " For TCP : tcp://[server_host][:server_port]\n"
-        << " For UDP : udp://[bind_host][:bind_port]\n"
-        << " For Serial : serial:///path/to/serial/dev[:baudrate]\n"
-        << "For example, to connect to the simulator use URL: udp://:14540\n";
-}
-
-namespace mavsdkmission
+namespace sardinos
 {
 void executeMission(std::vector<std::pair<float, float>>& waypoints)
 {
@@ -65,12 +54,16 @@ void executeMission(std::vector<std::pair<float, float>>& waypoints)
     if (connection_result != ConnectionResult::Success) {
         std::cerr << "Connection failed: " << connection_result << '\n';
         return;
+    } else {
+        std::cout << "Connection successful\n";
     }
 
     auto system = mavsdk.first_autopilot(3.0);
     if (!system) {
         std::cerr << "Timed out waiting for system\n";
         return;
+    } else {
+        std::cout << "System initialization successful\n";
     }
 
     auto action = Action {system.value()};
@@ -80,6 +73,13 @@ void executeMission(std::vector<std::pair<float, float>>& waypoints)
     while (!telemetry.health_all_ok()) {
         std::cout << "Waiting for system to be ready\n";
         sleep_for(seconds(1));
+    }
+
+    // Set position update rate to 1 Hz.
+    const Telemetry::Result set_rate_result = telemetry.set_rate_position(0.5);
+    if (set_rate_result != Telemetry::Result::Success) {
+        // handle rate-setting failure (in this case print error)
+        std::cout << "Setting rate failed:" << set_rate_result << '\n';
     }
 
     std::cout << "System ready\n";
@@ -122,6 +122,15 @@ void executeMission(std::vector<std::pair<float, float>>& waypoints)
         return;
     }
     std::cout << "Armed.\n";
+
+    telemetry.subscribe_position(
+        [](Telemetry::Position position)
+        {
+            std::cout << "Altitude: " << position.relative_altitude_m << " m"
+                      << std::endl
+                      << "Latitude: " << position.latitude_deg << std::endl
+                      << "Longitude: " << position.longitude_deg << "\n\n";
+        });
 
     std::atomic<bool> want_to_pause {false};
     // Before starting the mission, we want to be sure to subscribe to the
@@ -192,6 +201,6 @@ void executeMission(std::vector<std::pair<float, float>>& waypoints)
     }
     std::cout << "Disarmed, exiting.\n";
 }
-}  // namespace mavsdkmission
+}  // namespace sardinos
 
-#endif  // VCSI_SARDINOS_MAVSDKMISSIONPUBLISHER_H
+#endif  // VCSI_SARDINOS_SARDINOSPUBLISHER_H
