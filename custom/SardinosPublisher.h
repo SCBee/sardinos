@@ -81,6 +81,11 @@ void executeMission(std::vector<std::pair<float, float>>& waypoints)
         // handle rate-setting failure (in this case print error)
         std::cout << "Setting rate failed:" << set_rate_result << '\n';
     }
+    const Telemetry::Result set_odometry_rate_result =
+        telemetry.set_rate_odometry(0.5);
+    if (set_odometry_rate_result != Telemetry::Result::Success) {
+        std::cerr << "Setting odometry rate failed:" << set_rate_result << "\n";
+    }
 
     std::cout << "System ready\n";
     std::cout << "Creating and uploading mission\n";
@@ -88,7 +93,7 @@ void executeMission(std::vector<std::pair<float, float>>& waypoints)
     std::vector<Mission::MissionItem> mission_items;
 
     const float defaultAltitude = 10.0f;
-    const float defaultSpeed = 5.0f;
+    const float defaultSpeed = 25.0f;
     const float defaultGimbalPitch = 0.0f;
     const float defaultGimbalYaw = 0.0f;
     const auto defaultCamera = Mission::MissionItem::CameraAction::None;
@@ -124,12 +129,26 @@ void executeMission(std::vector<std::pair<float, float>>& waypoints)
     std::cout << "Armed.\n";
 
     telemetry.subscribe_position(
-        [](Telemetry::Position position)
+        [](const Telemetry::Position& position)
         {
             std::cout << "Altitude: " << position.relative_altitude_m << " m"
                       << std::endl
                       << "Latitude: " << position.latitude_deg << std::endl
-                      << "Longitude: " << position.longitude_deg << "\n\n";
+                      << "Longitude: " << position.longitude_deg << std::endl
+                      << std::endl;
+        });
+
+    telemetry.subscribe_odometry(
+        [](const Telemetry::Odometry& odom)
+        {
+            std::cout << "[time] " << odom.time_usec << " ms" << std::endl
+                      << "[x-vel] " << odom.velocity_body.x_m_s << " m/s"
+                      << std::endl
+                      << "[y-vel] " << odom.velocity_body.y_m_s << " m/s"
+                      << std::endl
+                      << "[z-vel] " << odom.velocity_body.z_m_s << " m/s"
+                      << std::endl
+                      << std::endl;
         });
 
     std::atomic<bool> want_to_pause {false};
