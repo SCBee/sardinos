@@ -325,8 +325,7 @@ add_executable(examples
         custom/MathExt.cpp
         custom/MathExt.h
         custom/MissionPlanningPolygon.cpp
-        custom/mavsdkMissionPublisher.cpp
-        custom/mavsdkMissionPublisher.h
+        custom/SardinosPublisher.h
 )
 
 

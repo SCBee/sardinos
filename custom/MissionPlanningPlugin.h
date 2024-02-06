@@ -1,20 +1,31 @@
 #pragma once
 
-#include <LmCdl/I_Plugin.h>
 #include <QObject>
 #include <QScopedPointer>
 
+#include <LmCdl/I_Plugin.h>
+
+#define DEBUG
+#ifdef DEBUG
+#    include <stdio.h>
+#    include <windows.h>
+#endif
+
 class MissionPlanningContentCreator;
 
-namespace LmCdl {
+namespace LmCdl
+{
 class I_VectorDataDrawingApi;
 class I_PointOfInterestApi;
 class I_VcsiApplicationApi;
 class I_MissionDrawingApi;
 class I_RouteApi;
-}
+}  // namespace LmCdl
 
-class MissionPlanningPlugin : public QObject, public LmCdl::I_Plugin {
+class MissionPlanningPlugin
+    : public QObject
+    , public LmCdl::I_Plugin
+{
     Q_OBJECT
     Q_INTERFACES(LmCdl::I_Plugin)
     Q_PLUGIN_METADATA(IID "LMCDL.Plugin.I_Plugin/1.0")
@@ -28,9 +39,10 @@ public:
 
     LmCdl::PluginCapabilityIdentifier providedApi() const override;
 
-    bool setRequiredApi(LmCdl::PluginCapabilityIdentifier id, QObject *api) override;
+    bool setRequiredApi(LmCdl::PluginCapabilityIdentifier id,
+                        QObject* api) override;
 
-    QObject *getProvidedApi() override;
+    QObject* getProvidedApi() override;
 
     bool isFullyInitialized() const override;
 
