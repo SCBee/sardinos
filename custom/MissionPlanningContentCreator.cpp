@@ -81,11 +81,6 @@ void MissionPlanningContentCreator::connectToApiSignals()
             &MissionPlanningContentCreator::updatePois);
 }
 
-void MissionPlanningContentCreator::routeAdded()
-{
-    notify("route added");
-}
-
 void MissionPlanningContentCreator::getPoiProperties(
     const LmCdl::ContextMenuEvent& event)
 {
