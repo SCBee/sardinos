@@ -28,7 +28,6 @@
 #include <MissionPlanningPolygon.h>
 #include <MissionPlanningWaypoint.h>
 #include <MissionPlanningWaypointConnector.h>
-#include <MissionplanningWaypointConnector.h>
 #include <qgeocoordinate.h>
 
 namespace LmCdl
@@ -40,9 +39,9 @@ class I_PointOfInterestApi;
 class I_VcsiApplicationApi;
 }  // namespace LmCdl
 
-const auto SCANWIDTHMETERS = 20;
-const auto MAXDISTANCEMETERS = 2000;
-const auto TURNINGRADIUSMETERS = 10;
+const auto SCANWIDTHMETERS = 500;
+const auto MAXDISTANCEMETERS = 10000000000;
+const auto TURNINGRADIUSMETERS = 200;
 
 class MissionPlanningContentCreator : public QObject
 {
@@ -101,6 +100,8 @@ private:
 
     void clearFlightPath();
 
+    void notifyPeriodically();
+
     LmCdl::I_ContextMenuItem& missionBoundMenuItem_;
     LmCdl::I_ContextMenuItem& submitMissionMenuItem_;
 
@@ -121,4 +122,8 @@ private:
     MissionDomain mission_;
 
     int m_state;
+    volatile static double latitude;
+    volatile static double longitude;
+    volatile static double altitude;
+    QTimer* timer;
 };
