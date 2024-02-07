@@ -28,7 +28,8 @@ SOURCES += \
     MathExt.cpp \
     MissionPlanningWaypoint.cpp \
     MissionPlanningWaypointConnector.cpp \
-    MissionDomain.cpp
+    MissionDomain.cpp \
+    Drone.cpp
 
 HEADERS += \
     FlightPather.h \
@@ -42,7 +43,8 @@ HEADERS += \
     MathExt.h \
     MissionPlanningWaypoint.h \
     MissionPlanningWaypointConnector.h \
-    MissionDomain.h
+    MissionDomain.h \
+    Drone.h
 
 INCLUDEPATH += $$EXAMPLES_ROOT_DIRECTORY/../include d:\mavsdk-windows-x64-release\include d:\mavsdk-windows-x64-release\include\mavsdk
 win32:INCLUDEPATH += .

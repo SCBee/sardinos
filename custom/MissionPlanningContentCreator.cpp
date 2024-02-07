@@ -120,13 +120,6 @@ void MissionPlanningContentCreator::getFlightPath()
 {
     updatePois();
 
-    auto route = new LmCdl::StanagRoute();
-    auto waypoint = new LmCdl::StanagWaypoint();
-    waypoint->location = QGeoCoordinate(51, -114);
-    route->waypoints.append(waypoint->waypointId);
-
-    routeApi_.plannedRoutes().routes().append(LmCdl::UniqueIdentifier());
-
     if (flightPather_.canFly(missionBounds_)) {
         notify("Building Flight Path.");
         mission_.setPath(flightPather_.path());
@@ -153,9 +146,8 @@ void MissionPlanningContentCreator::runMission()
         mavWaypoints.emplace_back(waypoint->location().longitude(),
                                   waypoint->location().latitude());
     }
-    LmCdl::I_Billboard& billboard = mapApi_.addBillboard(QImage("Drone.png"));
 
-    auto drone = Drone(&billboard, new QGeoCoordinate(51, -114, 1000));
+    auto drone = Drone(mapApi_.addBillboard(QImage("Drone.png")), new QGeoCoordinate(51, -114, 1000));
 
     /*
         QFuture<void> future =

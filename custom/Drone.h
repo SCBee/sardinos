@@ -10,7 +10,7 @@ class Drone : public QObject
 {
     Q_OBJECT
 public:
-    Drone(LmCdl::I_Billboard* billboard, QGeoCoordinate* updatingLocation);
+    Drone(LmCdl::I_Billboard& billboard, QGeoCoordinate* updatingLocation);
 
     ~Drone() {}
 
