@@ -1,26 +1,61 @@
 #include <QTimer>
-
-#include <Drone.h>
 #include <iostream>
 
+#include <Drone.h>
 
-void Drone::init(LmCdl::I_Billboard& billboard){
-    billboard_ = &billboard;
+Drone::Drone() {}
 
-    billboard_->setVisible(false);
-}
+Drone::~Drone() {}
 
-void Drone::show(){
-    billboard_->setVisible(true);
-}
-
-void Drone::hide(){
-    billboard_->setVisible(false);
-}
-
-void Drone::setLocation(double latitude, double longitude, double altitude)
+QGeoCoordinate Drone::location() const
 {
-    billboard_->setLocation(QGeoCoordinate(latitude, longitude, altitude));
+    return location_;
+}
 
-    std::cout << "Going to new location: " << latitude << ", " << longitude; 
+void Drone::setLocation(QGeoCoordinate location)
+{
+    location_ = location;
+    emit locationChanged(location_);
+}
+
+LmCdl::WrappedAnglePlusMinusPi Drone::heading() const
+{
+    return heading_;
+}
+
+void Drone::setHeading(LmCdl::WrappedAnglePlusMinusPi heading)
+{
+    heading_ = heading;
+    emit headingChanged(heading_);
+}
+
+QColor Drone::color() const
+{
+    return color_;
+}
+
+void Drone::setColor(QColor color)
+{
+    color_ = color;
+    emit colorChanged(color_);
+}
+
+bool Drone::visible() const
+{
+    return visible_;
+}
+
+void Drone::setVisible(bool visible)
+{
+    visible_ = visible;
+    emit visibleChanged(visible_);
+}
+
+void Drone::selected() {}
+
+void Drone::deselected() {}
+
+bool Drone::selectionEnabled() const
+{
+    return false;
 }

@@ -5,22 +5,55 @@
 #include <QObject>
 
 #include <LmCdl/I_Billboard.h>
+#include <LmCdl/I_TrackVisualization.h>
 
-class Drone : public QObject
+class Drone
+    : public QObject
+    , public LmCdl::I_TrackVisualization
 {
     Q_OBJECT
 public:
-    Drone() {}
+    explicit Drone();
 
-    ~Drone() {}
+    ~Drone();
 
-    void setLocation(double latitude, double longitude, double altitude);
-    void Drone::init(LmCdl::I_Billboard& billboard);
-    void Drone::show();
-    void Drone::hide();
+    QGeoCoordinate location() const override;
+
+    void setLocation(QGeoCoordinate location);
+
+    LmCdl::WrappedAnglePlusMinusPi heading() const override;
+
+    void setHeading(LmCdl::WrappedAnglePlusMinusPi heading);
+
+    QColor color() const override;
+
+    void setColor(QColor color);
+
+    bool visible() const override;
+
+    void setVisible(bool visible);
+
+    void selected() override;
+
+    void deselected() override;
+
+    bool selectionEnabled() const override;
+
+signals:
+
+    void locationChanged(const QGeoCoordinate& location);
+
+    void headingChanged(const LmCdl::WrappedAnglePlusMinusPi& heading);
+
+    void colorChanged(const QColor& color);
+
+    void visibleChanged(bool visible);
+
+    void selectionEnabledChanged(bool selectionEnabled);
 
 private:
-    LmCdl::I_Billboard* billboard_;
-
-    QTimer* timer_;
+    QGeoCoordinate location_;
+    LmCdl::WrappedAnglePlusMinusPi heading_;
+    QColor color_;
+    bool visible_;
 };
