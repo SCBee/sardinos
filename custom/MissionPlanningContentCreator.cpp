@@ -118,13 +118,6 @@ void MissionPlanningContentCreator::getFlightPath()
 {
     updatePois();
 
-    auto route = new LmCdl::StanagRoute();
-    auto waypoint = new LmCdl::StanagWaypoint();
-    waypoint->location = QGeoCoordinate(51, -114);
-    route->waypoints.append(waypoint->waypointId);
-
-    routeApi_.plannedRoutes().routes().append(LmCdl::UniqueIdentifier());
-
     if (flightPather_.canFly(missionBounds_)) {
         notify("Building Flight Path.");
         mission_.setPath(flightPather_.path());
