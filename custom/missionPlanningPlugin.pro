@@ -2,7 +2,7 @@ include(../config.pri)
 
 QT += core widgets positioning gui
 
-QMAKE_CXXFLAGS += /Z7 /FS /FC /MD
+QMAKE_CXXFLAGS += /Z7 /FS /FC /MD /wd4005
 QMAKE_CXXFLAGS -= -O2
 QMAKE_CXXFLAGS_RELEASE -= -O2
 QMAKE_LFLAGS += /DEBUG /OPT:REF /OPT:NOICF

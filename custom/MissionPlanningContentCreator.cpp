@@ -175,7 +175,7 @@ void MissionPlanningContentCreator::cancelMission()
 void MissionPlanningContentCreator::updatePois()
 {
     MathExt().delay(20);
-
+    
     auto points = poiApi_.pointsOfInterest();
 
     missionBounds_ = MathExt().findSmallestBoundingBox(points);
