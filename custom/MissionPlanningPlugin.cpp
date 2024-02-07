@@ -4,11 +4,11 @@
 #include <LmCdl/I_MissionDrawingApi.h>
 #include <LmCdl/I_PointOfInterestApi.h>
 #include <LmCdl/I_RouteApi.h>
+#include <LmCdl/I_TrackDrawingApi.h>
 #include <LmCdl/I_VcsiApplicationApi.h>
 #include <LmCdl/I_VcsiMapExtensionApi.h>
 #include <LmCdl/I_VcsiWidgetExtensionApi.h>
 #include <LmCdl/I_VectorDataDrawingApi.h>
-#include <LmCdl/I_TrackDrawingApi.h>
 #include <LmCdl/PluginCapabilityIdentifier.h>
 #include <LmCdl/PluginRequirement.h>
 #include <MissionPlanningContentCreator.h>
@@ -33,13 +33,14 @@ MissionPlanningPlugin::~MissionPlanningPlugin() {}
 QList<LmCdl::PluginRequirement> MissionPlanningPlugin::requiredApis() const
 {
     return {
-        LmCdl::PluginRequirement(POINT_OF_INTEREST_API_CAPABILITY_NAME, 1, 0, 0),
+        LmCdl::PluginRequirement(
+            POINT_OF_INTEREST_API_CAPABILITY_NAME, 1, 0, 0),
         LmCdl::PluginRequirement(VCSI_APPLICATION_API_CAPABILITY_NAME, 1, 0, 0),
-        LmCdl::PluginRequirement(VECTOR_DATA_DRAWING_API_CAPABILITY_NAME, 1, 0, 0),
+        LmCdl::PluginRequirement(
+            VECTOR_DATA_DRAWING_API_CAPABILITY_NAME, 1, 0, 0),
         LmCdl::PluginRequirement(MISSION_DRAWING_API_CAPABILITY_NAME, 1, 0, 0),
         LmCdl::PluginRequirement(ROUTE_API_CAPABILITY_NAME, 1, 0, 0),
-        LmCdl::PluginRequirement(TRACK_DRAWING_API_CAPABILITY_NAME, 1, 0, 0)
-    };
+        LmCdl::PluginRequirement(TRACK_DRAWING_API_CAPABILITY_NAME, 1, 0, 0)};
 }
 
 LmCdl::PluginCapabilityIdentifier MissionPlanningPlugin::providedApi() const
@@ -80,7 +81,7 @@ bool MissionPlanningPlugin::setRequiredApi(LmCdl::PluginCapabilityIdentifier id,
         routeApi_ = dynamic_cast<LmCdl::I_RouteApi*>(api);
         capabilityFound = true;
     }
-    
+
     else if (id.capabilityName() == TRACK_DRAWING_API_CAPABILITY_NAME)
     {
         trackApi_ = dynamic_cast<LmCdl::I_TrackDrawingApi*>(api);

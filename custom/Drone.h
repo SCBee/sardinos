@@ -7,9 +7,7 @@
 #include <LmCdl/I_Billboard.h>
 #include <LmCdl/I_TrackVisualization.h>
 
-class Drone
-    : public QObject
-    , public LmCdl::I_TrackVisualization
+class Drone : public LmCdl::I_TrackVisualization
 {
     Q_OBJECT
 public:
