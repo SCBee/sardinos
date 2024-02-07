@@ -79,7 +79,7 @@ MissionPlanningContentCreator::MissionPlanningContentCreator(
             [=]()
             {
                 notifyPeriodically();
-                drone_->setLocation(QGeoCoordinate(latitude, longitude, altitude));
+                //drone_->setLocation(QGeoCoordinate(latitude, longitude, altitude));
             });
 
     // Start the timer
