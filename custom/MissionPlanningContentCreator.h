@@ -118,5 +118,7 @@ private:
     FlightPather flightPather_ =
         FlightPather(TURNINGRADIUSMETERS, SCANWIDTHMETERS, MAXDISTANCEMETERS);
 
+    MissionDomain mission_;
+
     int m_state;
 };
