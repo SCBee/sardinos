@@ -3,7 +3,10 @@
 
 #include <Drone.h>
 
-Drone::Drone() {}
+Drone::Drone() {
+    setLocation(QGeoCoordinate(51, -114, 1250));
+    setVisible(true);
+}
 
 Drone::~Drone() {}
 
