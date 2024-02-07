@@ -22,6 +22,7 @@
 #include <QtConcurrent/QtConcurrent>
 #include <SardinosPublisher.h>
 #include <qicon.h>
+#include <Drone.h>
 
 using std::chrono::seconds;
 using std::this_thread::sleep_for;
@@ -35,6 +36,7 @@ MissionPlanningContentCreator::MissionPlanningContentCreator(
     LmCdl::I_RouteApi& routeApi)
     : missionBoundMenuItem_(mapApi.terrainContextMenu().registerMenuItem())
     , submitMissionMenuItem_(mapApi.terrainContextMenu().registerMenuItem())
+    , mapApi_(mapApi)
     , poiApi_(poiApi)
     , notApi_(notApi)
     , drawApi_(drawApi)
@@ -133,6 +135,9 @@ void MissionPlanningContentCreator::runMission()
         mavWaypoints.emplace_back(waypoint->location().longitude(),
                                   waypoint->location().latitude());
     }
+    LmCdl::I_Billboard& billboard = mapApi_.addBillboard(QImage("Drone.png"));
+
+    auto drone = Drone(&billboard, new QGeoCoordinate(51, -114, 1000));
 
     QFuture<void> future =
         QtConcurrent::run(sardinos::executeMission, mavWaypoints);
