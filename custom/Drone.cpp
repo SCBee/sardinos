@@ -1,21 +1,26 @@
 #include <QTimer>
 
 #include <Drone.h>
+#include <iostream>
 
-Drone::Drone(LmCdl::I_Billboard& billboard, QGeoCoordinate* updatingLocation)
-    : billboard_(&billboard)
-    , locationToGoTo_(updatingLocation)
-{
+
+void Drone::init(LmCdl::I_Billboard& billboard){
+    billboard_ = &billboard;
+
+    billboard_->setVisible(false);
+}
+
+void Drone::show(){
     billboard_->setVisible(true);
-    
-    timer_ = new QTimer();
+}
 
-    timer_->setInterval(1000);
+void Drone::hide(){
+    billboard_->setVisible(false);
+}
 
-    connect(timer_, &QTimer::timeout, this, &Drone::setLocation);
-};
-
-void Drone::setLocation()
+void Drone::setLocation(double latitude, double longitude, double altitude)
 {
-    billboard_->setLocation(*locationToGoTo_);
+    billboard_->setLocation(QGeoCoordinate(latitude, longitude, altitude));
+
+    std::cout << "Going to new location: " << latitude << ", " << longitude; 
 }

@@ -29,6 +29,7 @@
 #include <MissionPlanningWaypoint.h>
 #include <MissionPlanningWaypointConnector.h>
 #include <qgeocoordinate.h>
+#include <Drone.h>
 
 namespace LmCdl
 {
@@ -111,7 +112,6 @@ private:
     LmCdl::I_VectorDataDrawingApi& drawApi_;
     LmCdl::I_MissionDrawingApi& missionApi_;
     LmCdl::I_RouteApi& routeApi_;
-    LmCdl::I_VcsiMapExtensionApi& mapApi_;
 
     LmCdl::I_UserNotification* notification_;
     MissionPlanningDrawing* drawing_ = new MissionPlanningDrawing();
@@ -127,4 +127,6 @@ private:
     volatile static double longitude;
     volatile static double altitude;
     QTimer* timer;
+
+    Drone *drone_ = new Drone();
 };

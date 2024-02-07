@@ -7,7 +7,6 @@
 #include <cmath>
 #include <iostream>
 #include <thread>
-
 #include <LmCdl/ContextMenuEvent.h>
 #include <LmCdl/I_Billboard.h>
 #include <LmCdl/I_PlannedRouteCollection.h>
@@ -41,7 +40,6 @@ MissionPlanningContentCreator::MissionPlanningContentCreator(
     LmCdl::I_RouteApi& routeApi)
     : missionBoundMenuItem_(mapApi.terrainContextMenu().registerMenuItem())
     , submitMissionMenuItem_(mapApi.terrainContextMenu().registerMenuItem())
-    , mapApi_(mapApi)
     , poiApi_(poiApi)
     , notApi_(notApi)
     , drawApi_(drawApi)
@@ -65,6 +63,8 @@ MissionPlanningContentCreator::MissionPlanningContentCreator(
 
     connectToApiSignals();
 
+    drone_->init(mapApi.addBillboard(QImage(":/MissionPlanning/Drone")));
+
     // Create and configure the QTimer
     timer = new QTimer();
     // Set the interval to 1000 milliseconds (1 second)
@@ -73,7 +73,7 @@ MissionPlanningContentCreator::MissionPlanningContentCreator(
     connect(timer,
             &QTimer::timeout,
             this,
-            &MissionPlanningContentCreator::notifyPeriodically);
+            [=](){ notifyPeriodically(); drone_->setLocation(latitude, longitude, altitude); });
 
     // Start the timer
     timer->start();
@@ -147,12 +147,8 @@ void MissionPlanningContentCreator::runMission()
                                   waypoint->location().latitude());
     }
 
-    auto drone = Drone(mapApi_.addBillboard(QImage("Drone.png")), new QGeoCoordinate(51, -114, 1000));
+    drone_->show();
 
-    /*
-        QFuture<void> future =
-            QtConcurrent::run(sardinos::executeMission, mavWaypoints);
-    */
     QFuture<void> future = QtConcurrent::run(sardinos::executeMissionVTOL,
                                              mavWaypoints,
                                              std::ref(latitude),
