@@ -9,7 +9,8 @@ QMAKE_LFLAGS += /DEBUG /OPT:REF /OPT:NOICF
 QMAKE_LFLAGS -= -O2
 QMAKE_LFLAGS_RELEASE -= -O2
 
-unix:QMAKE_CXXFLAGS += -std=c++20
+unix:QMAKE_CXXFLAGS += -std=c++20 
+
 
 TARGET = MissionPlanningPlugin
 CONFIG += console c++1z
@@ -27,7 +28,8 @@ SOURCES += \
     MathExt.cpp \
     MissionPlanningWaypoint.cpp \
     MissionPlanningWaypointConnector.cpp \
-    MissionDomain.cpp
+    MissionDomain.cpp \
+    Drone.cpp
 
 HEADERS += \
     FlightPather.h \
@@ -41,11 +43,12 @@ HEADERS += \
     MathExt.h \
     MissionPlanningWaypoint.h \
     MissionPlanningWaypointConnector.h \
-    MissionDomain.h
+    MissionDomain.h \
+    Drone.h
 
-INCLUDEPATH += $$EXAMPLES_ROOT_DIRECTORY/../include C:\Users\dev\Documents\mavsdk\include C:\Users\dev\Documents\mavsdk\include\mavsdk
+INCLUDEPATH += $$EXAMPLES_ROOT_DIRECTORY/../include d:\mavsdk-windows-x64-release\include d:\mavsdk-windows-x64-release\include\mavsdk
 win32:INCLUDEPATH += .
-LIBS += -L$$EXAMPLES_ROOT_DIRECTORY/../lib -lvcsiapi -lGroundControlStationDrawings_Mission -lC:\Users\dev\Documents\mavsdk\lib\mavsdk
+LIBS += -L$$EXAMPLES_ROOT_DIRECTORY/../lib -lvcsiapi -lGroundControlStationDrawings_Mission -ld:\mavsdk-windows-x64-release\lib\mavsdk -lGroundControlStationDrawings_Track
 
 release:DESTDIR = $$BUILD_DIR
 debug:DESTDIR = $$BUILD_DIR

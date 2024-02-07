@@ -18,6 +18,8 @@
 #include <LmCdl/I_VcsiMapExtensionApi.h>
 #include <LmCdl/I_VcsiUserNotificationApi.h>
 #include <LmCdl/I_VectorDataDrawingApi.h>
+#include <LmCdl/I_TrackDrawingApi.h>
+#include <LmCdl/I_TrackVisualization.h>
 #include <LmCdl/UniqueIdentifier.h>
 #include <LmCdl/VcsiIdentifiedPointOfInterest.h>
 #include <LmCdl/VcsiMilStdCode.h>
@@ -29,6 +31,7 @@
 #include <MissionPlanningWaypoint.h>
 #include <MissionPlanningWaypointConnector.h>
 #include <qgeocoordinate.h>
+#include <Drone.h>
 
 namespace LmCdl
 {
@@ -62,7 +65,8 @@ public:
                                   LmCdl::I_VcsiUserNotificationApi& notApi,
                                   LmCdl::I_VectorDataDrawingApi& drawApi,
                                   LmCdl::I_MissionDrawingApi& missionApi,
-                                  LmCdl::I_RouteApi& routeApi);
+                                  LmCdl::I_RouteApi& routeApi,
+                                  LmCdl::I_TrackDrawingApi& trackApi);
 
     virtual ~MissionPlanningContentCreator();
 
@@ -111,6 +115,7 @@ private:
     LmCdl::I_VectorDataDrawingApi& drawApi_;
     LmCdl::I_MissionDrawingApi& missionApi_;
     LmCdl::I_RouteApi& routeApi_;
+    LmCdl::I_TrackDrawingApi& trackApi_;
 
     LmCdl::I_UserNotification* notification_;
     MissionPlanningDrawing* drawing_ = new MissionPlanningDrawing();
@@ -126,4 +131,6 @@ private:
     volatile static double longitude;
     volatile static double altitude;
     QTimer* timer;
+
+    Drone *drone_ = new Drone();
 };

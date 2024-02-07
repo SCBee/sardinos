@@ -8,6 +8,7 @@
 #include <iostream>
 #include <thread>
 
+#include <Drone.h>
 #include <LmCdl/ContextMenuEvent.h>
 #include <LmCdl/I_Billboard.h>
 #include <LmCdl/I_PlannedRouteCollection.h>
@@ -37,7 +38,8 @@ MissionPlanningContentCreator::MissionPlanningContentCreator(
     LmCdl::I_VcsiUserNotificationApi& notApi,
     LmCdl::I_VectorDataDrawingApi& drawApi,
     LmCdl::I_MissionDrawingApi& missionApi,
-    LmCdl::I_RouteApi& routeApi)
+    LmCdl::I_RouteApi& routeApi,
+    LmCdl::I_TrackDrawingApi& trackApi)
     : missionBoundMenuItem_(mapApi.terrainContextMenu().registerMenuItem())
     , submitMissionMenuItem_(mapApi.terrainContextMenu().registerMenuItem())
     , poiApi_(poiApi)
@@ -45,6 +47,7 @@ MissionPlanningContentCreator::MissionPlanningContentCreator(
     , drawApi_(drawApi)
     , missionApi_(missionApi)
     , routeApi_(routeApi)
+    , trackApi_(trackApi)
     , notification_(nullptr)
     , m_state(STARTUP)
     , mission_()
@@ -63,6 +66,8 @@ MissionPlanningContentCreator::MissionPlanningContentCreator(
 
     connectToApiSignals();
 
+    trackApi.addDrawingForTrack(*drone_);
+
     // Create and configure the QTimer
     timer = new QTimer();
     // Set the interval to 1000 milliseconds (1 second)
@@ -71,7 +76,11 @@ MissionPlanningContentCreator::MissionPlanningContentCreator(
     connect(timer,
             &QTimer::timeout,
             this,
-            &MissionPlanningContentCreator::notifyPeriodically);
+            [=]()
+            {
+                notifyPeriodically();
+                drone_->setLocation(QGeoCoordinate(latitude, longitude, altitude));
+            });
 
     // Start the timer
     timer->start();
@@ -145,10 +154,8 @@ void MissionPlanningContentCreator::runMission()
                                   waypoint->location().latitude());
     }
 
-    /*
-        QFuture<void> future =
-            QtConcurrent::run(sardinos::executeMission, mavWaypoints);
-    */
+    drone_->setVisible(true);
+
     QFuture<void> future = QtConcurrent::run(sardinos::executeMissionVTOL,
                                              mavWaypoints,
                                              std::ref(latitude),
