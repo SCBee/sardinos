@@ -70,18 +70,19 @@ MissionPlanningContentCreator::MissionPlanningContentCreator(
 
     // Create and configure the QTimer
     timer = new QTimer();
+
     // Set the interval to 1000 milliseconds (1 second)
     timer->setInterval(1000);
 
-    connect(timer,
-            &QTimer::timeout,
-            this,
-            [=]()
-            {
-                notifyPeriodically();
-                // drone_->setLocation(QGeoCoordinate(latitude, longitude,
-                // altitude));
-            });
+    connect(
+        timer,
+        &QTimer::timeout,
+        this,
+        [=]()
+        {
+            notifyPeriodically();
+            drone_->setLocation(QGeoCoordinate(latitude, longitude, altitude));
+        });
 
     // Start the timer
     timer->start();
@@ -175,7 +176,7 @@ void MissionPlanningContentCreator::cancelMission()
 void MissionPlanningContentCreator::updatePois()
 {
     MathExt().delay(20);
-    
+
     auto points = poiApi_.pointsOfInterest();
 
     missionBounds_ = MathExt().findSmallestBoundingBox(points);
