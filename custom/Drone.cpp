@@ -3,7 +3,8 @@
 
 #include <Drone.h>
 
-Drone::Drone() {
+Drone::Drone()
+{
     setVisible(true);
 }
 
@@ -14,7 +15,7 @@ QGeoCoordinate Drone::location() const
     return location_;
 }
 
-void Drone::setLocation(QGeoCoordinate location)
+void Drone::setLocation(const QGeoCoordinate& location)
 {
     location_ = location;
     emit locationChanged(location_);

@@ -17,7 +17,7 @@ public:
 
     QGeoCoordinate location() const override;
 
-    void setLocation(QGeoCoordinate location);
+    void setLocation(const QGeoCoordinate& location);
 
     LmCdl::WrappedAnglePlusMinusPi heading() const override;
 
