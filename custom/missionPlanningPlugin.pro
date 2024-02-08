@@ -2,14 +2,16 @@ include(../config.pri)
 
 QT += core widgets positioning gui
 
-QMAKE_CXXFLAGS += /Z7 /FS /FC /MD
+QMAKE_CXXFLAGS += /Z7 /FS /FC /MD /wd4005
 QMAKE_CXXFLAGS -= -O2
 QMAKE_CXXFLAGS_RELEASE -= -O2
 QMAKE_LFLAGS += /DEBUG /OPT:REF /OPT:NOICF
 QMAKE_LFLAGS -= -O2
 QMAKE_LFLAGS_RELEASE -= -O2
+QMAKE_LFLAGS += /ignore:4099 /ignore:4229
 
-unix:QMAKE_CXXFLAGS += -std=c++20
+unix:QMAKE_CXXFLAGS += -std=c++20 
+
 
 TARGET = MissionPlanningPlugin
 CONFIG += console c++1z
@@ -18,22 +20,23 @@ CONFIG -= app_bundle
 TEMPLATE = lib
 
 SOURCES += \
-    FlightPather.cpp \
     MissionPlanningPlugin.cpp \
     MissionPlanningContentCreator.cpp \
+    FlightPather.cpp \
     MissionPlanningPolygon.cpp \
     MissionPlanningDrawing.cpp \
     MissionPlanningLine.cpp \
     MathExt.cpp \
     MissionPlanningWaypoint.cpp \
     MissionPlanningWaypointConnector.cpp \
-    MissionDomain.cpp
+    MissionDomain.cpp \
+    Drone.cpp
 
 HEADERS += \
-    FlightPather.h \
-    SardinosPublisher.h \
     MissionPlanningPlugin.h \
     MissionPlanningContentCreator.h \
+    FlightPather.h \
+    SardinosPublisher.h \
     MissionPlanningPolygon.h \
     MissionPlanningDrawing.h \
     MissionPlanningLine.h \
@@ -41,11 +44,12 @@ HEADERS += \
     MathExt.h \
     MissionPlanningWaypoint.h \
     MissionPlanningWaypointConnector.h \
-    MissionDomain.h
+    MissionDomain.h \
+    Drone.h
 
-INCLUDEPATH += $$EXAMPLES_ROOT_DIRECTORY/../include C:\Users\dev\Documents\mavsdk\include C:\Users\dev\Documents\mavsdk\include\mavsdk
+INCLUDEPATH += $$EXAMPLES_ROOT_DIRECTORY/../include C:\Users\luisc\Documents\mavsdk-windows-x64-release\include C:\Users\luisc\Documents\mavsdk-windows-x64-release\include\mavsdk
 win32:INCLUDEPATH += .
-LIBS += -L$$EXAMPLES_ROOT_DIRECTORY/../lib -lvcsiapi -lGroundControlStationDrawings_Mission -lC:\Users\dev\Documents\mavsdk\lib\mavsdk
+LIBS += -L$$EXAMPLES_ROOT_DIRECTORY/../lib -lvcsiapi -lGroundControlStationDrawings_Mission -lC:\Users\luisc\Documents\mavsdk-windows-x64-release\lib\mavsdk -lGroundControlStationDrawings_Track
 
 release:DESTDIR = $$BUILD_DIR
 debug:DESTDIR = $$BUILD_DIR
