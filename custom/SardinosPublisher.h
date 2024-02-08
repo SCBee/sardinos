@@ -228,7 +228,9 @@ void executeMission(std::vector<std::pair<float, float>>& waypoints)
 }
 void executeMissionVTOL(std::vector<std::pair<float, float>>& waypoints,
                         volatile double& lat_,
-                        volatile double& lon_)
+                        volatile double& lon_,
+                        volatile double& alt_,
+                        volatile double& head_)
 {
     auto connectStr = "udp://:14550";
     Mavsdk mavsdk {
@@ -257,8 +259,16 @@ void executeMissionVTOL(std::vector<std::pair<float, float>>& waypoints,
         return;
     }
 
+    telemetry.subscribe_heading(
+        [&head_](const Telemetry::Heading& headTel)
+        {
+            std::cout << "Heading: " << headTel.heading_deg << " deg"
+                      << std::endl;
+            head_ = headTel.heading_deg;
+        });
+
     telemetry.subscribe_position(
-        [&lat_, &lon_](const Telemetry::Position& position)
+        [&lat_, &lon_, &alt_](const Telemetry::Position& position)
         {
             std::cout << "Altitude: " << position.relative_altitude_m << " m"
                       << std::endl
@@ -267,6 +277,7 @@ void executeMissionVTOL(std::vector<std::pair<float, float>>& waypoints,
                       << std::endl;
             lat_ = position.latitude_deg;
             lon_ = position.longitude_deg;
+            alt_ = position.relative_altitude_m;
         });
 
     // Wait until we are ready to arm.
@@ -312,8 +323,10 @@ void executeMissionVTOL(std::vector<std::pair<float, float>>& waypoints,
     for (auto& [longitude, latitude] : waypoints) {
         std::cout << "Sending it to location: (" << latitude << ", "
                   << longitude << ")" << std::endl;
+
         const Action::Result goto_result =
             action.goto_location(latitude, longitude, NAN, NAN);
+
         if (goto_result != Action::Result::Success) {
             std::cerr << "Goto command failed: " << goto_result << '\n';
             return;

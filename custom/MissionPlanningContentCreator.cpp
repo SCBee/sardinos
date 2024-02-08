@@ -31,6 +31,7 @@ using std::this_thread::sleep_for;
 volatile double MissionPlanningContentCreator::latitude = 0.0f;
 volatile double MissionPlanningContentCreator::longitude = 0.0f;
 volatile double MissionPlanningContentCreator::altitude = 0.0f;
+volatile double MissionPlanningContentCreator::heading = 0.0f;
 
 MissionPlanningContentCreator::MissionPlanningContentCreator(
     LmCdl::I_VcsiMapExtensionApi& mapApi,
@@ -70,19 +71,18 @@ MissionPlanningContentCreator::MissionPlanningContentCreator(
 
     // Create and configure the QTimer
     timer = new QTimer();
+    // Set the interval to 3 seconds
+    timer->setInterval(3000);
 
-    // Set the interval to 1000 milliseconds (1 second)
-    timer->setInterval(1000);
-
-    connect(
-        timer,
-        &QTimer::timeout,
-        this,
-        [=]()
-        {
-            notifyPeriodically();
-            drone_->setLocation(QGeoCoordinate(latitude, longitude, altitude));
-        });
+    connect(timer,
+            &QTimer::timeout,
+            this,
+            [=]()
+            {
+                notifyPeriodically();
+                drone_->setLocation(
+                    QGeoCoordinate(latitude, longitude, altitude + 1219));
+            });
 
     // Start the timer
     timer->start();
@@ -161,7 +161,9 @@ void MissionPlanningContentCreator::runMission()
     QFuture<void> future = QtConcurrent::run(sardinos::executeMissionVTOL,
                                              mavWaypoints,
                                              std::ref(latitude),
-                                             std::ref(longitude));
+                                             std::ref(longitude),
+                                             std::ref(altitude),
+                                             std::ref(heading));
 }
 
 void MissionPlanningContentCreator::cancelMission()
@@ -330,7 +332,10 @@ void MissionPlanningContentCreator::notify(const std::string& msg)
 
 void MissionPlanningContentCreator::notifyPeriodically()
 {
-    std::string msg =
-        std::to_string(latitude) + ", " + std::to_string(longitude);
+    // (lat, long, alt) [heading]
+    std::string msg = "(" + std::to_string(latitude) + ", "
+        + std::to_string(longitude) + ", " + std::to_string(altitude) + ") ["
+        + std::to_string(heading) + "]";
+
     notApi_.addNotification(new QLabel(QString(msg.c_str())));
 }

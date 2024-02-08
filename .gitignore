@@ -12,7 +12,6 @@ custom/MakeFile.Debug
 custom/MakeFile.Release
 custom/missionPlanningPlugin.pro
 test_plugin/MakeFile
-test_plugin/MakeFile
 
 # Folders
 .idea

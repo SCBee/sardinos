@@ -8,18 +8,19 @@
 #include <vector>
 
 #include <BoundingBox.h>
+#include <Drone.h>
 #include <FlightPather.h>
 #include <LmCdl/I_ContextMenu.h>
 #include <LmCdl/I_ContextMenuItem.h>
 #include <LmCdl/I_MissionDrawingApi.h>
 #include <LmCdl/I_PointOfInterestApi.h>
 #include <LmCdl/I_RouteApi.h>
+#include <LmCdl/I_TrackDrawingApi.h>
+#include <LmCdl/I_TrackVisualization.h>
 #include <LmCdl/I_UserNotification.h>
 #include <LmCdl/I_VcsiMapExtensionApi.h>
 #include <LmCdl/I_VcsiUserNotificationApi.h>
 #include <LmCdl/I_VectorDataDrawingApi.h>
-#include <LmCdl/I_TrackDrawingApi.h>
-#include <LmCdl/I_TrackVisualization.h>
 #include <LmCdl/UniqueIdentifier.h>
 #include <LmCdl/VcsiIdentifiedPointOfInterest.h>
 #include <LmCdl/VcsiMilStdCode.h>
@@ -31,7 +32,6 @@
 #include <MissionPlanningWaypoint.h>
 #include <MissionPlanningWaypointConnector.h>
 #include <qgeocoordinate.h>
-#include <Drone.h>
 
 namespace LmCdl
 {
@@ -127,10 +127,11 @@ private:
     MissionDomain mission_;
 
     int m_state;
-    volatile static double latitude;
-    volatile static double longitude;
-    volatile static double altitude;
+    volatile static double latitude;  // WGS84
+    volatile static double longitude;  // WGS84
+    volatile static double altitude;  // relative altitude, m
+    volatile static double heading;  // degrees, 0 to 360
     QTimer* timer;
 
-    Drone *drone_ = new Drone();
+    Drone* drone_ = new Drone();
 };
