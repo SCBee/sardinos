@@ -72,7 +72,7 @@ MissionPlanningContentCreator::MissionPlanningContentCreator(
     // Create and configure the QTimer
     timer = new QTimer();
     // Set the interval to 3 seconds
-    timer->setInterval(3000);
+    timer->setInterval(1000);
 
     connect(timer,
             &QTimer::timeout,
@@ -80,8 +80,11 @@ MissionPlanningContentCreator::MissionPlanningContentCreator(
             [=]()
             {
                 notifyPeriodically();
-                drone_->setLocation(
-                    QGeoCoordinate(latitude, longitude, altitude + 1219));
+                drone_->setLocation(QGeoCoordinate(std::ref(latitude),
+                                                   std::ref(longitude),
+                                                   std::ref(altitude) + 1219));
+                drone_->setHeading(LmCdl::WrappedAnglePlusMinusPi(
+                    heading, LmCdl::AngleUnit::Degrees));
             });
 
     // Start the timer
