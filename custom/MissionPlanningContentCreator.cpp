@@ -357,13 +357,11 @@ void MissionPlanningContentCreator::notify(const std::string& msg,
         case Warning:
             label->setBackgroundRole(QPalette::Background);  // Set the background role
             label->setAutoFillBackground(true);
-
             label->setPalette(QPalette(Qt::yellow));
             break;
         case Danger:
             label->setBackgroundRole(QPalette::Background);  // Set the background role
             label->setAutoFillBackground(true);
-
             label->setPalette(QPalette(Qt::red));
             break;
     };
