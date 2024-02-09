@@ -58,6 +58,8 @@ QGeoCoordinate Drone::location() const
 void Drone::setLocation(const QGeoCoordinate& location)
 {
     location_ = location;
+    widget_->setLocation(location_);
+    widget_->setOffsetInPixels(QPoint(20, 20));
     emit locationChanged(location_);
 }
 
