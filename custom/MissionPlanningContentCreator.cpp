@@ -145,15 +145,19 @@ void MissionPlanningContentCreator::getFlightPath()
 void MissionPlanningContentCreator::runMission()
 {
     notify("Starting Mission.");
+
     updateUIState(State::CanCancelMission);
 
     std::vector<std::pair<float, float>> mavWaypoints;
+
     foreach(MissionPlanningWaypoint* waypoint, mission_.waypoints()) {
         mavWaypoints.emplace_back(waypoint->location().longitude(),
                                   waypoint->location().latitude());
     }
 
     drone_->setVisible(true);
+
+    mission_.startMission();
 
     QFuture<void> future = QtConcurrent::run(sardinos::executeMissionVTOL,
                                              mavWaypoints,
