@@ -52,10 +52,11 @@ MissionPlanningContentCreator::MissionPlanningContentCreator(
     , missionApi_(missionApi)
     , routeApi_(routeApi)
     , trackApi_(trackApi)
-    , mapApi_(mapApi)
     , notification_(nullptr)
     , m_state(STARTUP)
     , mission_()
+    , drone_(new Drone(mapApi))
+    , timer_(new QTimer())
 {
     missionBoundMenuItem_.setBackgroundColor(QColor(235, 12, 12, 180));
     missionBoundMenuItem_.setDescription("Add Mission Bound");
@@ -70,15 +71,16 @@ MissionPlanningContentCreator::MissionPlanningContentCreator(
     submitMissionMenuItem_.setVisible(false);
 
     connectToApiSignals();
+    
+    timer_->setInterval(1000);
 
-    drone_ = new Drone(std::ref(latitude),
-                       std::ref(longitude),
-                       std::ref(altitude),
-                       std::ref(heading),
-                       std::ref(speed),
-                       std::ref(yaw),
-                       std::ref(battery),
-                       mapApi_);
+    connect(
+        timer_,
+        &QTimer::timeout,
+        this,
+        [=](){ drone_->updateValues(latitude, longitude, altitude, heading, speed, yaw, battery); });
+
+    timer_->start();
 
     trackApi.addDrawingForTrack(*drone_);
 

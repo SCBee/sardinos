@@ -2,53 +2,37 @@
 #include <iostream>
 
 #include <Drone.h>
-#include <DroneWidget.h>
 
-Drone::Drone(volatile double& latitude,
-             volatile double& longitude,
-             volatile double& altitude,
-             volatile double& heading,
-             volatile double& speed,
-             volatile double& yaw,
-             volatile double& battery,
-             LmCdl::I_VcsiMapExtensionApi& mapApi)
+Drone::Drone(LmCdl::I_VcsiMapExtensionApi& mapApi)
     : visible_(true)
     , color_(deselectedColor_)
+    , droneWidget_(new DroneWidget())
 {
-    auto droneWidget = new DroneWidget();
-
-    widget_ = &mapApi.addGraphicsWidget(droneWidget);
-
-    timer = new QTimer();
-    timer->setInterval(1000);
-
-    connect(
-        timer,
-        &QTimer::timeout,
-        this,
-        [=]()
-        {
-            setLocation(QGeoCoordinate(std::ref(latitude),
-                                       std::ref(longitude),
-                                       std::ref(altitude) + 1219));
-
-            setHeading(LmCdl::WrappedAnglePlusMinusPi(
-                std::ref(heading), LmCdl::AngleUnit::Degrees));
-
-            setSpeed(LmCdl::Speed(speed, LmCdl::SpeedUnit::MetersPerSecond));
-
-            setYaw(
-                LmCdl::WrappedAnglePlusMinusPi(yaw, LmCdl::AngleUnit::Degrees));
-
-            setBattery(battery);
-
-            droneWidget->updateValues(latitude, longitude, altitude, heading, speed, yaw, battery);
-        });
-
-    timer->start();
+    widget_ = &mapApi.addGraphicsWidget(droneWidget_);
 }
 
 Drone::~Drone() {}
+
+void Drone::updateValues(double latitude,
+                         double longitude,
+                         double altitude,
+                         double heading,
+                         double speed,
+                         double yaw,
+                         double battery)
+{
+    setLocation(QGeoCoordinate(latitude, longitude, altitude + 1219));
+
+    setHeading(LmCdl::WrappedAnglePlusMinusPi(heading, LmCdl::AngleUnit::Degrees));
+
+    setSpeed(LmCdl::Speed(speed, LmCdl::SpeedUnit::MetersPerSecond));
+
+    setYaw(LmCdl::WrappedAnglePlusMinusPi(yaw, LmCdl::AngleUnit::Degrees));
+
+    setBattery(battery);
+
+    droneWidget_->updateValues(latitude, longitude, altitude, heading, speed, yaw, battery);
+}
 
 QGeoCoordinate Drone::location() const
 {
