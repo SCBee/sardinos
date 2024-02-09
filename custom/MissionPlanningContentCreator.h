@@ -116,7 +116,6 @@ private:
     LmCdl::I_MissionDrawingApi& missionApi_;
     LmCdl::I_RouteApi& routeApi_;
     LmCdl::I_TrackDrawingApi& trackApi_;
-    LmCdl::I_VcsiMapExtensionApi& mapApi_;
 
     LmCdl::I_UserNotification* notification_;
     MissionPlanningDrawing* drawing_ = new MissionPlanningDrawing();
@@ -134,7 +133,9 @@ private:
     volatile static double heading;  // degrees, 0 to 360
     volatile static double speed; // meters per second
     volatile static double yaw; // degrees, 0 to 360
-    volatile static double battery; //percentage 0 to 1
+    volatile static double battery; //percentage, 0 to 1
 
     Drone* drone_;
+
+    QTimer* timer_;
 };
