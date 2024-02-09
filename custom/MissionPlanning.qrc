@@ -2,6 +2,5 @@
  <qresource prefix="/MissionPlanning">
     <file alias="missionPlanningDinoIcon">Dino.svg</file>
     <file alias="UCIcon">UC.svg</file>
-    <file alias="Drone">Drone.png</file>
  </qresource>
 </RCC>
