@@ -24,6 +24,7 @@
 #include <QtConcurrent/QtConcurrent>
 #include <SardinosPublisher.h>
 #include <qicon.h>
+#include <qwidget.h>
 
 using std::chrono::seconds;
 using std::this_thread::sleep_for;
@@ -71,14 +72,18 @@ MissionPlanningContentCreator::MissionPlanningContentCreator(
     submitMissionMenuItem_.setVisible(false);
 
     connectToApiSignals();
-    
+
     timer_->setInterval(1000);
 
     connect(
         timer_,
         &QTimer::timeout,
         this,
-        [=](){ drone_->updateValues(latitude, longitude, altitude, heading, speed, yaw, battery); });
+        [=]()
+        {
+            drone_->updateValues(
+                latitude, longitude, altitude, heading, speed, yaw, battery);
+        });
 
     timer_->start();
 
@@ -126,14 +131,13 @@ void MissionPlanningContentCreator::getFlightPath()
 {
     updatePois();
 
-    if (flightPather_.canFly(missionBounds_)) {
-        notify("Building Flight Path.");
-        mission_.setPath(flightPather_.path());
-        drawFlightPath();
-        updateUIState(State::CanRunMission);
-    } else {
-        notify("Area is too large.");
-    }
+    notify("Building Flight Path.");
+
+    mission_.setPath(flightPather_.getPath(missionBounds_));
+
+    drawFlightPath();
+
+    updateUIState(State::CanRunMission);
 }
 
 // " Connection URL format should be :"
@@ -144,7 +148,12 @@ void MissionPlanningContentCreator::getFlightPath()
 
 void MissionPlanningContentCreator::runMission()
 {
-    notify("Starting Mission.");
+    if (!flightPather_.canFly(mission_.waypoints())) {
+        notify("Flight path is too long.", Severity::Warning);
+        return;
+    }
+
+    notify("Starting Mission.", Severity::Continue);
 
     updateUIState(State::CanCancelMission);
 
@@ -169,7 +178,7 @@ void MissionPlanningContentCreator::runMission()
 
 void MissionPlanningContentCreator::cancelMission()
 {
-    notify("Cancelling Mission.");
+    notify("Cancelling Mission.", Severity::Warning);
 
     updateUIState(State::CanGetFlightPath);
 
@@ -326,9 +335,40 @@ void MissionPlanningContentCreator::updateUIState(State newState)
         changeUI(newState);
     }
 }
-void MissionPlanningContentCreator::notify(const std::string& msg)
+
+void MissionPlanningContentCreator::notify(const std::string& msg,
+                                           Severity severity)
 {
-    notApi_.addNotification(new QLabel(QString(msg.c_str())));
+    auto label = new QLabel(QString(msg.c_str()));
+
+    label->setStyleSheet("color: black;");
+
+    switch (severity) {
+        case Message:
+            label->setBackgroundRole(QPalette::Background);  // Set the background role
+            label->setAutoFillBackground(true);
+            label->setPalette(QPalette(Qt::white));
+            break;
+        case Continue:
+            label->setBackgroundRole(QPalette::Background);  // Set the background role
+            label->setAutoFillBackground(true);
+            label->setPalette(QPalette(Qt::green));
+            break;
+        case Warning:
+            label->setBackgroundRole(QPalette::Background);  // Set the background role
+            label->setAutoFillBackground(true);
+
+            label->setPalette(QPalette(Qt::yellow));
+            break;
+        case Danger:
+            label->setBackgroundRole(QPalette::Background);  // Set the background role
+            label->setAutoFillBackground(true);
+
+            label->setPalette(QPalette(Qt::red));
+            break;
+    };
+
+    notApi_.addNotification(label);
 }
 
 void MissionPlanningContentCreator::notifyPeriodically()
