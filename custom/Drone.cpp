@@ -4,7 +4,7 @@
 #include <Drone.h>
 
 Drone::Drone(LmCdl::I_VcsiMapExtensionApi& mapApi)
-    : visible_(true)
+    : visible_(false)
     , color_(deselectedColor_)
     , droneWidget_(new DroneWidget())
 {
