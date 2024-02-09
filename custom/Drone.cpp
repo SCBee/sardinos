@@ -2,10 +2,50 @@
 #include <iostream>
 
 #include <Drone.h>
+#include <DroneWidget.h>
 
-Drone::Drone()
+Drone::Drone(volatile double& latitude,
+             volatile double& longitude,
+             volatile double& altitude,
+             volatile double& heading,
+             volatile double& speed,
+             volatile double& yaw,
+             volatile double& battery,
+             LmCdl::I_VcsiMapExtensionApi& mapApi)
+    : visible_(true)
+    , color_(deselectedColor_)
 {
-    setVisible(true);
+    auto droneWidget = new DroneWidget();
+
+    widget_ = &mapApi.addGraphicsWidget(droneWidget);
+
+    timer = new QTimer();
+    timer->setInterval(1000);
+
+    connect(
+        timer,
+        &QTimer::timeout,
+        this,
+        [=]()
+        {
+            setLocation(QGeoCoordinate(std::ref(latitude),
+                                       std::ref(longitude),
+                                       std::ref(altitude) + 1219));
+
+            setHeading(LmCdl::WrappedAnglePlusMinusPi(
+                std::ref(heading), LmCdl::AngleUnit::Degrees));
+
+            setSpeed(LmCdl::Speed(speed, LmCdl::SpeedUnit::MetersPerSecond));
+
+            setYaw(
+                LmCdl::WrappedAnglePlusMinusPi(yaw, LmCdl::AngleUnit::Degrees));
+
+            setBattery(battery);
+
+            droneWidget->updateValues(latitude, longitude, altitude, heading, speed, yaw, battery);
+        });
+
+    timer->start();
 }
 
 Drone::~Drone() {}
@@ -54,11 +94,34 @@ void Drone::setVisible(bool visible)
     emit visibleChanged(visible_);
 }
 
-void Drone::selected() {}
+void Drone::selected()
+{
+    setColor(selectedColor_);
+    widget_->setVisible(true);
+}
 
-void Drone::deselected() {}
+void Drone::deselected()
+{
+    setColor(deselectedColor_);
+    widget_->setVisible(false);
+}
 
 bool Drone::selectionEnabled() const
 {
-    return false;
+    return true;
+}
+
+void Drone::setSpeed(LmCdl::Speed speed)
+{
+    speed_ = speed;
+}
+
+void Drone::setYaw(LmCdl::WrappedAnglePlusMinusPi yaw)
+{
+    yaw_ = yaw;
+}
+
+void Drone::setBattery(double battery)
+{
+    battery_ = battery;
 }

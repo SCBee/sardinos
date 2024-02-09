@@ -3,15 +3,26 @@
 #include <QGeoCoordinate>
 #include <QImage>
 #include <QObject>
+#include <QTimer>
 
 #include <LmCdl/I_Billboard.h>
 #include <LmCdl/I_TrackVisualization.h>
+#include <LmCdl/Speed.h>
+#include <LmCdl/I_VcsiMapExtensionApi.h>
+#include <LmCdl/I_GraphicsWidget.h>
 
 class Drone : public LmCdl::I_TrackVisualization
 {
     Q_OBJECT
 public:
-    explicit Drone();
+    explicit Drone(volatile double& latitude,
+                   volatile double& longitude,
+                   volatile double& altitude,
+                   volatile double& heading,
+                   volatile double& speed,
+                   volatile double& yaw,
+                   volatile double& battery,
+                   LmCdl::I_VcsiMapExtensionApi& mapApi);
 
     ~Drone();
 
@@ -37,6 +48,12 @@ public:
 
     bool selectionEnabled() const override;
 
+    void setSpeed(LmCdl::Speed speed);
+
+    void setYaw(LmCdl::WrappedAnglePlusMinusPi yaw);
+
+    void setBattery(double battery);
+
 signals:
 
     void locationChanged(const QGeoCoordinate& location);
@@ -50,8 +67,17 @@ signals:
     void selectionEnabledChanged(bool selectionEnabled);
 
 private:
+    const QColor selectedColor_ = QColor("darkBlue");
+    const QColor deselectedColor_ = QColor("blue");
+
     QGeoCoordinate location_;
     LmCdl::WrappedAnglePlusMinusPi heading_;
+    LmCdl::Speed speed_;
+    LmCdl::WrappedAnglePlusMinusPi yaw_;
+    double battery_;
     QColor color_;
+    QTimer* timer;
     bool visible_;
+
+    LmCdl::I_GraphicsWidget* widget_;
 };

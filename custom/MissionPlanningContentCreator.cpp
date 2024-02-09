@@ -32,6 +32,9 @@ volatile double MissionPlanningContentCreator::latitude = 0.0f;
 volatile double MissionPlanningContentCreator::longitude = 0.0f;
 volatile double MissionPlanningContentCreator::altitude = 0.0f;
 volatile double MissionPlanningContentCreator::heading = 0.0f;
+volatile double MissionPlanningContentCreator::speed = 0.0f;
+volatile double MissionPlanningContentCreator::yaw = 0.0f;
+volatile double MissionPlanningContentCreator::battery = 0.0f;
 
 MissionPlanningContentCreator::MissionPlanningContentCreator(
     LmCdl::I_VcsiMapExtensionApi& mapApi,
@@ -49,6 +52,7 @@ MissionPlanningContentCreator::MissionPlanningContentCreator(
     , missionApi_(missionApi)
     , routeApi_(routeApi)
     , trackApi_(trackApi)
+    , mapApi_(mapApi)
     , notification_(nullptr)
     , m_state(STARTUP)
     , mission_()
@@ -67,28 +71,16 @@ MissionPlanningContentCreator::MissionPlanningContentCreator(
 
     connectToApiSignals();
 
+    drone_ = new Drone(std::ref(latitude),
+                       std::ref(longitude),
+                       std::ref(altitude),
+                       std::ref(heading),
+                       std::ref(speed),
+                       std::ref(yaw),
+                       std::ref(battery),
+                       mapApi_);
+
     trackApi.addDrawingForTrack(*drone_);
-
-    // Create and configure the QTimer
-    timer = new QTimer();
-    // Set the interval to 3 seconds
-    timer->setInterval(1000);
-
-    connect(timer,
-            &QTimer::timeout,
-            this,
-            [=]()
-            {
-                notifyPeriodically();
-                drone_->setLocation(QGeoCoordinate(std::ref(latitude),
-                                                   std::ref(longitude),
-                                                   std::ref(altitude) + 1219));
-                drone_->setHeading(LmCdl::WrappedAnglePlusMinusPi(
-                    heading, LmCdl::AngleUnit::Degrees));
-            });
-
-    // Start the timer
-    timer->start();
 
     updatePois();
 }
