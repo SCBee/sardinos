@@ -8,18 +8,19 @@
 #include <vector>
 
 #include <BoundingBox.h>
+#include <Drone.h>
 #include <FlightPather.h>
 #include <LmCdl/I_ContextMenu.h>
 #include <LmCdl/I_ContextMenuItem.h>
 #include <LmCdl/I_MissionDrawingApi.h>
 #include <LmCdl/I_PointOfInterestApi.h>
 #include <LmCdl/I_RouteApi.h>
+#include <LmCdl/I_TrackDrawingApi.h>
+#include <LmCdl/I_TrackVisualization.h>
 #include <LmCdl/I_UserNotification.h>
 #include <LmCdl/I_VcsiMapExtensionApi.h>
 #include <LmCdl/I_VcsiUserNotificationApi.h>
 #include <LmCdl/I_VectorDataDrawingApi.h>
-#include <LmCdl/I_MissionDrawingApi.h>
-#include <LmCdl/I_RouteApi.h>
 #include <LmCdl/UniqueIdentifier.h>
 #include <LmCdl/VcsiIdentifiedPointOfInterest.h>
 #include <LmCdl/VcsiMilStdCode.h>
@@ -31,9 +32,6 @@
 #include <MissionPlanningWaypoint.h>
 #include <MissionPlanningWaypointConnector.h>
 #include <qgeocoordinate.h>
-#include <MissionPlanningWaypoint.h>
-#include <MissionplanningWaypointConnector.h>
-#include <MissionDomain.h>
 
 namespace LmCdl
 {
@@ -44,9 +42,9 @@ class I_PointOfInterestApi;
 class I_VcsiApplicationApi;
 }  // namespace LmCdl
 
-const auto SCANWIDTHMETERS = 20;
-const auto MAXDISTANCEMETERS = 2000;
-const auto TURNINGRADIUSMETERS = 10;
+const auto SCANWIDTHMETERS = 500;
+const auto MAXDISTANCEMETERS = 10000000000;
+const auto TURNINGRADIUSMETERS = 200;
 
 class MissionPlanningContentCreator : public QObject
 {
@@ -67,7 +65,8 @@ public:
                                   LmCdl::I_VcsiUserNotificationApi& notApi,
                                   LmCdl::I_VectorDataDrawingApi& drawApi,
                                   LmCdl::I_MissionDrawingApi& missionApi,
-                                  LmCdl::I_RouteApi& routeApi);
+                                  LmCdl::I_RouteApi& routeApi,
+                                  LmCdl::I_TrackDrawingApi& trackApi);
 
     virtual ~MissionPlanningContentCreator();
 
@@ -105,6 +104,8 @@ private:
 
     void clearFlightPath();
 
+    void notifyPeriodically();
+
     LmCdl::I_ContextMenuItem& missionBoundMenuItem_;
     LmCdl::I_ContextMenuItem& submitMissionMenuItem_;
 
@@ -114,16 +115,26 @@ private:
     LmCdl::I_VectorDataDrawingApi& drawApi_;
     LmCdl::I_MissionDrawingApi& missionApi_;
     LmCdl::I_RouteApi& routeApi_;
+    LmCdl::I_TrackDrawingApi& trackApi_;
+    LmCdl::I_VcsiMapExtensionApi& mapApi_;
 
     LmCdl::I_UserNotification* notification_;
     MissionPlanningDrawing* drawing_ = new MissionPlanningDrawing();
     BoundingBox missionBounds_;
 
-    FlightPather flightPather_ = FlightPather(TURNINGRADIUSMETERS, SCANWIDTHMETERS, MAXDISTANCEMETERS);
-
-    MissionDomain mission_;
+    FlightPather flightPather_ =
+        FlightPather(TURNINGRADIUSMETERS, SCANWIDTHMETERS, MAXDISTANCEMETERS);
 
     MissionDomain mission_;
 
     int m_state;
+    volatile static double latitude;  // WGS84
+    volatile static double longitude;  // WGS84
+    volatile static double altitude;  // relative altitude, m
+    volatile static double heading;  // degrees, 0 to 360
+    volatile static double speed; // meters per second
+    volatile static double yaw; // degrees, 0 to 360
+    volatile static double battery; //percentage 0 to 1
+
+    Drone* drone_;
 };

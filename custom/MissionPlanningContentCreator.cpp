@@ -3,10 +3,12 @@
 #include <QGeoRectangle>
 #include <QLabel>
 #include <QTime>
+#include <QTimer>
 #include <cmath>
 #include <iostream>
 #include <thread>
 
+#include <Drone.h>
 #include <LmCdl/ContextMenuEvent.h>
 #include <LmCdl/I_Billboard.h>
 #include <LmCdl/I_PlannedRouteCollection.h>
@@ -26,13 +28,22 @@
 using std::chrono::seconds;
 using std::this_thread::sleep_for;
 
+volatile double MissionPlanningContentCreator::latitude = 0.0f;
+volatile double MissionPlanningContentCreator::longitude = 0.0f;
+volatile double MissionPlanningContentCreator::altitude = 0.0f;
+volatile double MissionPlanningContentCreator::heading = 0.0f;
+volatile double MissionPlanningContentCreator::speed = 0.0f;
+volatile double MissionPlanningContentCreator::yaw = 0.0f;
+volatile double MissionPlanningContentCreator::battery = 0.0f;
+
 MissionPlanningContentCreator::MissionPlanningContentCreator(
     LmCdl::I_VcsiMapExtensionApi& mapApi,
     LmCdl::I_PointOfInterestApi& poiApi,
     LmCdl::I_VcsiUserNotificationApi& notApi,
     LmCdl::I_VectorDataDrawingApi& drawApi,
     LmCdl::I_MissionDrawingApi& missionApi,
-    LmCdl::I_RouteApi& routeApi)
+    LmCdl::I_RouteApi& routeApi,
+    LmCdl::I_TrackDrawingApi& trackApi)
     : missionBoundMenuItem_(mapApi.terrainContextMenu().registerMenuItem())
     , submitMissionMenuItem_(mapApi.terrainContextMenu().registerMenuItem())
     , poiApi_(poiApi)
@@ -40,6 +51,8 @@ MissionPlanningContentCreator::MissionPlanningContentCreator(
     , drawApi_(drawApi)
     , missionApi_(missionApi)
     , routeApi_(routeApi)
+    , trackApi_(trackApi)
+    , mapApi_(mapApi)
     , notification_(nullptr)
     , m_state(STARTUP)
     , mission_()
@@ -57,6 +70,17 @@ MissionPlanningContentCreator::MissionPlanningContentCreator(
     submitMissionMenuItem_.setVisible(false);
 
     connectToApiSignals();
+
+    drone_ = new Drone(std::ref(latitude),
+                       std::ref(longitude),
+                       std::ref(altitude),
+                       std::ref(heading),
+                       std::ref(speed),
+                       std::ref(yaw),
+                       std::ref(battery),
+                       mapApi_);
+
+    trackApi.addDrawingForTrack(*drone_);
 
     updatePois();
 }
@@ -81,11 +105,6 @@ void MissionPlanningContentCreator::connectToApiSignals()
             &MissionPlanningContentCreator::updatePois);
 }
 
-void MissionPlanningContentCreator::routeAdded()
-{
-    notify("route added");
-}
-
 void MissionPlanningContentCreator::getPoiProperties(
     const LmCdl::ContextMenuEvent& event)
 {
@@ -104,13 +123,6 @@ void MissionPlanningContentCreator::getPoiProperties(
 void MissionPlanningContentCreator::getFlightPath()
 {
     updatePois();
-
-    auto route = new LmCdl::StanagRoute();
-    auto waypoint = new LmCdl::StanagWaypoint();
-    waypoint->location = QGeoCoordinate(51, -114);
-    route->waypoints.append(waypoint->waypointId);
-
-    routeApi_.plannedRoutes().routes().append(LmCdl::UniqueIdentifier());
 
     if (flightPather_.canFly(missionBounds_)) {
         notify("Building Flight Path.");
@@ -139,9 +151,14 @@ void MissionPlanningContentCreator::runMission()
                                   waypoint->location().latitude());
     }
 
-    QFuture<void> future =
-        QtConcurrent::run(sardinos::executeMission, mavWaypoints);
-    //    sardinos::executeMission(mavWaypoints);
+    drone_->setVisible(true);
+
+    QFuture<void> future = QtConcurrent::run(sardinos::executeMissionVTOL,
+                                             mavWaypoints,
+                                             std::ref(latitude),
+                                             std::ref(longitude),
+                                             std::ref(altitude),
+                                             std::ref(heading));
 }
 
 void MissionPlanningContentCreator::cancelMission()
@@ -305,5 +322,15 @@ void MissionPlanningContentCreator::updateUIState(State newState)
 }
 void MissionPlanningContentCreator::notify(const std::string& msg)
 {
+    notApi_.addNotification(new QLabel(QString(msg.c_str())));
+}
+
+void MissionPlanningContentCreator::notifyPeriodically()
+{
+    // (lat, long, alt) [heading]
+    std::string msg = "(" + std::to_string(latitude) + ", "
+        + std::to_string(longitude) + ", " + std::to_string(altitude) + ") ["
+        + std::to_string(heading) + "]";
+
     notApi_.addNotification(new QLabel(QString(msg.c_str())));
 }
