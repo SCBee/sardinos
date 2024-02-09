@@ -6,7 +6,7 @@
 #include <MissionPlanningWaypoint.h>
 
 const auto SCANWIDTHMETERS = 500;
-const auto MAXDISTANCEMETERS = 2000;
+const auto MAXDISTANCEMETERS = 200000000;
 const auto TURNINGRADIUSMETERS = 200;
 
 class FlightPather
