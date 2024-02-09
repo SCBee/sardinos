@@ -345,28 +345,18 @@ void MissionPlanningContentCreator::notify(const std::string& msg,
 
     switch (severity) {
         case Message:
-            label->setBackgroundRole(QPalette::Background);  // Set the background role
-            label->setAutoFillBackground(true);
-            label->setPalette(QPalette(Qt::white));
+            notApi_.addNotification(label).setBackgroundColor(Qt::white);
             break;
         case Continue:
-            label->setBackgroundRole(QPalette::Background);  // Set the background role
-            label->setAutoFillBackground(true);
-            label->setPalette(QPalette(Qt::green));
+            notApi_.addNotification(label).setBackgroundColor(Qt::green);
             break;
         case Warning:
-            label->setBackgroundRole(QPalette::Background);  // Set the background role
-            label->setAutoFillBackground(true);
-            label->setPalette(QPalette(Qt::yellow));
+            notApi_.addNotification(label).setBackgroundColor(Qt::yellow);
             break;
         case Danger:
-            label->setBackgroundRole(QPalette::Background);  // Set the background role
-            label->setAutoFillBackground(true);
-            label->setPalette(QPalette(Qt::red));
+            notApi_.addNotification(label).setBackgroundColor(Qt::red);
             break;
     };
-
-    notApi_.addNotification(label);
 }
 
 void MissionPlanningContentCreator::notifyPeriodically()
