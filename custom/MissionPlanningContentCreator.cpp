@@ -79,12 +79,12 @@ MissionPlanningContentCreator::MissionPlanningContentCreator(
             this,
             [=]()
             {
-                notifyPeriodically();
+                //                notifyPeriodically();
                 drone_->setLocation(QGeoCoordinate(std::ref(latitude),
                                                    std::ref(longitude),
                                                    std::ref(altitude) + 1219));
                 drone_->setHeading(LmCdl::WrappedAnglePlusMinusPi(
-                    heading, LmCdl::AngleUnit::Degrees));
+                    std::ref(heading), LmCdl::AngleUnit::Degrees));
             });
 
     // Start the timer
