@@ -2,21 +2,45 @@ cmake_minimum_required(VERSION 3.27)
 project(vcsi_sardinos)
 
 set(CMAKE_CXX_STANDARD 20)
-
-set(CMAKE_AUTOMOC ON)
-set(CMAKE_AUTOUIC ON)
-set(CMAKE_AUTORCC ON)
+#set(CMAKE_AUTOMOC ON)
+#set(CMAKE_AUTOUIC ON)
+#set(CMAKE_AUTORCC ON)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
+
+
 include_directories("C:/Users/dev/Documents/mavsdk/include")
 include_directories("C:/Users/dev/Documents/mavsdk/include/mavsdk")
 include_directories("C:/Users/dev/Documents/mavsdk/include/mavsdk/mavlink")
 include_directories("C:/Users/dev/Documents/mavsdk/include/mavsdk/plugins/*")
 include_directories(custom)
 
-add_executable(examples
-        custom/*.cpp
-        custom/*.h
+add_executable(vcsi_sardinos
+        custom/BoundingBox.h
+        custom/Drone.cpp
+        custom/Drone.h
+        custom/DroneWidget.h
+        custom/FlightPather.cpp
+        custom/FlightPather.h
+        custom/MathExt.cpp
+        custom/MathExt.h
+        custom/MissionDomain.cpp
+        custom/MissionDomain.h
+        custom/MissionPlanningContentCreator.cpp
+        custom/MissionPlanningContentCreator.h
+        custom/MissionPlanningDrawing.cpp
+        custom/MissionPlanningDrawing.h
+        custom/MissionPlanningLine.cpp
+        custom/MissionPlanningLine.h
+        custom/MissionPlanningPlugin.cpp
+        custom/MissionPlanningPlugin.h
+        custom/MissionPlanningPolygon.cpp
+        custom/MissionPlanningPolygon.h
+        custom/MissionPlanningWaypoint.cpp
+        custom/MissionPlanningWaypoint.h
+        custom/MissionPlanningWaypointConnector.cpp
+        custom/MissionPlanningWaypointConnector.h
+        custom/SardinosPublisher.h
 )
 
 
