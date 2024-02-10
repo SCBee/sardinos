@@ -1,6 +1,5 @@
 #include <ImageProcessor.h>
-#include <opencv2/videoio.hpp>
-#include <opencv2/imgcodecs.hpp>
+
 #include <iostream>
 
 void ImageProcessor::init(const std::string& uri)
