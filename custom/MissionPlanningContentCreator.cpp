@@ -175,10 +175,6 @@ void MissionPlanningContentCreator::runMission()
 
     liveDroneFeed_ = &videoCollectionApi_.registerStream("http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4", "Live drone stream");
 
-    auto callback = [](const QGeoCoordinate& coordinate){ std::cerr << coordinate.longitude() << ", " << coordinate.latitude(); };
-
-    liveDroneFeed_->videoWindowApi().registerVideoGeoCoordinatePickInterest(callback);
-
     QFuture<void> future = QtConcurrent::run(sardinos::executeMissionVTOL,
                                              mavWaypoints,
                                              std::ref(latitude),
