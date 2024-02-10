@@ -1,4 +1,6 @@
 # Raw Files
+CMakeLists.txt
+custom/vcsibuild.bat
 build.bat
 config.pri
 examples.pro
@@ -8,8 +10,7 @@ replace.vbs
 custom/MakeFile
 custom/MakeFile.Debug
 custom/MakeFile.Release
-test_plugin/MakeFile
-test_plugin/MakeFile
+custom/missionPlanningPlugin.pro
 test_plugin/MakeFile
 
 # Folders

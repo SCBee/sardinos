@@ -4,6 +4,7 @@
 #include <LmCdl/I_MissionDrawingApi.h>
 #include <LmCdl/I_PointOfInterestApi.h>
 #include <LmCdl/I_RouteApi.h>
+#include <LmCdl/I_TrackDrawingApi.h>
 #include <LmCdl/I_VcsiApplicationApi.h>
 #include <LmCdl/I_VcsiMapExtensionApi.h>
 #include <LmCdl/I_VcsiWidgetExtensionApi.h>
@@ -23,6 +24,7 @@ MissionPlanningPlugin::MissionPlanningPlugin()
     , vectorDrawingApi_(nullptr)
     , missionDrawingApi_(nullptr)
     , routeApi_(nullptr)
+    , trackApi_(nullptr)
 {
 }
 
@@ -38,7 +40,7 @@ QList<LmCdl::PluginRequirement> MissionPlanningPlugin::requiredApis() const
             VECTOR_DATA_DRAWING_API_CAPABILITY_NAME, 1, 0, 0),
         LmCdl::PluginRequirement(MISSION_DRAWING_API_CAPABILITY_NAME, 1, 0, 0),
         LmCdl::PluginRequirement(ROUTE_API_CAPABILITY_NAME, 1, 0, 0),
-    };
+        LmCdl::PluginRequirement(TRACK_DRAWING_API_CAPABILITY_NAME, 1, 0, 0)};
 }
 
 LmCdl::PluginCapabilityIdentifier MissionPlanningPlugin::providedApi() const
@@ -80,6 +82,12 @@ bool MissionPlanningPlugin::setRequiredApi(LmCdl::PluginCapabilityIdentifier id,
         capabilityFound = true;
     }
 
+    else if (id.capabilityName() == TRACK_DRAWING_API_CAPABILITY_NAME)
+    {
+        trackApi_ = dynamic_cast<LmCdl::I_TrackDrawingApi*>(api);
+        capabilityFound = true;
+    }
+
     startPluginIfInitialized();
     return capabilityFound;
 }
@@ -92,7 +100,7 @@ QObject* MissionPlanningPlugin::getProvidedApi()
 bool MissionPlanningPlugin::isFullyInitialized() const
 {
     return (pointOfInterestApi_ && applicationApi_ && vectorDrawingApi_
-            && missionDrawingApi_ && routeApi_);
+            && missionDrawingApi_ && routeApi_ && trackApi_);
 }
 
 void MissionPlanningPlugin::startPluginIfInitialized()
@@ -119,6 +127,7 @@ void MissionPlanningPlugin::startPluginIfInitialized()
             applicationApi_->userNotificationApi(),
             *vectorDrawingApi_,
             *missionDrawingApi_,
-            *routeApi_));
+            *routeApi_,
+            *trackApi_));
     }
 }

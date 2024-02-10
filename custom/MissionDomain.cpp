@@ -2,6 +2,8 @@
 
 #include <MissionDomain.h>
 
+#include "FlightPather.h"
+
 QList<MissionPlanningWaypoint*> MissionDomain::waypoints() const
 {
     auto waypoints = QList<MissionPlanningWaypoint*>();
@@ -174,4 +176,11 @@ void MissionDomain::ConnectedWaypointRef::setLocation(
     waypoint_.setLocation(location);
     connectorEndingAtWaypoint_.setEndLocation(location);
     connectorStartingAtWaypoint_.setStartLocation(location);
+}
+
+void MissionDomain::startMission()
+{
+    for (auto i = 0; i < waypoints_.size(); i++) {
+        waypoints_[i].first->setDraggingEnabled(false);
+    }
 }
