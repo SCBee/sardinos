@@ -229,6 +229,7 @@ void executeMission(std::vector<std::pair<float, float>>& waypoints)
         std::cout << "Disarmed, exiting.\n";
     }
 }
+
 void executeMissionVTOL(std::vector<std::pair<float, float>>& waypoints,
                         volatile double& lat_,
                         volatile double& lon_,
