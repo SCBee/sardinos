@@ -42,10 +42,6 @@ class I_PointOfInterestApi;
 class I_VcsiApplicationApi;
 }  // namespace LmCdl
 
-const auto SCANWIDTHMETERS = 500;
-const auto MAXDISTANCEMETERS = 10000000000;
-const auto TURNINGRADIUSMETERS = 200;
-
 class MissionPlanningContentCreator : public QObject
 {
     Q_OBJECT
@@ -58,6 +54,14 @@ public:
         CannotGetFlightPath,
         CanRunMission,
         CanCancelMission,
+    };
+
+    enum Severity
+    {
+        Message,
+        Continue,
+        Warning,
+        Danger
     };
 
     MissionPlanningContentCreator(LmCdl::I_VcsiMapExtensionApi& mapApi,
@@ -93,7 +97,7 @@ private:
 
     void updateUIState(State newState);
 
-    void notify(const std::string& msg);
+    void notify(const std::string& msg, Severity severity = Severity::Message);
 
     void draw(QList<MissionPlanningPolygon*> polygons,
               QList<MissionPlanningLine*> lines);
@@ -116,14 +120,12 @@ private:
     LmCdl::I_MissionDrawingApi& missionApi_;
     LmCdl::I_RouteApi& routeApi_;
     LmCdl::I_TrackDrawingApi& trackApi_;
-    LmCdl::I_VcsiMapExtensionApi& mapApi_;
 
     LmCdl::I_UserNotification* notification_;
     MissionPlanningDrawing* drawing_ = new MissionPlanningDrawing();
     BoundingBox missionBounds_;
 
-    FlightPather flightPather_ =
-        FlightPather(TURNINGRADIUSMETERS, SCANWIDTHMETERS, MAXDISTANCEMETERS);
+    FlightPather flightPather_ = FlightPather();
 
     MissionDomain mission_;
 
@@ -132,9 +134,11 @@ private:
     volatile static double longitude;  // WGS84
     volatile static double altitude;  // relative altitude, m
     volatile static double heading;  // degrees, 0 to 360
-    volatile static double speed; // meters per second
-    volatile static double yaw; // degrees, 0 to 360
-    volatile static double battery; //percentage 0 to 1
+    volatile static double speed;  // meters per second
+    volatile static double yaw;  // degrees, 0 to 360
+    volatile static double battery;  // percentage, 0 to 1
 
     Drone* drone_;
+
+    QTimer* timer_;
 };

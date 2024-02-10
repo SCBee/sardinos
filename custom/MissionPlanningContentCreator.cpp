@@ -24,6 +24,7 @@
 #include <QtConcurrent/QtConcurrent>
 #include <SardinosPublisher.h>
 #include <qicon.h>
+#include <qwidget.h>
 
 using std::chrono::seconds;
 using std::this_thread::sleep_for;
@@ -52,10 +53,11 @@ MissionPlanningContentCreator::MissionPlanningContentCreator(
     , missionApi_(missionApi)
     , routeApi_(routeApi)
     , trackApi_(trackApi)
-    , mapApi_(mapApi)
     , notification_(nullptr)
     , m_state(STARTUP)
     , mission_()
+    , drone_(new Drone(mapApi))
+    , timer_(new QTimer())
 {
     missionBoundMenuItem_.setBackgroundColor(QColor(235, 12, 12, 180));
     missionBoundMenuItem_.setDescription("Add Mission Bound");
@@ -71,14 +73,19 @@ MissionPlanningContentCreator::MissionPlanningContentCreator(
 
     connectToApiSignals();
 
-    drone_ = new Drone(std::ref(latitude),
-                       std::ref(longitude),
-                       std::ref(altitude),
-                       std::ref(heading),
-                       std::ref(speed),
-                       std::ref(yaw),
-                       std::ref(battery),
-                       mapApi_);
+    timer_->setInterval(1000);
+
+    connect(
+        timer_,
+        &QTimer::timeout,
+        this,
+        [=]()
+        {
+            drone_->updateValues(
+                latitude, longitude, altitude, heading, speed, yaw, battery);
+        });
+
+    timer_->start();
 
     trackApi.addDrawingForTrack(*drone_);
 
@@ -124,14 +131,13 @@ void MissionPlanningContentCreator::getFlightPath()
 {
     updatePois();
 
-    if (flightPather_.canFly(missionBounds_)) {
-        notify("Building Flight Path.");
-        mission_.setPath(flightPather_.path());
-        drawFlightPath();
-        updateUIState(State::CanRunMission);
-    } else {
-        notify("Area is too large.");
-    }
+    notify("Building Flight Path.");
+
+    mission_.setPath(flightPather_.getPath(missionBounds_));
+
+    drawFlightPath();
+
+    updateUIState(State::CanRunMission);
 }
 
 // " Connection URL format should be :"
@@ -142,16 +148,25 @@ void MissionPlanningContentCreator::getFlightPath()
 
 void MissionPlanningContentCreator::runMission()
 {
-    notify("Starting Mission.");
+    if (!flightPather_.canFly(mission_.waypoints())) {
+        notify("Flight path is too long.", Severity::Warning);
+        return;
+    }
+
+    notify("Starting Mission.", Severity::Continue);
+
     updateUIState(State::CanCancelMission);
 
     std::vector<std::pair<float, float>> mavWaypoints;
+
     foreach(MissionPlanningWaypoint* waypoint, mission_.waypoints()) {
         mavWaypoints.emplace_back(waypoint->location().longitude(),
                                   waypoint->location().latitude());
     }
 
     drone_->setVisible(true);
+
+    mission_.startMission();
 
     QFuture<void> future = QtConcurrent::run(sardinos::executeMissionVTOL,
                                              mavWaypoints,
@@ -163,7 +178,7 @@ void MissionPlanningContentCreator::runMission()
 
 void MissionPlanningContentCreator::cancelMission()
 {
-    notify("Cancelling Mission.");
+    notify("Cancelling Mission.", Severity::Warning);
 
     updateUIState(State::CanGetFlightPath);
 
@@ -320,9 +335,28 @@ void MissionPlanningContentCreator::updateUIState(State newState)
         changeUI(newState);
     }
 }
-void MissionPlanningContentCreator::notify(const std::string& msg)
+
+void MissionPlanningContentCreator::notify(const std::string& msg,
+                                           Severity severity)
 {
-    notApi_.addNotification(new QLabel(QString(msg.c_str())));
+    auto label = new QLabel(QString(msg.c_str()));
+
+    label->setStyleSheet("color: black;");
+
+    switch (severity) {
+        case Message:
+            notApi_.addNotification(label).setBackgroundColor(Qt::white);
+            break;
+        case Continue:
+            notApi_.addNotification(label).setBackgroundColor(Qt::green);
+            break;
+        case Warning:
+            notApi_.addNotification(label).setBackgroundColor(Qt::yellow);
+            break;
+        case Danger:
+            notApi_.addNotification(label).setBackgroundColor(Qt::red);
+            break;
+    };
 }
 
 void MissionPlanningContentCreator::notifyPeriodically()

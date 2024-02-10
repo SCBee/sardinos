@@ -38,12 +38,14 @@ public:
                       double yaw,
                       double battery)
     {
+        auto degreeSymbol = static_cast<char>(176);
+
         latitude_label->setText("Latitude: " + QString::number(latitude));
         longitude_label->setText("Longitude: " + QString::number(longitude));
-        altitude_label->setText("Altitude: " + QString::number(altitude));
-        speed_label->setText("Speed: " + QString::number(speed));
-        heading_label->setText("Heading: " + QString::number(heading));
-        yaw_label->setText("Yaw: " + QString::number(yaw));
+        altitude_label->setText("Altitude: " + QString::number(altitude) + " m AGL");
+        speed_label->setText("Speed: " + QString::number(speed) + " m/s");
+        heading_label->setText("Heading: " + QString::number(heading) + degreeSymbol);
+        yaw_label->setText("Yaw: " + QString::number(yaw) + degreeSymbol);
         battery_label->setText("Battery: " + QString::number(battery * 100) + "%");
     }
 

@@ -20,6 +20,8 @@ public:
     MissionDomain() {}
     ~MissionDomain() override {}
 
+    void startMission();
+
     QList<MissionPlanningWaypoint*> waypoints() const;
     QList<LmCdl::I_SimpleWaypointConnector*> waypointConnectors() const;
 
