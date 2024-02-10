@@ -295,7 +295,7 @@ void executeMissionVTOL(std::vector<std::pair<float, float>>& waypoints,
         return;
     }
 
-    action.set_takeoff_altitude(55.0f);
+    action.set_takeoff_altitude(30.0f);
     sleep_for(seconds(2));
 
     // Take off
@@ -307,7 +307,10 @@ void executeMissionVTOL(std::vector<std::pair<float, float>>& waypoints,
     }
 
     // Wait while it takes off.
-    sleep_for(seconds(35));
+    while (alt_ <= 29) {
+        sleep_for(seconds(1));
+    }
+    sleep_for(seconds(3));
 
     std::cout << "Transition to fixedwing.\n";
     const Action::Result fw_result = action.transition_to_fixedwing();
@@ -331,7 +334,11 @@ void executeMissionVTOL(std::vector<std::pair<float, float>>& waypoints,
             std::cerr << "Goto command failed: " << goto_result << '\n';
             return;
         }
-        sleep_for(seconds(9));
+        while (std::abs(lat_ - latitude) > 0.001
+               || std::abs(lon_ - longitude) > 0.001)
+        {
+            sleep_for(seconds(1));
+        }
     }
 
     // Let's stop before reaching the goto point and go back to hover.
