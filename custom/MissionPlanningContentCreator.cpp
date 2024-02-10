@@ -18,6 +18,9 @@
 #include <LmCdl/StanagWaypoint.h>
 #include <LmCdl/VcsiPointOfInterestProperties.h>
 #include <LmCdl/VectorDataPolygonDrawing.h>
+#include <LmCdl/I_VideoVectorPickExclusiveListener.h>
+#include <LmCdl/I_VideoStreamApi.h>
+#include <LmCdl/I_VideoWindowApi.h>
 #include <MathExt.cpp>
 #include <MissionDomain.h>
 #include <MissionPlanningContentCreator.h>
@@ -44,7 +47,8 @@ MissionPlanningContentCreator::MissionPlanningContentCreator(
     LmCdl::I_VectorDataDrawingApi& drawApi,
     LmCdl::I_MissionDrawingApi& missionApi,
     LmCdl::I_RouteApi& routeApi,
-    LmCdl::I_TrackDrawingApi& trackApi)
+    LmCdl::I_TrackDrawingApi& trackApi,
+    LmCdl::I_VideoStreamApiCollection& videoCollectionApi)
     : missionBoundMenuItem_(mapApi.terrainContextMenu().registerMenuItem())
     , submitMissionMenuItem_(mapApi.terrainContextMenu().registerMenuItem())
     , poiApi_(poiApi)
@@ -53,6 +57,7 @@ MissionPlanningContentCreator::MissionPlanningContentCreator(
     , missionApi_(missionApi)
     , routeApi_(routeApi)
     , trackApi_(trackApi)
+    , videoCollectionApi_(videoCollectionApi)
     , notification_(nullptr)
     , m_state(STARTUP)
     , mission_()
@@ -168,6 +173,12 @@ void MissionPlanningContentCreator::runMission()
 
     mission_.startMission();
 
+    liveDroneFeed_ = &videoCollectionApi_.registerStream("http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4", "Live drone stream");
+
+    auto callback = [](const QGeoCoordinate& coordinate){ std::cerr << coordinate.longitude() << ", " << coordinate.latitude(); };
+
+    liveDroneFeed_->videoWindowApi().registerVideoGeoCoordinatePickInterest(callback);
+
     QFuture<void> future = QtConcurrent::run(sardinos::executeMissionVTOL,
                                              mavWaypoints,
                                              std::ref(latitude),
@@ -180,9 +191,12 @@ void MissionPlanningContentCreator::cancelMission()
 {
     notify("Cancelling Mission.", Severity::Warning);
 
-    updateUIState(State::CanGetFlightPath);
+    videoCollectionApi_.unregisterStream(*liveDroneFeed_);
 
     updatePois();
+
+    updateUIState(State::CanGetFlightPath);
+
 }
 
 void MissionPlanningContentCreator::updatePois()
