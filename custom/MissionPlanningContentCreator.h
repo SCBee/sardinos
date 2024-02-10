@@ -33,6 +33,7 @@
 #include <MissionPlanningWaypoint.h>
 #include <MissionPlanningWaypointConnector.h>
 #include <qgeocoordinate.h>
+#include <ImageProcessor.h>
 
 namespace LmCdl
 {
@@ -125,6 +126,8 @@ private:
     LmCdl::I_VideoStreamApiCollection& videoCollectionApi_;
 
     LmCdl::I_VideoStreamApi* liveDroneFeed_;
+
+    ImageProcessor imageProcessor_ = ImageProcessor();
 
     LmCdl::I_UserNotification* notification_;
     MissionPlanningDrawing* drawing_ = new MissionPlanningDrawing();
