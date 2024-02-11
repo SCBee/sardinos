@@ -344,7 +344,7 @@ void executeMissionVTOL(std::vector<std::pair<float, float>>& waypoints,
         {
             double distance = MathExt().calculateSeparation(lat_, lon_, latitude, longitude);
 
-            if (distance > 50.0)
+            if (distance > 5.0)
             {
                 if(!outOfPath){
                     std::cout << "Drone is " << distance << " meters off the path!\n";
