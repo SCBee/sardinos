@@ -1,6 +1,7 @@
 #include <QList>
 
 #include <LmCdl/I_Billboard.h>
+#include <LmCdl/I_GroundElevationApi.h>
 #include <LmCdl/I_MissionDrawingApi.h>
 #include <LmCdl/I_PointOfInterestApi.h>
 #include <LmCdl/I_RouteApi.h>
@@ -43,8 +44,10 @@ QList<LmCdl::PluginRequirement> MissionPlanningPlugin::requiredApis() const
         LmCdl::PluginRequirement(MISSION_DRAWING_API_CAPABILITY_NAME, 1, 0, 0),
         LmCdl::PluginRequirement(ROUTE_API_CAPABILITY_NAME, 1, 0, 0),
         LmCdl::PluginRequirement(TRACK_DRAWING_API_CAPABILITY_NAME, 1, 0, 0),
-        LmCdl::PluginRequirement(VIDEO_STREAM_API_COLLECTION_CAPABILITY_NAME, 1, 0, 0)
-        };
+        LmCdl::PluginRequirement(
+            VIDEO_STREAM_API_COLLECTION_CAPABILITY_NAME, 1, 0, 0),
+        LmCdl::PluginRequirement(
+            GROUND_ELEVATION_API_CAPABILITY_NAME, 1, 0, 0)};
 }
 
 LmCdl::PluginCapabilityIdentifier MissionPlanningPlugin::providedApi() const
@@ -92,8 +95,16 @@ bool MissionPlanningPlugin::setRequiredApi(LmCdl::PluginCapabilityIdentifier id,
         capabilityFound = true;
     }
 
-    else if (id.capabilityName() == VIDEO_STREAM_API_COLLECTION_CAPABILITY_NAME){
-        videoCollectionApi_ = dynamic_cast<LmCdl::I_VideoStreamApiCollection*>(api);
+    else if (id.capabilityName() == VIDEO_STREAM_API_COLLECTION_CAPABILITY_NAME)
+    {
+        videoCollectionApi_ =
+            dynamic_cast<LmCdl::I_VideoStreamApiCollection*>(api);
+        capabilityFound = true;
+    }
+
+    else if (id.capabilityName() == GROUND_ELEVATION_API_CAPABILITY_NAME)
+    {
+        elevationApi_ = dynamic_cast<LmCdl::I_GroundElevationApi*>(api);
         capabilityFound = true;
     }
 
@@ -109,7 +120,8 @@ QObject* MissionPlanningPlugin::getProvidedApi()
 bool MissionPlanningPlugin::isFullyInitialized() const
 {
     return (pointOfInterestApi_ && applicationApi_ && vectorDrawingApi_
-            && missionDrawingApi_ && routeApi_ && trackApi_ && videoCollectionApi_);
+            && missionDrawingApi_ && routeApi_ && trackApi_
+            && videoCollectionApi_ && elevationApi_);
 }
 
 void MissionPlanningPlugin::startPluginIfInitialized()
@@ -138,6 +150,7 @@ void MissionPlanningPlugin::startPluginIfInitialized()
             *missionDrawingApi_,
             *routeApi_,
             *trackApi_,
-            *videoCollectionApi_));
+            *videoCollectionApi_,
+            *elevationApi_));
     }
 }

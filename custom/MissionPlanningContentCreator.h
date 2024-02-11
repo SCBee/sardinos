@@ -22,6 +22,7 @@
 #include <LmCdl/I_VcsiMapExtensionApi.h>
 #include <LmCdl/I_VcsiUserNotificationApi.h>
 #include <LmCdl/I_VectorDataDrawingApi.h>
+#include <LmCdl/I_GroundElevationApi.h>
 #include <LmCdl/I_VideoStreamApiCollection.h>
 #include <LmCdl/UniqueIdentifier.h>
 #include <LmCdl/VcsiIdentifiedPointOfInterest.h>
@@ -74,7 +75,8 @@ public:
         LmCdl::I_MissionDrawingApi& missionApi,
         LmCdl::I_RouteApi& routeApi,
         LmCdl::I_TrackDrawingApi& trackApi,
-        LmCdl::I_VideoStreamApiCollection& videoCollectionApi);
+        LmCdl::I_VideoStreamApiCollection& videoCollectionApi,
+        LmCdl::I_GroundElevationApi& elevationApi);
 
     virtual ~MissionPlanningContentCreator();
 
@@ -128,6 +130,7 @@ private:
     LmCdl::I_RouteApi& routeApi_;
     LmCdl::I_TrackDrawingApi& trackApi_;
     LmCdl::I_VideoStreamApiCollection& videoCollectionApi_;
+    LmCdl::I_GroundElevationApi& elevationApi_;
 
     LmCdl::I_VideoStreamApi* liveDroneFeed_;
 

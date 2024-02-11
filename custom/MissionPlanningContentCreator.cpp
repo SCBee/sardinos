@@ -15,6 +15,7 @@
 #include <LmCdl/I_VcsiUserNotificationApi.h>
 #include <LmCdl/I_VectorDataDrawingApi.h>
 #include <LmCdl/I_VideoStreamApi.h>
+#include <LmCdl/GroundElevation.h>
 #include <LmCdl/I_VideoVectorPickExclusiveListener.h>
 #include <LmCdl/I_VideoWindowApi.h>
 #include <LmCdl/StanagRoute.h>
@@ -32,8 +33,8 @@
 using std::chrono::seconds;
 using std::this_thread::sleep_for;
 
-volatile double MissionPlanningContentCreator::latitude = 0.0f;
-volatile double MissionPlanningContentCreator::longitude = 0.0f;
+volatile double MissionPlanningContentCreator::latitude = 51.0f;
+volatile double MissionPlanningContentCreator::longitude = -114.0f;
 volatile double MissionPlanningContentCreator::altitude = 0.0f;
 volatile double MissionPlanningContentCreator::heading = 0.0f;
 volatile double MissionPlanningContentCreator::speed = 0.0f;
@@ -48,7 +49,8 @@ MissionPlanningContentCreator::MissionPlanningContentCreator(
     LmCdl::I_MissionDrawingApi& missionApi,
     LmCdl::I_RouteApi& routeApi,
     LmCdl::I_TrackDrawingApi& trackApi,
-    LmCdl::I_VideoStreamApiCollection& videoCollectionApi)
+    LmCdl::I_VideoStreamApiCollection& videoCollectionApi,
+    LmCdl::I_GroundElevationApi& elevationApi)
     : missionBoundMenuItem_(mapApi.terrainContextMenu().registerMenuItem())
     , submitMissionMenuItem_(mapApi.terrainContextMenu().registerMenuItem())
     , poiApi_(poiApi)
@@ -58,6 +60,7 @@ MissionPlanningContentCreator::MissionPlanningContentCreator(
     , routeApi_(routeApi)
     , trackApi_(trackApi)
     , videoCollectionApi_(videoCollectionApi)
+    , elevationApi_(elevationApi)
     , notification_(nullptr)
     , m_state(STARTUP)
     , mission_()
@@ -101,9 +104,10 @@ void MissionPlanningContentCreator::startLoop()
             this,
             [=]()
             {
-                drone_->updateValues(latitude,
+                auto msl = elevationApi_.lookupGroundElevationSynchronously(QGeoCoordinate(latitude, longitude)).altitudeMsl().value(LmCdl::DistanceUnit::Meters);
+                drone_->updateValues(latitude+=0.01,
                                      longitude,
-                                     altitude,
+                                     altitude + msl,
                                      heading,
                                      speed,
                                      yaw,
