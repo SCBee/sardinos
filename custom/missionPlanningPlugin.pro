@@ -19,9 +19,33 @@ CONFIG -= app_bundle
 
 TEMPLATE = lib
 
-SOURCES += *.cpp
+SOURCES += \
+    MissionPlanningPlugin.cpp \
+    MissionPlanningContentCreator.cpp \
+    FlightPather.cpp \
+    MissionPlanningPolygon.cpp \
+    MissionPlanningDrawing.cpp \
+    MissionPlanningLine.cpp \
+    MathExt.cpp \
+    MissionPlanningWaypoint.cpp \
+    MissionPlanningWaypointConnector.cpp \
+    MissionDomain.cpp \
+    Drone.cpp
 
-HEADERS += *.h
+HEADERS += \
+    MissionPlanningPlugin.h \
+    MissionPlanningContentCreator.h \
+    FlightPather.h \
+    SardinosPublisher.h \
+    MissionPlanningPolygon.h \
+    MissionPlanningDrawing.h \
+    MissionPlanningLine.h \
+    BoundingBox.h \
+    MathExt.h \
+    MissionPlanningWaypoint.h \
+    MissionPlanningWaypointConnector.h \
+    MissionDomain.h \
+    Drone.h
 
 INCLUDEPATH += $$EXAMPLES_ROOT_DIRECTORY/../include \
                d:\mavsdk-windows-x64-release\include \
