@@ -2,25 +2,41 @@
 
 #include <QGeoCoordinate>
 
-#include <qmath.h>
-
-const double ALTITUDEMETERS = 1200;
+#include <LmCdl/I_GroundElevationApi.h>
+#include <LmCdl/GroundElevation.h>
+#include <LmCdl/DistanceUnit.h>
 
 struct BoundingBox
 {
 public:
-    QGeoCoordinate SW;
-    QGeoCoordinate NW;
-    QGeoCoordinate SE;
-    QGeoCoordinate NE;
+    BoundingBox(LmCdl::I_GroundElevationApi& elevationApi) 
+    : elevationApi_(elevationApi)
+    {
+    }
+
+    void setCoordinates(QGeoCoordinate SW,
+                        QGeoCoordinate NW,
+                        QGeoCoordinate SE,
+                        QGeoCoordinate NE)
+    {
+        this->SW = SW;
+        this->NW = NW;
+        this->SE = SE;
+        this->NE = NE;
+
+        this->SW.setAltitude(elevationApi_.lookupGroundElevationSynchronously(this->SW).altitudeMsl().value(LmCdl::DistanceUnit::Meters));
+        this->NW.setAltitude(elevationApi_.lookupGroundElevationSynchronously(this->NW).altitudeMsl().value(LmCdl::DistanceUnit::Meters));
+        this->SE.setAltitude(elevationApi_.lookupGroundElevationSynchronously(this->SE).altitudeMsl().value(LmCdl::DistanceUnit::Meters));
+        this->NE.setAltitude(elevationApi_.lookupGroundElevationSynchronously(this->NE).altitudeMsl().value(LmCdl::DistanceUnit::Meters));
+    }
+
+        void setCoordinates(BoundingBox box)
+    {
+        setCoordinates(box.SW, box.NW, box.SE, box.NE);
+    }
 
     QList<QGeoCoordinate> list()
     {
-        SW.setAltitude(ALTITUDEMETERS);
-        SE.setAltitude(ALTITUDEMETERS);
-        NE.setAltitude(ALTITUDEMETERS);
-        NW.setAltitude(ALTITUDEMETERS);
-
         return {SW, SE, NE, NW};
     }
 
@@ -32,26 +48,11 @@ public:
 
     double southBound() { return SW.latitude(); }
 
-    bool isVertical()
-    {
-        if (getDistance(SE, SW) > getDistance(SE, NE))
-            return false;
-        return true;
-    }
+    QGeoCoordinate SW;
+    QGeoCoordinate NW;
+    QGeoCoordinate SE;
+    QGeoCoordinate NE;
 
 private:
-    double getDistance(QGeoCoordinate c1, QGeoCoordinate c2)
-    {
-        const double R = 6378.137;
-        double dLat =
-            (c2.latitude() * M_PI / 180) - (c1.latitude() * M_PI / 180);
-        double dLon =
-            (c2.longitude() * M_PI / 180) - (c1.longitude() * M_PI / 180);
-        double a = sin(dLat / 2) * sin(dLat / 2)
-            + cos(c1.latitude() * M_PI / 180) * cos(c2.latitude() * M_PI / 180)
-                * sin(dLon / 2) * sin(dLon / 2);
-        double c = 2 * atan2(sqrt(a), sqrt(1 - a));
-        double d = R * c;
-        return d * 1000;
-    }
+    LmCdl::I_GroundElevationApi& elevationApi_;
 };

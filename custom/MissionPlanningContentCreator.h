@@ -10,6 +10,7 @@
 #include <BoundingBox.h>
 #include <Drone.h>
 #include <FlightPather.h>
+#include <ImageProcessor.h>
 #include <LmCdl/I_ContextMenu.h>
 #include <LmCdl/I_ContextMenuItem.h>
 #include <LmCdl/I_MissionDrawingApi.h>
@@ -21,6 +22,8 @@
 #include <LmCdl/I_VcsiMapExtensionApi.h>
 #include <LmCdl/I_VcsiUserNotificationApi.h>
 #include <LmCdl/I_VectorDataDrawingApi.h>
+#include <LmCdl/I_GroundElevationApi.h>
+#include <LmCdl/I_VideoStreamApiCollection.h>
 #include <LmCdl/UniqueIdentifier.h>
 #include <LmCdl/VcsiIdentifiedPointOfInterest.h>
 #include <LmCdl/VcsiMilStdCode.h>
@@ -64,13 +67,16 @@ public:
         Danger
     };
 
-    MissionPlanningContentCreator(LmCdl::I_VcsiMapExtensionApi& mapApi,
-                                  LmCdl::I_PointOfInterestApi& poiApi,
-                                  LmCdl::I_VcsiUserNotificationApi& notApi,
-                                  LmCdl::I_VectorDataDrawingApi& drawApi,
-                                  LmCdl::I_MissionDrawingApi& missionApi,
-                                  LmCdl::I_RouteApi& routeApi,
-                                  LmCdl::I_TrackDrawingApi& trackApi);
+    MissionPlanningContentCreator(
+        LmCdl::I_VcsiMapExtensionApi& mapApi,
+        LmCdl::I_PointOfInterestApi& poiApi,
+        LmCdl::I_VcsiUserNotificationApi& notApi,
+        LmCdl::I_VectorDataDrawingApi& drawApi,
+        LmCdl::I_MissionDrawingApi& missionApi,
+        LmCdl::I_RouteApi& routeApi,
+        LmCdl::I_TrackDrawingApi& trackApi,
+        LmCdl::I_VideoStreamApiCollection& videoCollectionApi,
+        LmCdl::I_GroundElevationApi& elevationApi);
 
     virtual ~MissionPlanningContentCreator();
 
@@ -78,6 +84,10 @@ private:
     Q_DISABLE_COPY(MissionPlanningContentCreator);
 
     void getPoiProperties(const LmCdl::ContextMenuEvent& event);
+
+    void MissionPlanningContentCreator::startLoop();
+
+    void initConextMenuItems();
 
     void getFlightPath();
 
@@ -99,8 +109,7 @@ private:
 
     void notify(const std::string& msg, Severity severity = Severity::Message);
 
-    void draw(QList<MissionPlanningPolygon*> polygons,
-              QList<MissionPlanningLine*> lines);
+    void draw(QList<MissionPlanningPolygon*> polygons, QList<MissionPlanningLine*> lines);
 
     void drawFlightPath();
 
@@ -120,6 +129,12 @@ private:
     LmCdl::I_MissionDrawingApi& missionApi_;
     LmCdl::I_RouteApi& routeApi_;
     LmCdl::I_TrackDrawingApi& trackApi_;
+    LmCdl::I_VideoStreamApiCollection& videoCollectionApi_;
+    LmCdl::I_GroundElevationApi& elevationApi_;
+
+    LmCdl::I_VideoStreamApi* liveDroneFeed_;
+
+    ImageProcessor imageProcessor_ = ImageProcessor();
 
     LmCdl::I_UserNotification* notification_;
     MissionPlanningDrawing* drawing_ = new MissionPlanningDrawing();

@@ -21,6 +21,8 @@ class I_VcsiApplicationApi;
 class I_MissionDrawingApi;
 class I_RouteApi;
 class I_TrackDrawingApi;
+class I_VideoStreamApiCollection;
+class I_GroundElevationApi;
 }  // namespace LmCdl
 
 class MissionPlanningPlugin
@@ -64,6 +66,10 @@ private:
     LmCdl::I_RouteApi* routeApi_;
 
     LmCdl::I_TrackDrawingApi* trackApi_;
+
+    LmCdl::I_VideoStreamApiCollection* videoCollectionApi_;
+
+    LmCdl::I_GroundElevationApi* elevationApi_;
 
     QScopedPointer<MissionPlanningContentCreator> pluginContentCreator_;
 };

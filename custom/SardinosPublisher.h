@@ -11,10 +11,13 @@
 #include <iostream>
 #include <thread>
 
+#include <MathExt.h>
+#include <MissionPlanningContentCreator.h>
 #include <mavsdk/mavsdk.h>
 #include <mavsdk/plugins/action/action.h>
 #include <mavsdk/plugins/mission/mission.h>
 #include <mavsdk/plugins/telemetry/telemetry.h>
+#include <windows.h>
 
 using namespace mavsdk;
 using std::chrono::seconds;
@@ -44,6 +47,35 @@ Mission::MissionItem make_mission_item(
 
 namespace sardinos
 {
+void setColor(const std::string& textColor,
+              const std::string& bgColor = "black")
+{
+    // Map of color strings to their corresponding Windows Console color codes
+    std::map<std::string, int> colors {{"black", 0},
+                                       {"blue", 1},
+                                       {"green", 2},
+                                       {"cyan", 3},
+                                       {"red", 4},
+                                       {"magenta", 5},
+                                       {"brown", 6},
+                                       {"default", 7},
+                                       {"darkgray", 8},
+                                       {"lightblue", 9},
+                                       {"lightgreen", 10},
+                                       {"lightcyan", 11},
+                                       {"lightred", 12},
+                                       {"lightmagenta", 13},
+                                       {"yellow", 14},
+                                       {"white", 15}};
+
+    HANDLE consoleHandle = GetStdHandle(STD_OUTPUT_HANDLE);
+    // Find the color codes from the map, use light gray (7) if not found
+    int textCode =
+        colors.find(textColor) != colors.end() ? colors[textColor] : 7;
+    int bgCode = colors.find(bgColor) != colors.end() ? colors[bgColor] : 0;
+    SetConsoleTextAttribute(consoleHandle, (WORD)((bgCode << 4) | textCode));
+}
+
 void executeMission(std::vector<std::pair<float, float>>& waypoints)
 {
     auto connectStr = "udp://:14550";
@@ -226,6 +258,7 @@ void executeMission(std::vector<std::pair<float, float>>& waypoints)
         std::cout << "Disarmed, exiting.\n";
     }
 }
+
 void executeMissionVTOL(std::vector<std::pair<float, float>>& waypoints,
                         volatile double& lat_,
                         volatile double& lon_,
@@ -262,19 +295,23 @@ void executeMissionVTOL(std::vector<std::pair<float, float>>& waypoints,
     telemetry.subscribe_heading(
         [&head_](const Telemetry::Heading& headTel)
         {
-            std::cout << "Heading: " << headTel.heading_deg << " deg"
-                      << std::endl;
+            //            std::cout << "Heading: " << headTel.heading_deg << "
+            //            deg"
+            //                      << std::endl;
             head_ = headTel.heading_deg;
         });
 
     telemetry.subscribe_position(
         [&lat_, &lon_, &alt_](const Telemetry::Position& position)
         {
-            std::cout << "Altitude: " << position.relative_altitude_m << " m"
-                      << std::endl
-                      << "Latitude: " << position.latitude_deg << std::endl
-                      << "Longitude: " << position.longitude_deg << std::endl
-                      << std::endl;
+            //            std::cout << "Altitude: " <<
+            //            position.relative_altitude_m << " m"
+            //                      << std::endl
+            //                      << "Latitude: " << position.latitude_deg <<
+            //                      std::endl
+            //                      << "Longitude: " << position.longitude_deg
+            //                      << std::endl
+            //                      << std::endl;
             lat_ = position.latitude_deg;
             lon_ = position.longitude_deg;
             alt_ = position.relative_altitude_m;
@@ -295,7 +332,7 @@ void executeMissionVTOL(std::vector<std::pair<float, float>>& waypoints,
         return;
     }
 
-    action.set_takeoff_altitude(55.0f);
+    action.set_takeoff_altitude(200.0f);
     sleep_for(seconds(2));
 
     // Take off
@@ -307,7 +344,10 @@ void executeMissionVTOL(std::vector<std::pair<float, float>>& waypoints,
     }
 
     // Wait while it takes off.
-    sleep_for(seconds(35));
+    while (alt_ <= 199.0f) {
+        sleep_for(seconds(2));
+    }
+    sleep_for(seconds(3));
 
     std::cout << "Transition to fixedwing.\n";
     const Action::Result fw_result = action.transition_to_fixedwing();
@@ -320,6 +360,8 @@ void executeMissionVTOL(std::vector<std::pair<float, float>>& waypoints,
     // Let it transition and start loitering.
     sleep_for(seconds(10));
 
+    bool outOfPath = false;
+
     for (auto& [longitude, latitude] : waypoints) {
         std::cout << "Sending it to location: (" << latitude << ", "
                   << longitude << ")" << std::endl;
@@ -331,7 +373,29 @@ void executeMissionVTOL(std::vector<std::pair<float, float>>& waypoints,
             std::cerr << "Goto command failed: " << goto_result << '\n';
             return;
         }
-        sleep_for(seconds(9));
+        while (std::abs(lat_ - latitude) > 0.001
+               || std::abs(lon_ - longitude) > 0.001)
+        {
+            double distance =
+                MathExt().getDistance(lat_, lon_, latitude, longitude);
+
+            if (distance > 5.0f) {
+                if (!outOfPath) {
+                    sardinos::setColor("red");
+                    std::cout << "Drone is " << distance
+                              << " meters off the path!" << std::endl;
+                    outOfPath = true;
+                }
+            } else {
+                if (outOfPath) {
+                    sardinos::setColor("green");
+                    std::cout << "Drone is back on track" << std::endl;
+                    outOfPath = false;
+                }
+            }
+            sardinos::setColor("default");
+            sleep_for(seconds(1));
+        }
     }
 
     // Let's stop before reaching the goto point and go back to hover.
