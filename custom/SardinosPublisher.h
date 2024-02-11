@@ -16,6 +16,9 @@
 #include <mavsdk/plugins/mission/mission.h>
 #include <mavsdk/plugins/telemetry/telemetry.h>
 
+#include <MathExt.h>
+#include <MissionPlanningContentCreator.h>
+
 using namespace mavsdk;
 using std::chrono::seconds;
 using std::this_thread::sleep_for;
@@ -323,6 +326,8 @@ void executeMissionVTOL(std::vector<std::pair<float, float>>& waypoints,
     // Let it transition and start loitering.
     sleep_for(seconds(10));
 
+    bool outOfPath = false;
+
     for (auto& [longitude, latitude] : waypoints) {
         std::cout << "Sending it to location: (" << latitude << ", "
                   << longitude << ")" << std::endl;
@@ -337,6 +342,20 @@ void executeMissionVTOL(std::vector<std::pair<float, float>>& waypoints,
         while (std::abs(lat_ - latitude) > 0.001
                || std::abs(lon_ - longitude) > 0.001)
         {
+            double distance = MathExt().calculateSeparation(lat_, lon_, latitude, longitude);
+
+            if (distance > 50.0)
+            {
+                if(!outOfPath){
+                    std::cout << "Drone is " << distance << " meters off the path!\n";
+                    outOfPath = true;
+                }
+            } else {
+                if(outOfPath){
+                    std::cout << "Drone is back on track\n";
+                    outOfPath = false;
+                }
+            }
             sleep_for(seconds(1));
         }
     }
