@@ -105,14 +105,7 @@ void MissionPlanningContentCreator::startLoop()
             this,
             [=]()
             {
-                auto msl = elevationApi_.lookupGroundElevationSynchronously(QGeoCoordinate(latitude, longitude)).altitudeMsl().value(LmCdl::DistanceUnit::Meters);
-                drone_->updateValues(latitude+=0.01,
-                                     longitude,
-                                     altitude + msl,
-                                     heading,
-                                     speed,
-                                     yaw,
-                                     battery);
+                drone_->updateValues(latitude, longitude, altitude, heading, speed, yaw, battery);
             });
 
     timer_->start();

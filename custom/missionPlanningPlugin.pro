@@ -23,10 +23,20 @@ SOURCES += *.cpp
 
 HEADERS += *.h
 
-INCLUDEPATH += $$EXAMPLES_ROOT_DIRECTORY/../include c:\mavsdk\include c:\mavsdk\include\mavsdk c:\opencv\build\include
-win32:INCLUDEPATH += .
-LIBS += -L$$EXAMPLES_ROOT_DIRECTORY/../lib -lvcsiapi -lGroundControlStationDrawings_Mission -lc:\mavsdk\lib\mavsdk -lGroundControlStationDrawings_Track -lc:\opencv\build\x64\vc16\lib\opencv_world490
+INCLUDEPATH += $$EXAMPLES_ROOT_DIRECTORY/../include \
+               d:\mavsdk-windows-x64-release\include \
+               d:\mavsdk-windows-x64-release\include\mavsdk \
+               d:\opencv\build\include
 
+win32:INCLUDEPATH += .
+
+LIBS += -L$$EXAMPLES_ROOT_DIRECTORY/../lib \
+        -lvcsiapi \
+        -lGroundControlStationDrawings_Mission \
+        -ld:\mavsdk-windows-x64-release\lib\mavsdk \
+        -lGroundControlStationDrawings_Track \
+        -ld:\opencv\build\x64\vc16\lib\opencv_world490 
+        
 release:DESTDIR = $$BUILD_DIR
 debug:DESTDIR = $$BUILD_DIR
 OBJECTS_DIR = $$OBJ_DIR
