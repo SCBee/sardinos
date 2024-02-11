@@ -44,6 +44,13 @@ Mission::MissionItem make_mission_item(
 
 namespace sardinos
 {
+
+// " Connection URL format should be :"
+// " For TCP : tcp://[server_host][:server_port]"
+// " For UDP : udp://[bind_host][:bind_port]"
+// " For Serial : serial:///path/to/serial/dev[:baudrate]"
+// " For example, to connect to the simulator use URL: udp://:14540";
+
 void executeMission(std::vector<std::pair<float, float>>& waypoints)
 {
     auto connectStr = "udp://:14550";
