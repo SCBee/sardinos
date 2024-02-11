@@ -66,6 +66,7 @@ MissionPlanningContentCreator::MissionPlanningContentCreator(
     , mission_()
     , drone_(new Drone(mapApi))
     , timer_(new QTimer())
+    , missionBounds_(BoundingBox(elevationApi))
 {
     initConextMenuItems();
 
@@ -219,7 +220,7 @@ void MissionPlanningContentCreator::updatePois()
 
     auto points = poiApi_.pointsOfInterest();
 
-    missionBounds_ = MathExt().findSmallestBoundingBox(points);
+    missionBounds_.setCoordinates(MathExt().findSmallestBoundingBox(points, elevationApi_));
 
     pois_.clear();
 
