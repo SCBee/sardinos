@@ -15,7 +15,6 @@ public:
     FlightPather();
     ~FlightPather();
 
-    double getDistance(QGeoCoordinate c1, QGeoCoordinate c2);
     QList<QGeoCoordinate> getVerticalFlightPath(BoundingBox missionBounds);
     QList<QGeoCoordinate> getHorizontalFlightPath(BoundingBox missionBounds);
     QList<QGeoCoordinate> getPath(BoundingBox missionBounds);
