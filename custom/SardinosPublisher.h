@@ -377,7 +377,7 @@ void executeMissionVTOL(std::vector<std::pair<float, float>>& waypoints,
                || std::abs(lon_ - longitude) > 0.001)
         {
             double distance =
-                MathExt().calculateSeparation(lat_, lon_, latitude, longitude);
+                MathExt().getDistance(lat_, lon_, latitude, longitude);
 
             if (distance > 5.0f) {
                 if (!outOfPath) {
