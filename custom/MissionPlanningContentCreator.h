@@ -10,6 +10,7 @@
 #include <BoundingBox.h>
 #include <Drone.h>
 #include <FlightPather.h>
+#include <ImageProcessor.h>
 #include <LmCdl/I_ContextMenu.h>
 #include <LmCdl/I_ContextMenuItem.h>
 #include <LmCdl/I_MissionDrawingApi.h>
@@ -33,7 +34,6 @@
 #include <MissionPlanningWaypoint.h>
 #include <MissionPlanningWaypointConnector.h>
 #include <qgeocoordinate.h>
-#include <ImageProcessor.h>
 
 namespace LmCdl
 {
@@ -66,14 +66,15 @@ public:
         Danger
     };
 
-    MissionPlanningContentCreator(LmCdl::I_VcsiMapExtensionApi& mapApi,
-                                  LmCdl::I_PointOfInterestApi& poiApi,
-                                  LmCdl::I_VcsiUserNotificationApi& notApi,
-                                  LmCdl::I_VectorDataDrawingApi& drawApi,
-                                  LmCdl::I_MissionDrawingApi& missionApi,
-                                  LmCdl::I_RouteApi& routeApi,
-                                  LmCdl::I_TrackDrawingApi& trackApi,
-                                  LmCdl::I_VideoStreamApiCollection& videoCollectionApi);
+    MissionPlanningContentCreator(
+        LmCdl::I_VcsiMapExtensionApi& mapApi,
+        LmCdl::I_PointOfInterestApi& poiApi,
+        LmCdl::I_VcsiUserNotificationApi& notApi,
+        LmCdl::I_VectorDataDrawingApi& drawApi,
+        LmCdl::I_MissionDrawingApi& missionApi,
+        LmCdl::I_RouteApi& routeApi,
+        LmCdl::I_TrackDrawingApi& trackApi,
+        LmCdl::I_VideoStreamApiCollection& videoCollectionApi);
 
     virtual ~MissionPlanningContentCreator();
 
@@ -81,6 +82,10 @@ private:
     Q_DISABLE_COPY(MissionPlanningContentCreator);
 
     void getPoiProperties(const LmCdl::ContextMenuEvent& event);
+
+    void MissionPlanningContentCreator::startLoop();
+
+    void initConextMenuItems();
 
     void getFlightPath();
 
@@ -102,8 +107,7 @@ private:
 
     void notify(const std::string& msg, Severity severity = Severity::Message);
 
-    void draw(QList<MissionPlanningPolygon*> polygons,
-              QList<MissionPlanningLine*> lines);
+    void draw(QList<MissionPlanningPolygon*> polygons, QList<MissionPlanningLine*> lines);
 
     void drawFlightPath();
 

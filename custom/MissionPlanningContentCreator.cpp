@@ -14,13 +14,13 @@
 #include <LmCdl/I_PlannedRouteCollection.h>
 #include <LmCdl/I_VcsiUserNotificationApi.h>
 #include <LmCdl/I_VectorDataDrawingApi.h>
+#include <LmCdl/I_VideoStreamApi.h>
+#include <LmCdl/I_VideoVectorPickExclusiveListener.h>
+#include <LmCdl/I_VideoWindowApi.h>
 #include <LmCdl/StanagRoute.h>
 #include <LmCdl/StanagWaypoint.h>
 #include <LmCdl/VcsiPointOfInterestProperties.h>
 #include <LmCdl/VectorDataPolygonDrawing.h>
-#include <LmCdl/I_VideoVectorPickExclusiveListener.h>
-#include <LmCdl/I_VideoStreamApi.h>
-#include <LmCdl/I_VideoWindowApi.h>
 #include <MathExt.cpp>
 #include <MissionDomain.h>
 #include <MissionPlanningContentCreator.h>
@@ -64,6 +64,21 @@ MissionPlanningContentCreator::MissionPlanningContentCreator(
     , drone_(new Drone(mapApi))
     , timer_(new QTimer())
 {
+    initConextMenuItems();
+
+    connectToApiSignals();
+
+    startLoop();
+
+    trackApi.addDrawingForTrack(*drone_);
+
+    updatePois();
+}
+
+MissionPlanningContentCreator::~MissionPlanningContentCreator() {};
+
+void MissionPlanningContentCreator::initConextMenuItems()
+{
     missionBoundMenuItem_.setBackgroundColor(QColor(235, 12, 12, 180));
     missionBoundMenuItem_.setDescription("Add Mission Bound");
     missionBoundMenuItem_.setGrouping(LmCdl::ContextMenuItemGrouping::Bottom);
@@ -75,29 +90,28 @@ MissionPlanningContentCreator::MissionPlanningContentCreator(
     submitMissionMenuItem_.setGrouping(LmCdl::ContextMenuItemGrouping::Top);
     submitMissionMenuItem_.setIcon(":/MissionPlanning/UCIcon");
     submitMissionMenuItem_.setVisible(false);
-
-    connectToApiSignals();
-
-    timer_->setInterval(1000);
-
-    connect(
-        timer_,
-        &QTimer::timeout,
-        this,
-        [=]()
-        {
-            drone_->updateValues(
-                latitude, longitude, altitude, heading, speed, yaw, battery);
-        });
-
-    timer_->start();
-
-    trackApi.addDrawingForTrack(*drone_);
-
-    updatePois();
 }
 
-MissionPlanningContentCreator::~MissionPlanningContentCreator() {};
+void MissionPlanningContentCreator::startLoop()
+{
+    timer_->setInterval(1000);
+
+    connect(timer_,
+            &QTimer::timeout,
+            this,
+            [=]()
+            {
+                drone_->updateValues(latitude,
+                                     longitude,
+                                     altitude,
+                                     heading,
+                                     speed,
+                                     yaw,
+                                     battery);
+            });
+
+    timer_->start();
+}
 
 void MissionPlanningContentCreator::connectToApiSignals()
 {
@@ -145,12 +159,6 @@ void MissionPlanningContentCreator::getFlightPath()
     updateUIState(State::CanRunMission);
 }
 
-// " Connection URL format should be :"
-// " For TCP : tcp://[server_host][:server_port]"
-// " For UDP : udp://[bind_host][:bind_port]"
-// " For Serial : serial:///path/to/serial/dev[:baudrate]"
-// " For example, to connect to the simulator use URL: udp://:14540";
-
 void MissionPlanningContentCreator::runMission()
 {
     if (!flightPather_.canFly(mission_.waypoints())) {
@@ -173,9 +181,12 @@ void MissionPlanningContentCreator::runMission()
 
     mission_.startMission();
 
-    auto uri = "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4";
+    auto uri =
+        "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/"
+        "BigBuckBunny.mp4";
 
-    liveDroneFeed_ = &videoCollectionApi_.registerStream(uri, "Live drone stream");
+    liveDroneFeed_ =
+        &videoCollectionApi_.registerStream(uri, "Live drone stream");
 
     imageProcessor_.init(uri);
 
@@ -196,7 +207,6 @@ void MissionPlanningContentCreator::cancelMission()
     updatePois();
 
     updateUIState(State::CanGetFlightPath);
-
 }
 
 void MissionPlanningContentCreator::updatePois()
@@ -292,8 +302,7 @@ void MissionPlanningContentCreator::changeUI(
         case CanGetFlightPath:
             missionBoundMenuItem_.setVisible(true);
             submitMissionMenuItem_.setVisible(true);
-            submitMissionMenuItem_.setBackgroundColor(
-                QColor(50, 100, 235, 180));
+            submitMissionMenuItem_.setBackgroundColor(QColor(50, 100, 235, 180));
             submitMissionMenuItem_.setDescription("Get Flight Path");
             clearFlightPath();
             break;
@@ -319,8 +328,7 @@ void MissionPlanningContentCreator::changeUI(
         default:
             missionBoundMenuItem_.setVisible(true);
             submitMissionMenuItem_.setVisible(true);
-            submitMissionMenuItem_.setBackgroundColor(
-                QColor(50, 100, 235, 180));
+            submitMissionMenuItem_.setBackgroundColor(QColor(50, 100, 235, 180));
             submitMissionMenuItem_.setDescription("Get Flight Path");
             clearFlightPath();
             break;
@@ -350,8 +358,7 @@ void MissionPlanningContentCreator::updateUIState(State newState)
     }
 }
 
-void MissionPlanningContentCreator::notify(const std::string& msg,
-                                           Severity severity)
+void MissionPlanningContentCreator::notify(const std::string& msg, Severity severity)
 {
     auto label = new QLabel(QString(msg.c_str()));
 
