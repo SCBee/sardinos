@@ -21,7 +21,7 @@ TEMPLATE = lib
 
 SOURCES += *.cpp
 
-HEADERS += *h
+HEADERS += *.h
 
 INCLUDEPATH += $$EXAMPLES_ROOT_DIRECTORY/../include \
                d:\mavsdk-windows-x64-release\include \

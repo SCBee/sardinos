@@ -1,27 +1,15 @@
 #include <FlightPather.h>
 #include <qmath.h>
+#include <MathExt.h>
 
 FlightPather::FlightPather() {}
 
 FlightPather::~FlightPather() {}
 
-double FlightPather::getDistance(QGeoCoordinate c1, QGeoCoordinate c2)
-{
-    const double R = 6378.137;
-    double dLat = (c2.latitude() * M_PI / 180) - (c1.latitude() * M_PI / 180);
-    double dLon = (c2.longitude() * M_PI / 180) - (c1.longitude() * M_PI / 180);
-    double a = sin(dLat / 2) * sin(dLat / 2)
-        + cos(c1.latitude() * M_PI / 180) * cos(c2.latitude() * M_PI / 180)
-            * sin(dLon / 2) * sin(dLon / 2);
-    double c = 2 * atan2(sqrt(a), sqrt(1 - a));
-    double d = R * c;
-    return d * 1000;  // meters
-}
-
 QList<QGeoCoordinate> FlightPather::getVerticalFlightPath(
     BoundingBox missionBounds)
 {
-    auto longSpreadMeters = getDistance(missionBounds.NE, missionBounds.NW);
+    auto longSpreadMeters = MathExt().getDistance(missionBounds.NE, missionBounds.NW);
 
     auto longSpread =
         abs(missionBounds.eastBound() - missionBounds.westBound());
@@ -79,10 +67,9 @@ QList<QGeoCoordinate> FlightPather::getVerticalFlightPath(
 QList<QGeoCoordinate> FlightPather::getHorizontalFlightPath(
     BoundingBox missionBounds)
 {
-    auto latSpreadMeters = getDistance(missionBounds.NE, missionBounds.SE);
+    auto latSpreadMeters = MathExt().getDistance(missionBounds.NE, missionBounds.SE);
 
-    auto latSpread =
-        abs(missionBounds.northBound() - missionBounds.southBound());
+    auto latSpread = abs(missionBounds.northBound() - missionBounds.southBound());
 
     auto steps = latSpreadMeters / SCANWIDTHMETERS;
 
@@ -138,7 +125,7 @@ QList<QGeoCoordinate> FlightPather::getHorizontalFlightPath(
 
 QList<QGeoCoordinate> FlightPather::getPath(BoundingBox missionBounds)
 {
-    if (missionBounds.isVertical())
+    if (MathExt().isVertical(missionBounds))
         return getVerticalFlightPath(missionBounds);
     else
         return getHorizontalFlightPath(missionBounds);
@@ -150,7 +137,7 @@ bool FlightPather::canFly(QList<MissionPlanningWaypoint*> waypoints)
 
     for (auto i = 0; i < waypoints.size() - 1; i++) {
         sum +=
-            getDistance(waypoints[i]->location(), waypoints[i + 1]->location());
+            MathExt().getDistance(waypoints[i]->location(), waypoints[i + 1]->location());
     }
 
     if (sum <= MAXDISTANCEMETERS)
