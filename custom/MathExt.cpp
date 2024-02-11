@@ -42,11 +42,11 @@ std::vector<double> MathExt::sqPolar(QGeoCoordinate& point, QGeoCoordinate& com)
     return {angle, distance};
 }
 
-BoundingBox MathExt::findSmallestBoundingBox(const QList<LmCdl::VcsiIdentifiedPointOfInterest>& points, LmCdl::I_GroundElevationApi& elevationApi)
+BoundingBox MathExt::findSmallestBoundingBox(
+    const QList<LmCdl::VcsiIdentifiedPointOfInterest>& points)
 {
-    auto boundingBox = BoundingBox(elevationApi);
     if (points.empty())
-        return boundingBox;
+        return BoundingBox();
 
     QGeoCoordinate southwest, northeast, southeast, northwest;
     southwest = northeast = southeast = northwest = points[0].pointOfInterest().location();
@@ -65,9 +65,7 @@ BoundingBox MathExt::findSmallestBoundingBox(const QList<LmCdl::VcsiIdentifiedPo
     northwest.setLatitude(northeast.latitude());
     northwest.setLongitude(southwest.longitude());
 
-    boundingBox.setCoordinates(southwest, northwest, southeast, northeast);
-
-    return boundingBox;
+    return {southwest, northwest, southeast, northeast};
 }
 
 void MathExt::delay(int ms)
