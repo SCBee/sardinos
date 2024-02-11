@@ -41,6 +41,8 @@ add_executable(vcsi_sardinos
         custom/MissionPlanningWaypointConnector.cpp
         custom/MissionPlanningWaypointConnector.h
         custom/SardinosPublisher.h
+        custom/ImageProcessor.h
+        custom/ImageProcessor.cpp
 )
 
 

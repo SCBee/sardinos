@@ -96,19 +96,15 @@ void MissionPlanningContentCreator::startLoop()
 {
     timer_->setInterval(1000);
 
-    connect(timer_,
-            &QTimer::timeout,
-            this,
-            [=]()
-            {
-                drone_->updateValues(latitude,
-                                     longitude,
-                                     altitude,
-                                     heading,
-                                     speed,
-                                     yaw,
-                                     battery);
-            });
+    connect(
+        timer_,
+        &QTimer::timeout,
+        this,
+        [=]()
+        {
+            drone_->updateValues(
+                latitude, longitude, altitude, heading, speed, yaw, battery);
+        });
 
     timer_->start();
 }
@@ -181,9 +177,7 @@ void MissionPlanningContentCreator::runMission()
 
     mission_.startMission();
 
-    auto uri =
-        "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/"
-        "BigBuckBunny.mp4";
+    auto uri = "udp://:5200";
 
     liveDroneFeed_ =
         &videoCollectionApi_.registerStream(uri, "Live drone stream");
@@ -302,7 +296,8 @@ void MissionPlanningContentCreator::changeUI(
         case CanGetFlightPath:
             missionBoundMenuItem_.setVisible(true);
             submitMissionMenuItem_.setVisible(true);
-            submitMissionMenuItem_.setBackgroundColor(QColor(50, 100, 235, 180));
+            submitMissionMenuItem_.setBackgroundColor(
+                QColor(50, 100, 235, 180));
             submitMissionMenuItem_.setDescription("Get Flight Path");
             clearFlightPath();
             break;
@@ -328,7 +323,8 @@ void MissionPlanningContentCreator::changeUI(
         default:
             missionBoundMenuItem_.setVisible(true);
             submitMissionMenuItem_.setVisible(true);
-            submitMissionMenuItem_.setBackgroundColor(QColor(50, 100, 235, 180));
+            submitMissionMenuItem_.setBackgroundColor(
+                QColor(50, 100, 235, 180));
             submitMissionMenuItem_.setDescription("Get Flight Path");
             clearFlightPath();
             break;
@@ -358,7 +354,8 @@ void MissionPlanningContentCreator::updateUIState(State newState)
     }
 }
 
-void MissionPlanningContentCreator::notify(const std::string& msg, Severity severity)
+void MissionPlanningContentCreator::notify(const std::string& msg,
+                                           Severity severity)
 {
     auto label = new QLabel(QString(msg.c_str()));
 
