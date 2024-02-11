@@ -16,9 +16,6 @@
 #include <mavsdk/plugins/mission/mission.h>
 #include <mavsdk/plugins/telemetry/telemetry.h>
 
-#include <MathExt.h>
-#include <MissionPlanningContentCreator.h>
-
 using namespace mavsdk;
 using std::chrono::seconds;
 using std::this_thread::sleep_for;
@@ -306,8 +303,8 @@ void executeMissionVTOL(std::vector<std::pair<float, float>>& waypoints,
         return;
     }
 
-    action.set_takeoff_altitude(30.0f);
-    sleep_for(seconds(2));
+    action.set_takeoff_altitude(50.0f);
+    sleep_for(seconds(5));
 
     // Take off
     std::cout << "Taking off.\n";
@@ -324,17 +321,15 @@ void executeMissionVTOL(std::vector<std::pair<float, float>>& waypoints,
     sleep_for(seconds(3));
 
     std::cout << "Transition to fixedwing.\n";
-    const Action::Result fw_result = action.transition_to_fixedwing();
+    Action::Result fw_result = action.transition_to_fixedwing();
 
-    if (fw_result != Action::Result::Success) {
-        std::cerr << "Transition to fixed wing failed: " << fw_result << '\n';
-        return;
+    while (fw_result != Action::Result::Success) {
+        sleep_for(seconds(3));
+        fw_result = action.transition_to_fixedwing();
     }
 
     // Let it transition and start loitering.
     sleep_for(seconds(10));
-
-    bool outOfPath = false;
 
     for (auto& [longitude, latitude] : waypoints) {
         std::cout << "Sending it to location: (" << latitude << ", "
@@ -347,25 +342,12 @@ void executeMissionVTOL(std::vector<std::pair<float, float>>& waypoints,
             std::cerr << "Goto command failed: " << goto_result << '\n';
             return;
         }
-        while (std::abs(lat_ - latitude) > 0.001
-               || std::abs(lon_ - longitude) > 0.001)
-        {
-            double distance = MathExt().calculateSeparation(lat_, lon_, latitude, longitude);
-
-            if (distance > 5.0)
-            {
-                if(!outOfPath){
-                    std::cout << "Drone is " << distance << " meters off the path!\n";
-                    outOfPath = true;
-                }
-            } else {
-                if(outOfPath){
-                    std::cout << "Drone is back on track\n";
-                    outOfPath = false;
-                }
-            }
-            sleep_for(seconds(1));
-        }
+        //        while (std::abs(lat_ - latitude) > 0.001
+        //               || std::abs(lon_ - longitude) > 0.001)
+        //        {
+        //            sleep_for(seconds(1));
+        //        }
+        sleep_for(seconds(6));
     }
 
     // Let's stop before reaching the goto point and go back to hover.
