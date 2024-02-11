@@ -21,7 +21,7 @@ void Drone::updateValues(double latitude,
                          double yaw,
                          double battery)
 {
-    setLocation(QGeoCoordinate(latitude, longitude, altitude + 1219));
+    setLocation(QGeoCoordinate(latitude, longitude, altitude));
 
     setHeading(LmCdl::WrappedAnglePlusMinusPi(heading, LmCdl::AngleUnit::Degrees));
 
