@@ -10,13 +10,11 @@
 
 #include <Drone.h>
 #include <LmCdl/ContextMenuEvent.h>
-#include <LmCdl/I_Billboard.h>
+#include <LmCdl/GroundElevation.h>
 #include <LmCdl/I_PlannedRouteCollection.h>
 #include <LmCdl/I_VcsiUserNotificationApi.h>
 #include <LmCdl/I_VectorDataDrawingApi.h>
 #include <LmCdl/I_VideoStreamApi.h>
-#include <LmCdl/GroundElevation.h>
-#include <LmCdl/I_VideoVectorPickExclusiveListener.h>
 #include <LmCdl/I_VideoWindowApi.h>
 #include <LmCdl/StanagRoute.h>
 #include <LmCdl/StanagWaypoint.h>
@@ -28,7 +26,6 @@
 #include <QtConcurrent/QtConcurrent>
 #include <SardinosPublisher.h>
 #include <qicon.h>
-#include <qwidget.h>
 
 using std::chrono::seconds;
 using std::this_thread::sleep_for;
@@ -67,7 +64,7 @@ MissionPlanningContentCreator::MissionPlanningContentCreator(
     , drone_(new Drone(mapApi))
     , timer_(new QTimer())
 {
-    initConextMenuItems();
+    initContextMenuItems();
 
     connectToApiSignals();
 
@@ -80,7 +77,7 @@ MissionPlanningContentCreator::MissionPlanningContentCreator(
 
 MissionPlanningContentCreator::~MissionPlanningContentCreator() {};
 
-void MissionPlanningContentCreator::initConextMenuItems()
+void MissionPlanningContentCreator::initContextMenuItems()
 {
     missionBoundMenuItem_.setBackgroundColor(QColor(235, 12, 12, 180));
     missionBoundMenuItem_.setDescription("Add Mission Bound");
@@ -99,13 +96,15 @@ void MissionPlanningContentCreator::startLoop()
 {
     timer_->setInterval(1000);
 
-    connect(timer_,
-            &QTimer::timeout,
-            this,
-            [=]()
-            {
-                drone_->updateValues(latitude, longitude, altitude, heading, speed, yaw, battery);
-            });
+    connect(
+        timer_,
+        &QTimer::timeout,
+        this,
+        [=]()
+        {
+            drone_->updateValues(
+                latitude, longitude, altitude, heading, speed, yaw, battery);
+        });
 
     timer_->start();
 }
@@ -176,16 +175,16 @@ void MissionPlanningContentCreator::runMission()
 
     drone_->setVisible(true);
 
-    mission_.startMission();
-
-    auto uri =
-        "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/"
-        "BigBuckBunny.mp4";
-
-    liveDroneFeed_ =
-        &videoCollectionApi_.registerStream(uri, "Live drone stream");
-
-    imageProcessor_.init(uri);
+    //    mission_.startMission();
+    //
+    //    auto uri =
+    //        "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/"
+    //        "BigBuckBunny.mp4";
+    //
+    //    liveDroneFeed_ =
+    //        &videoCollectionApi_.registerStream(uri, "Live drone stream");
+    //
+    //    imageProcessor_.init(uri);
 
     QFuture<void> future = QtConcurrent::run(sardinos::executeMissionVTOL,
                                              mavWaypoints,
@@ -293,13 +292,14 @@ void MissionPlanningContentCreator::drawFlightPath()
 }
 
 void MissionPlanningContentCreator::changeUI(
-    MissionPlanningContentCreator::State newState)
+    const MissionPlanningContentCreator::State& newState)
 {
     switch (newState) {
         case CanGetFlightPath:
             missionBoundMenuItem_.setVisible(true);
             submitMissionMenuItem_.setVisible(true);
-            submitMissionMenuItem_.setBackgroundColor(QColor(50, 100, 235, 180));
+            submitMissionMenuItem_.setBackgroundColor(
+                QColor(50, 100, 235, 180));
             submitMissionMenuItem_.setDescription("Get Flight Path");
             clearFlightPath();
             break;
@@ -325,7 +325,8 @@ void MissionPlanningContentCreator::changeUI(
         default:
             missionBoundMenuItem_.setVisible(true);
             submitMissionMenuItem_.setVisible(true);
-            submitMissionMenuItem_.setBackgroundColor(QColor(50, 100, 235, 180));
+            submitMissionMenuItem_.setBackgroundColor(
+                QColor(50, 100, 235, 180));
             submitMissionMenuItem_.setDescription("Get Flight Path");
             clearFlightPath();
             break;
@@ -344,18 +345,21 @@ void MissionPlanningContentCreator::executeMissionAction()
         case CanCancelMission:
             cancelMission();
             break;
+        default:
+            break;
     };
 }
 
-void MissionPlanningContentCreator::updateUIState(State newState)
+void MissionPlanningContentCreator::updateUIState(const State& newState)
 {
     if (newState != m_state) {
         m_state = newState;
-        changeUI(newState);
+        changeUI(m_state);
     }
 }
 
-void MissionPlanningContentCreator::notify(const std::string& msg, Severity severity)
+void MissionPlanningContentCreator::notify(const std::string& msg,
+                                           Severity severity)
 {
     auto label = new QLabel(QString(msg.c_str()));
 

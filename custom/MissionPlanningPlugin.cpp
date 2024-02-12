@@ -1,4 +1,5 @@
 #include <QList>
+#include <iostream>
 
 #include <LmCdl/I_Billboard.h>
 #include <LmCdl/I_GroundElevationApi.h>

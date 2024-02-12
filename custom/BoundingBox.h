@@ -2,7 +2,6 @@
 
 #include <QGeoCoordinate>
 
-
 const double ALTITUDEMETERS = 1300;
 
 struct BoundingBox

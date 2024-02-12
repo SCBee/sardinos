@@ -23,7 +23,8 @@ void Drone::updateValues(double latitude,
 {
     setLocation(QGeoCoordinate(latitude, longitude, altitude));
 
-    setHeading(LmCdl::WrappedAnglePlusMinusPi(heading, LmCdl::AngleUnit::Degrees));
+    setHeading(
+        LmCdl::WrappedAnglePlusMinusPi(heading, LmCdl::AngleUnit::Degrees));
 
     setSpeed(LmCdl::Speed(speed, LmCdl::SpeedUnit::MetersPerSecond));
 
@@ -31,7 +32,8 @@ void Drone::updateValues(double latitude,
 
     setBattery(battery);
 
-    droneWidget_->updateValues(latitude, longitude, altitude, heading, speed, yaw, battery);
+    droneWidget_->updateValues(
+        latitude, longitude, altitude, heading, speed, yaw, battery);
 }
 
 QGeoCoordinate Drone::location() const

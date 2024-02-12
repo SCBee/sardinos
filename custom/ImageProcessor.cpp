@@ -1,14 +1,14 @@
-#include <ImageProcessor.h>
-
 #include <iostream>
+
+#include <ImageProcessor.h>
 
 void ImageProcessor::init(const std::string& uri)
 {
-    //auto video = cv::VideoCapture(uri);
+    // auto video = cv::VideoCapture(uri);
 
-    //cv::Mat frame;
+    // cv::Mat frame;
 
-    //video >> frame;
+    // video >> frame;
 
-    //cv::imwrite("test", frame);
+    // cv::imwrite("test", frame);
 }
