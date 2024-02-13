@@ -139,8 +139,6 @@ private:
     MissionPlanningDrawing* drawing_ = new MissionPlanningDrawing();
     BoundingBox missionBounds_;
 
-    FlightPather flightPather_ = FlightPather();
-
     MissionDomain mission_;
 
     State m_state;

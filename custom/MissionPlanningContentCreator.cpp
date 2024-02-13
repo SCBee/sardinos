@@ -146,7 +146,7 @@ void MissionPlanningContentCreator::getFlightPath()
 
     notify("Building Flight Path.");
 
-    mission_.setPath(flightPather_.getPath(missionBounds_));
+    mission_.setPath(sardinos::FlightPather::getPath(missionBounds_));
 
     drawFlightPath();
 
@@ -155,7 +155,7 @@ void MissionPlanningContentCreator::getFlightPath()
 
 void MissionPlanningContentCreator::runMission()
 {
-    if (!flightPather_.canFly(mission_.waypoints())) {
+    if (!sardinos::FlightPather::canFly(mission_.waypoints())) {
         notify("Flight path is too long.", Severity::Warning);
         return;
     }
@@ -205,11 +205,11 @@ void MissionPlanningContentCreator::cancelMission()
 
 void MissionPlanningContentCreator::updatePois()
 {
-    MathExt().delay(20);
+    sardinos::MathExt::delay(20);
 
     auto points = poiApi_.pointsOfInterest();
 
-    missionBounds_ = MathExt().findSmallestBoundingBox(points);
+    missionBounds_ = sardinos::MathExt::findSmallestBoundingBox(points);
 
     pois_.clear();
 
@@ -234,7 +234,7 @@ Q_SLOT void MissionPlanningContentCreator::drawMissionArea()
 
     auto lines = QList<MissionPlanningLine*>();
 
-    MathExt().cvhull(pois_);
+    sardinos::MathExt::cvhull(pois_);
 
     for (auto i = 1; i < pois_.size(); i++) {
         lines.push_back(new MissionPlanningLine(pois_[i][0], pois_[i - 1][0]));
