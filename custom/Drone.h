@@ -69,7 +69,7 @@ signals:
     void selectionEnabledChanged(bool selectionEnabled);
 
 private:
-    const QColor selectedColor_ = QColor(50, 150, 255);
+    const QColor selectedColor_   = QColor(50, 150, 255);
     const QColor deselectedColor_ = QColor(0, 50, 120);
 
     QGeoCoordinate location_;

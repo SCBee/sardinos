@@ -63,7 +63,7 @@ bool MissionPlanningPlugin::setRequiredApi(LmCdl::PluginCapabilityIdentifier id,
 
     if (id.capabilityName() == POINT_OF_INTEREST_API_CAPABILITY_NAME) {
         pointOfInterestApi_ = dynamic_cast<LmCdl::I_PointOfInterestApi*>(api);
-        capabilityFound = true;
+        capabilityFound     = true;
     }
 
     else if (id.capabilityName() == VCSI_APPLICATION_API_CAPABILITY_NAME)
@@ -75,24 +75,24 @@ bool MissionPlanningPlugin::setRequiredApi(LmCdl::PluginCapabilityIdentifier id,
     else if (id.capabilityName() == VECTOR_DATA_DRAWING_API_CAPABILITY_NAME)
     {
         vectorDrawingApi_ = dynamic_cast<LmCdl::I_VectorDataDrawingApi*>(api);
-        capabilityFound = true;
+        capabilityFound   = true;
     }
 
     else if (id.capabilityName() == MISSION_DRAWING_API_CAPABILITY_NAME)
     {
         missionDrawingApi_ = dynamic_cast<LmCdl::I_MissionDrawingApi*>(api);
-        capabilityFound = true;
+        capabilityFound    = true;
     }
 
     else if (id.capabilityName() == ROUTE_API_CAPABILITY_NAME)
     {
-        routeApi_ = dynamic_cast<LmCdl::I_RouteApi*>(api);
+        routeApi_       = dynamic_cast<LmCdl::I_RouteApi*>(api);
         capabilityFound = true;
     }
 
     else if (id.capabilityName() == TRACK_DRAWING_API_CAPABILITY_NAME)
     {
-        trackApi_ = dynamic_cast<LmCdl::I_TrackDrawingApi*>(api);
+        trackApi_       = dynamic_cast<LmCdl::I_TrackDrawingApi*>(api);
         capabilityFound = true;
     }
 
@@ -105,7 +105,7 @@ bool MissionPlanningPlugin::setRequiredApi(LmCdl::PluginCapabilityIdentifier id,
 
     else if (id.capabilityName() == GROUND_ELEVATION_API_CAPABILITY_NAME)
     {
-        elevationApi_ = dynamic_cast<LmCdl::I_GroundElevationApi*>(api);
+        elevationApi_   = dynamic_cast<LmCdl::I_GroundElevationApi*>(api);
         capabilityFound = true;
     }
 

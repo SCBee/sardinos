@@ -30,13 +30,13 @@
 using std::chrono::seconds;
 using std::this_thread::sleep_for;
 
-volatile double MissionPlanningContentCreator::latitude = 51.0f;
+volatile double MissionPlanningContentCreator::latitude  = 51.0f;
 volatile double MissionPlanningContentCreator::longitude = -114.0f;
-volatile double MissionPlanningContentCreator::altitude = 0.0f;
-volatile double MissionPlanningContentCreator::heading = 0.0f;
-volatile double MissionPlanningContentCreator::speed = 0.0f;
-volatile double MissionPlanningContentCreator::yaw = 0.0f;
-volatile double MissionPlanningContentCreator::battery = 0.0f;
+volatile double MissionPlanningContentCreator::altitude  = 0.0f;
+volatile double MissionPlanningContentCreator::heading   = 0.0f;
+volatile double MissionPlanningContentCreator::speed     = 0.0f;
+volatile double MissionPlanningContentCreator::yaw       = 0.0f;
+volatile double MissionPlanningContentCreator::battery   = 0.0f;
 
 MissionPlanningContentCreator::MissionPlanningContentCreator(
     LmCdl::I_VcsiMapExtensionApi& mapApi,

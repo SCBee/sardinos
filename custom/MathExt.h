@@ -10,20 +10,17 @@
 
 namespace LmCdl
 {
-class I_PointOfInterestApi;
+    class I_PointOfInterestApi;
 }  // namespace LmCdl
 
-class MathExt
+namespace sardinos::MathExt
 {
-public:
     void cvhull(std::vector<std::vector<QGeoCoordinate>>& pois);
     BoundingBox findSmallestBoundingBox(
         const QList<LmCdl::VcsiIdentifiedPointOfInterest>& points);
     void delay(int ms);
     double getDistance(double lat1, double lon1, double lat2, double lon2);
-    double getDistance(QGeoCoordinate c1, QGeoCoordinate c2);
-    bool isVertical(BoundingBox box);
-
-private:
+    double getDistance(const QGeoCoordinate& c1, const QGeoCoordinate& c2);
+    bool isVertical(const BoundingBox& box);
     std::vector<double> sqPolar(QGeoCoordinate& point, QGeoCoordinate& com);
-};
+}  // namespace sardinos::MathExt

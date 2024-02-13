@@ -38,11 +38,11 @@
 
 namespace LmCdl
 {
-class I_VcsiMapExtensionApi;
+    class I_VcsiMapExtensionApi;
 
-class I_PointOfInterestApi;
+    class I_PointOfInterestApi;
 
-class I_VcsiApplicationApi;
+    class I_VcsiApplicationApi;
 }  // namespace LmCdl
 
 class MissionPlanningContentCreator : public QObject
