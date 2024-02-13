@@ -13,6 +13,7 @@
 #include <ImageProcessor.h>
 #include <LmCdl/I_ContextMenu.h>
 #include <LmCdl/I_ContextMenuItem.h>
+#include <LmCdl/I_GroundElevationApi.h>
 #include <LmCdl/I_MissionDrawingApi.h>
 #include <LmCdl/I_PointOfInterestApi.h>
 #include <LmCdl/I_RouteApi.h>
@@ -22,7 +23,6 @@
 #include <LmCdl/I_VcsiMapExtensionApi.h>
 #include <LmCdl/I_VcsiUserNotificationApi.h>
 #include <LmCdl/I_VectorDataDrawingApi.h>
-#include <LmCdl/I_GroundElevationApi.h>
 #include <LmCdl/I_VideoStreamApiCollection.h>
 #include <LmCdl/UniqueIdentifier.h>
 #include <LmCdl/VcsiIdentifiedPointOfInterest.h>
@@ -78,16 +78,16 @@ public:
         LmCdl::I_VideoStreamApiCollection& videoCollectionApi,
         LmCdl::I_GroundElevationApi& elevationApi);
 
-    virtual ~MissionPlanningContentCreator();
+    ~MissionPlanningContentCreator() override;
 
 private:
     Q_DISABLE_COPY(MissionPlanningContentCreator);
 
     void getPoiProperties(const LmCdl::ContextMenuEvent& event);
 
-    void MissionPlanningContentCreator::startLoop();
+    void startLoop();
 
-    void initConextMenuItems();
+    void initContextMenuItems();
 
     void getFlightPath();
 
@@ -103,13 +103,14 @@ private:
 
     void executeMissionAction();
 
-    void changeUI(State newState);
+    void changeUI(const State& newState);
 
-    void updateUIState(State newState);
+    void updateUIState(const State& newState);
 
     void notify(const std::string& msg, Severity severity = Severity::Message);
 
-    void draw(QList<MissionPlanningPolygon*> polygons, QList<MissionPlanningLine*> lines);
+    void draw(QList<MissionPlanningPolygon*> polygons,
+              QList<MissionPlanningLine*> lines);
 
     void drawFlightPath();
 
@@ -144,7 +145,7 @@ private:
 
     MissionDomain mission_;
 
-    int m_state;
+    State m_state;
     volatile static double latitude;  // WGS84
     volatile static double longitude;  // WGS84
     volatile static double altitude;  // relative altitude, m

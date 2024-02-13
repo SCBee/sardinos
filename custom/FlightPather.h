@@ -5,9 +5,9 @@
 #include <BoundingBox.h>
 #include <MissionPlanningWaypoint.h>
 
-const auto SCANWIDTHMETERS = 500;
-const auto MAXDISTANCEMETERS = 200000000;
-const auto TURNINGRADIUSMETERS = 200;
+const double SCANWIDTHMETERS = 500.0;
+const double MAXDISTANCEMETERS = 200000000.0;
+const double TURNINGRADIUSMETERS = 200.0;
 
 class FlightPather
 {

@@ -1,6 +1,6 @@
 #include <FlightPather.h>
-#include <qmath.h>
 #include <MathExt.h>
+#include <qmath.h>
 
 FlightPather::FlightPather() {}
 
@@ -9,12 +9,13 @@ FlightPather::~FlightPather() {}
 QList<QGeoCoordinate> FlightPather::getVerticalFlightPath(
     BoundingBox missionBounds)
 {
-    auto longSpreadMeters = MathExt().getDistance(missionBounds.NE, missionBounds.NW);
+    auto longSpreadMeters =
+        MathExt().getDistance(missionBounds.NE, missionBounds.NW);
 
     auto longSpread =
         abs(missionBounds.eastBound() - missionBounds.westBound());
 
-    auto steps = longSpreadMeters / SCANWIDTHMETERS;
+    auto steps = std::max(1.0, longSpreadMeters / SCANWIDTHMETERS);
 
     auto stepLongitude = longSpread / steps;
 
@@ -67,11 +68,13 @@ QList<QGeoCoordinate> FlightPather::getVerticalFlightPath(
 QList<QGeoCoordinate> FlightPather::getHorizontalFlightPath(
     BoundingBox missionBounds)
 {
-    auto latSpreadMeters = MathExt().getDistance(missionBounds.NE, missionBounds.SE);
+    auto latSpreadMeters =
+        MathExt().getDistance(missionBounds.NE, missionBounds.SE);
 
-    auto latSpread = abs(missionBounds.northBound() - missionBounds.southBound());
+    auto latSpread =
+        abs(missionBounds.northBound() - missionBounds.southBound());
 
-    auto steps = latSpreadMeters / SCANWIDTHMETERS;
+    auto steps = std::max(1.0, latSpreadMeters / SCANWIDTHMETERS);
 
     auto stepLatitude = latSpread / steps;
 
@@ -136,8 +139,8 @@ bool FlightPather::canFly(QList<MissionPlanningWaypoint*> waypoints)
     auto sum = 0;
 
     for (auto i = 0; i < waypoints.size() - 1; i++) {
-        sum +=
-            MathExt().getDistance(waypoints[i]->location(), waypoints[i + 1]->location());
+        sum += MathExt().getDistance(waypoints[i]->location(),
+                                     waypoints[i + 1]->location());
     }
 
     if (sum <= MAXDISTANCEMETERS)

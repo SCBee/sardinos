@@ -7,7 +7,8 @@
 
 #define DEBUG
 #ifdef DEBUG
-#    include <stdio.h>
+#    include <cstdio>
+
 #    include <windows.h>
 #endif
 

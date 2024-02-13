@@ -20,10 +20,10 @@ add_executable(vcsi_sardinos
         custom/Drone.cpp
         custom/Drone.h
         custom/DroneWidget.h
-        custom/FlightPather.cpp
         custom/FlightPather.h
-        custom/MathExt.cpp
+        custom/FlightPather.cpp
         custom/MathExt.h
+        custom/MathExt.cpp
         custom/MissionDomain.cpp
         custom/MissionDomain.h
         custom/MissionPlanningContentCreator.cpp

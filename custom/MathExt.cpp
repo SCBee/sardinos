@@ -1,3 +1,5 @@
+#include <QCoreApplication>
+#include <QTime>
 #include <cmath>
 
 #include <MathExt.h>
@@ -36,8 +38,10 @@ void MathExt::cvhull(std::vector<std::vector<QGeoCoordinate>>& pois)
 
 std::vector<double> MathExt::sqPolar(QGeoCoordinate& point, QGeoCoordinate& com)
 {
-    double angle = atan2(point.latitude() - com.latitude(), point.longitude() - com.longitude());
-    double distance = pow(point.longitude() - com.longitude(), 2) + pow(point.latitude() - com.latitude(), 2);
+    double angle = atan2(point.latitude() - com.latitude(),
+                         point.longitude() - com.longitude());
+    double distance = pow(point.longitude() - com.longitude(), 2)
+        + pow(point.latitude() - com.latitude(), 2);
 
     return {angle, distance};
 }
@@ -49,14 +53,23 @@ BoundingBox MathExt::findSmallestBoundingBox(
         return BoundingBox();
 
     QGeoCoordinate southwest, northeast, southeast, northwest;
-    southwest = northeast = southeast = northwest = points[0].pointOfInterest().location();
+    southwest = northeast = southeast = northwest =
+        points[0].pointOfInterest().location();
 
     for (const auto& point : points) {
-        southwest.setLatitude(std::min(southwest.latitude(), point.pointOfInterest().location().latitude()));
-        southwest.setLongitude(std::min(southwest.longitude(),  point.pointOfInterest().location().longitude()));
+        southwest.setLatitude(
+            std::min(southwest.latitude(),
+                     point.pointOfInterest().location().latitude()));
+        southwest.setLongitude(
+            std::min(southwest.longitude(),
+                     point.pointOfInterest().location().longitude()));
 
-        northeast.setLatitude(std::max(northeast.latitude(), point.pointOfInterest().location().latitude()));
-        northeast.setLongitude(std::max(northeast.longitude(), point.pointOfInterest().location().longitude()));
+        northeast.setLatitude(
+            std::max(northeast.latitude(),
+                     point.pointOfInterest().location().latitude()));
+        northeast.setLongitude(
+            std::max(northeast.longitude(),
+                     point.pointOfInterest().location().longitude()));
     }
 
     southeast.setLatitude(southwest.latitude());
@@ -85,14 +98,18 @@ double MathExt::getDistance(QGeoCoordinate c1, QGeoCoordinate c2)
     const double R = 6378.137;
     double dLat = (c2.latitude() * M_PI / 180) - (c1.latitude() * M_PI / 180);
     double dLon = (c2.longitude() * M_PI / 180) - (c1.longitude() * M_PI / 180);
-    double a = sin(dLat / 2) * sin(dLat / 2) + cos(c1.latitude() * M_PI / 180) * cos(c2.latitude() * M_PI / 180) * sin(dLon / 2) * sin(dLon / 2);
+    double a = sin(dLat / 2) * sin(dLat / 2)
+        + cos(c1.latitude() * M_PI / 180) * cos(c2.latitude() * M_PI / 180)
+            * sin(dLon / 2) * sin(dLon / 2);
     double c = 2 * atan2(sqrt(a), sqrt(1 - a));
     double d = R * c;
     return d * 1000;  // meters
 }
 
-    bool MathExt::isVertical(BoundingBox box)
-    {
-        if (MathExt().getDistance(box.SE, box.SW) > MathExt().getDistance(box.SE, box.NE)) return false;
-        return true;
-    }
+bool MathExt::isVertical(BoundingBox box)
+{
+    if (MathExt().getDistance(box.SE, box.SW)
+        > MathExt().getDistance(box.SE, box.NE))
+        return false;
+    return true;
+}

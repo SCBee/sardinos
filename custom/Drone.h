@@ -5,12 +5,12 @@
 #include <QObject>
 #include <QTimer>
 
+#include <DroneWidget.h>
 #include <LmCdl/I_Billboard.h>
 #include <LmCdl/I_GraphicsWidget.h>
 #include <LmCdl/I_TrackVisualization.h>
 #include <LmCdl/I_VcsiMapExtensionApi.h>
 #include <LmCdl/Speed.h>
-#include <DroneWidget.h>
 
 class Drone : public LmCdl::I_TrackVisualization
 {
