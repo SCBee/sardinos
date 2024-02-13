@@ -389,8 +389,8 @@ namespace sardinos
             while (std::abs(lat_ - latitude) > 0.001
                    || std::abs(lon_ - longitude) > 0.001)
             {
-                double distance =
-                    MathExt().getDistance(lat_, lon_, latitude, longitude);
+                double distance = sardinos::MathExt::getDistance(
+                    lat_, lon_, latitude, longitude);
 
                 if (distance > 5.0f) {
                     if (!outOfPath) {

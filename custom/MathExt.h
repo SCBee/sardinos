@@ -8,11 +8,6 @@
 #include <LmCdl/VcsiIdentifiedPointOfInterest.h>
 #include <LmCdl/VcsiPointOfInterestProperties.h>
 
-namespace LmCdl
-{
-    class I_PointOfInterestApi;
-}  // namespace LmCdl
-
 namespace sardinos::MathExt
 {
     void cvhull(std::vector<std::vector<QGeoCoordinate>>& pois);
