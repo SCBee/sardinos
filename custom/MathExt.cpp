@@ -1,3 +1,5 @@
+#include <QCoreApplication>
+#include <QTime>
 #include <cmath>
 
 #include <MathExt.h>

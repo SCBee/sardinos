@@ -4,7 +4,14 @@
 #include <vector>
 
 #include <BoundingBox.h>
+#include <LmCdl/I_PointOfInterestApi.h>
 #include <LmCdl/VcsiIdentifiedPointOfInterest.h>
+#include <LmCdl/VcsiPointOfInterestProperties.h>
+
+namespace LmCdl
+{
+class I_PointOfInterestApi;
+}  // namespace LmCdl
 
 class MathExt
 {

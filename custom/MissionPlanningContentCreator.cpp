@@ -20,7 +20,7 @@
 #include <LmCdl/StanagWaypoint.h>
 #include <LmCdl/VcsiPointOfInterestProperties.h>
 #include <LmCdl/VectorDataPolygonDrawing.h>
-#include <MathExt.cpp>
+#include <MathExt.h>
 #include <MissionDomain.h>
 #include <MissionPlanningContentCreator.h>
 #include <QtConcurrent/QtConcurrent>
