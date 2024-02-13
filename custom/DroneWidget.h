@@ -12,13 +12,13 @@ public:
     {
         move(200, 0);
 
-        latitude_label = new QLabel("Latitude: ", this);
+        latitude_label  = new QLabel("Latitude: ", this);
         longitude_label = new QLabel("Longitude: ", this);
-        altitude_label = new QLabel("Altitude: ", this);
-        speed_label = new QLabel("Speed: ", this);
-        heading_label = new QLabel("Heading: ", this);
-        yaw_label = new QLabel("Yaw: ", this);
-        battery_label = new QLabel("Battery: ", this);
+        altitude_label  = new QLabel("Altitude: ", this);
+        speed_label     = new QLabel("Speed: ", this);
+        heading_label   = new QLabel("Heading: ", this);
+        yaw_label       = new QLabel("Yaw: ", this);
+        battery_label   = new QLabel("Battery: ", this);
 
         QVBoxLayout* layout = new QVBoxLayout(this);
         layout->addWidget(latitude_label);

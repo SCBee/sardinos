@@ -53,8 +53,8 @@ void MissionDomain::setupWaypoints(QList<QGeoCoordinate> coordinates)
 void MissionDomain::setupConnectors()
 {
     for (auto i = 0; i < waypoints_.size() - 1; i++) {
-        auto p1 = waypoints_[i].first;
-        auto p2 = waypoints_[i + 1].first;
+        auto p1        = waypoints_[i].first;
+        auto p2        = waypoints_[i + 1].first;
         auto connector = new MissionPlanningWaypointConnector();
         connector->setStartLocation(p1->location());
         connector->setEndLocation(p2->location());

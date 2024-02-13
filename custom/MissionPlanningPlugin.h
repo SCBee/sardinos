@@ -16,14 +16,14 @@ class MissionPlanningContentCreator;
 
 namespace LmCdl
 {
-class I_VectorDataDrawingApi;
-class I_PointOfInterestApi;
-class I_VcsiApplicationApi;
-class I_MissionDrawingApi;
-class I_RouteApi;
-class I_TrackDrawingApi;
-class I_VideoStreamApiCollection;
-class I_GroundElevationApi;
+    class I_VectorDataDrawingApi;
+    class I_PointOfInterestApi;
+    class I_VcsiApplicationApi;
+    class I_MissionDrawingApi;
+    class I_RouteApi;
+    class I_TrackDrawingApi;
+    class I_VideoStreamApiCollection;
+    class I_GroundElevationApi;
 }  // namespace LmCdl
 
 class MissionPlanningPlugin

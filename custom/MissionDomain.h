@@ -10,7 +10,7 @@
 
 namespace LmCdl
 {
-class I_SimpleWaypointConnector;
+    class I_SimpleWaypointConnector;
 }
 
 class MissionDomain : public QObject
