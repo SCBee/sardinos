@@ -35,8 +35,8 @@ void sardinos::MathExt::cvhull(std::vector<std::vector<QGeoCoordinate>>& pois)
     std::sort(pois.begin(), pois.end(), Comparator);
 }
 
-std::vector<double> sardinos::MathExt::sqPolar(QGeoCoordinate& point,
-                                               QGeoCoordinate& com)
+std::vector<double> sardinos::MathExt::sqPolar(const QGeoCoordinate& point,
+                                               const QGeoCoordinate& com)
 {
     double angle    = atan2(point.latitude() - com.latitude(),
                          point.longitude() - com.longitude());
@@ -81,7 +81,7 @@ BoundingBox sardinos::MathExt::findSmallestBoundingBox(
     return {southwest, northwest, southeast, northeast};
 }
 
-void sardinos::MathExt::delay(int ms)
+void sardinos::MathExt::delay(const int& ms)
 {
     QTime dieTime = QTime::currentTime().addMSecs(ms);
     while (QTime::currentTime() < dieTime)

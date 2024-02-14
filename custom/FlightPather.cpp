@@ -3,7 +3,7 @@
 #include <qmath.h>
 
 QList<QGeoCoordinate> sardinos::FlightPather::getVerticalFlightPath(
-    BoundingBox missionBounds)
+    const BoundingBox& missionBounds)
 {
     auto longSpreadMeters =
         sardinos::MathExt::getDistance(missionBounds.NE, missionBounds.NW);
@@ -62,7 +62,7 @@ QList<QGeoCoordinate> sardinos::FlightPather::getVerticalFlightPath(
 }
 
 QList<QGeoCoordinate> sardinos::FlightPather::getHorizontalFlightPath(
-    BoundingBox missionBounds)
+    const BoundingBox& missionBounds)
 {
     auto latSpreadMeters =
         sardinos::MathExt::getDistance(missionBounds.NE, missionBounds.SE);
@@ -122,7 +122,8 @@ QList<QGeoCoordinate> sardinos::FlightPather::getHorizontalFlightPath(
     return wayPoints;
 }
 
-QList<QGeoCoordinate> sardinos::FlightPather::getPath(BoundingBox missionBounds)
+QList<QGeoCoordinate> sardinos::FlightPather::getPath(
+    const BoundingBox& missionBounds)
 {
     if (sardinos::MathExt::isVertical(missionBounds))
         return getVerticalFlightPath(missionBounds);
@@ -130,7 +131,8 @@ QList<QGeoCoordinate> sardinos::FlightPather::getPath(BoundingBox missionBounds)
         return getHorizontalFlightPath(missionBounds);
 }
 
-bool sardinos::FlightPather::canFly(QList<MissionPlanningWaypoint*> waypoints)
+bool sardinos::FlightPather::canFly(
+    const QList<MissionPlanningWaypoint*>& waypoints)
 {
     auto sum = 0.0;
 

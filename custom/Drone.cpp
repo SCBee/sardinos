@@ -1,5 +1,6 @@
 #include <QTimer>
 #include <iostream>
+#include <utility>
 
 #include <Drone.h>
 
@@ -10,8 +11,6 @@ Drone::Drone(LmCdl::I_VcsiMapExtensionApi& mapApi)
 {
     widget_ = &mapApi.addGraphicsWidget(droneWidget_);
 }
-
-Drone::~Drone() {}
 
 void Drone::updateValues(double latitude,
                          double longitude,
@@ -54,7 +53,7 @@ LmCdl::WrappedAnglePlusMinusPi Drone::heading() const
     return heading_;
 }
 
-void Drone::setHeading(LmCdl::WrappedAnglePlusMinusPi heading)
+void Drone::setHeading(const LmCdl::WrappedAnglePlusMinusPi& heading)
 {
     heading_ = heading;
     emit headingChanged(heading_);
@@ -67,7 +66,7 @@ QColor Drone::color() const
 
 void Drone::setColor(QColor color)
 {
-    color_ = color;
+    color_ = std::move(color);
     emit colorChanged(color_);
 }
 
@@ -99,12 +98,12 @@ bool Drone::selectionEnabled() const
     return true;
 }
 
-void Drone::setSpeed(LmCdl::Speed speed)
+void Drone::setSpeed(const LmCdl::Speed& speed)
 {
     speed_ = speed;
 }
 
-void Drone::setYaw(LmCdl::WrappedAnglePlusMinusPi yaw)
+void Drone::setYaw(const LmCdl::WrappedAnglePlusMinusPi& yaw)
 {
     yaw_ = yaw;
 }

@@ -1,3 +1,5 @@
+#pragma once
+
 #include <QApplication>
 #include <QGeoCoordinate>
 #include <QLabel>
@@ -20,7 +22,7 @@ public:
         yaw_label       = new QLabel("Yaw: ", this);
         battery_label   = new QLabel("Battery: ", this);
 
-        QVBoxLayout* layout = new QVBoxLayout(this);
+        auto* layout = new QVBoxLayout(this);
         layout->addWidget(latitude_label);
         layout->addWidget(longitude_label);
         layout->addWidget(altitude_label);

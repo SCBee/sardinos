@@ -18,7 +18,7 @@ class Drone : public LmCdl::I_TrackVisualization
 public:
     explicit Drone(LmCdl::I_VcsiMapExtensionApi& mapApi);
 
-    ~Drone();
+    ~Drone() override = default;
 
     void updateValues(double latitude,
                       double longitude,
@@ -28,19 +28,19 @@ public:
                       double yaw,
                       double battery);
 
-    QGeoCoordinate location() const override;
+    [[nodiscard]] QGeoCoordinate location() const override;
 
     void setLocation(const QGeoCoordinate& location);
 
-    LmCdl::WrappedAnglePlusMinusPi heading() const override;
+    [[nodiscard]] LmCdl::WrappedAnglePlusMinusPi heading() const override;
 
-    void setHeading(LmCdl::WrappedAnglePlusMinusPi heading);
+    void setHeading(const LmCdl::WrappedAnglePlusMinusPi& heading);
 
-    QColor color() const override;
+    [[nodiscard]] QColor color() const override;
 
     void setColor(QColor color);
 
-    bool visible() const override;
+    [[nodiscard]] bool visible() const override;
 
     void setVisible(bool visible);
 
@@ -48,25 +48,13 @@ public:
 
     void deselected() override;
 
-    bool selectionEnabled() const override;
+    [[nodiscard]] bool selectionEnabled() const override;
 
-    void setSpeed(LmCdl::Speed speed);
+    void setSpeed(const LmCdl::Speed& speed);
 
-    void setYaw(LmCdl::WrappedAnglePlusMinusPi yaw);
+    void setYaw(const LmCdl::WrappedAnglePlusMinusPi& yaw);
 
     void setBattery(double battery);
-
-signals:
-
-    void locationChanged(const QGeoCoordinate& location);
-
-    void headingChanged(const LmCdl::WrappedAnglePlusMinusPi& heading);
-
-    void colorChanged(const QColor& color);
-
-    void visibleChanged(bool visible);
-
-    void selectionEnabledChanged(bool selectionEnabled);
 
 private:
     const QColor selectedColor_   = QColor(50, 150, 255);

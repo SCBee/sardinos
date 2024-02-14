@@ -22,11 +22,11 @@ public:
         return {SW, SE, NE, NW};
     }
 
-    double eastBound() { return NE.longitude(); }
+    [[nodiscard]] double eastBound() const { return NE.longitude(); }
 
-    double northBound() { return NE.latitude(); }
+    [[nodiscard]] double northBound() const { return NE.latitude(); }
 
-    double westBound() { return SW.longitude(); }
+    [[nodiscard]] double westBound() const { return SW.longitude(); }
 
-    double southBound() { return SW.latitude(); }
+    [[nodiscard]] double southBound() const { return SW.latitude(); }
 };

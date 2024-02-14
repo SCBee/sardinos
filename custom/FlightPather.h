@@ -11,8 +11,10 @@ const double TURNINGRADIUSMETERS = 200.0;
 
 namespace sardinos::FlightPather
 {
-    QList<QGeoCoordinate> getVerticalFlightPath(BoundingBox missionBounds);
-    QList<QGeoCoordinate> getHorizontalFlightPath(BoundingBox missionBounds);
-    QList<QGeoCoordinate> getPath(BoundingBox missionBounds);
-    bool canFly(QList<MissionPlanningWaypoint*> waypoints);
+    QList<QGeoCoordinate> getVerticalFlightPath(
+        const BoundingBox& missionBounds);
+    QList<QGeoCoordinate> getHorizontalFlightPath(
+        const BoundingBox& missionBounds);
+    QList<QGeoCoordinate> getPath(const BoundingBox& missionBounds);
+    bool canFly(const QList<MissionPlanningWaypoint*>& waypoints);
 }  // namespace sardinos::FlightPather
