@@ -47,8 +47,8 @@ Mission::MissionItem make_mission_item(
 
 namespace sardinos
 {
-    void setColor(const std::string& textColor,
-                  const std::string& bgColor = "black")
+    void setColor(const std::string& textColor = "default",
+                  const std::string& bgColor   = "black")
     {
         // Map of color strings to their corresponding Windows Console color
         // codes
@@ -78,11 +78,16 @@ namespace sardinos
                                 (WORD)((bgCode << 4) | textCode));
     }
 
-    void executeMissionVTOL(std::vector<std::pair<float, float>>& waypoints,
-                            volatile double& lat_,
-                            volatile double& lon_,
-                            volatile double& alt_,
-                            volatile double& head_)
+    void executeMissionVTOL(
+        const std::vector<std::pair<float, float>>& waypoints,
+        volatile double& lat_,
+        volatile double& lon_,
+        volatile double& alt_,
+        volatile double& altAbs_,
+        volatile double& head_,
+        volatile double& speed_,
+        volatile double& yaw_,
+        volatile double& batt_)
     {
         auto connectStr = "udp://:14550";
         Mavsdk mavsdk {
@@ -90,15 +95,21 @@ namespace sardinos
         ConnectionResult connection_result =
             mavsdk.add_any_connection(connectStr);
 
-        if (connection_result != ConnectionResult::Success) {
+        // wait while we try to establish our connection (heartbeat needs to be
+        // recorded)
+        setColor("red");
+        while (connection_result != ConnectionResult::Success) {
             std::cerr << "Connection failed: " << connection_result << '\n';
-            return;
+            sleep_for(seconds(3));
+            connection_result = mavsdk.add_any_connection(connectStr);
         }
 
+        // wait while we connect to the system
+        setColor("red");
         auto system = mavsdk.first_autopilot(3.0);
-        if (!system) {
-            std::cerr << "Timed out waiting for system\n";
-            return;
+        while (!system) {
+            std::cerr << "Timed out waiting for system...\n";
+            sleep_for(seconds(3));
         }
 
         // Instantiate plugins.
@@ -106,95 +117,110 @@ namespace sardinos
         auto action    = Action {system.value()};
 
         // We want to listen to the altitude of the drone at 1 Hz.
-        const Telemetry::Result set_rate_result =
-            telemetry.set_rate_position(1.0);
-        if (set_rate_result != Telemetry::Result::Success) {
+        setColor("red");
+        Telemetry::Result set_rate_result = telemetry.set_rate_position(1.0);
+        while (set_rate_result != Telemetry::Result::Success) {
             std::cerr << "Setting rate failed: " << set_rate_result << '\n';
-            return;
+            sleep_for(seconds(3));
+            set_rate_result = telemetry.set_rate_position(1.0);
         }
 
-        telemetry.subscribe_heading(
-            [&head_](const Telemetry::Heading& headTel)
-            {
-                //            std::cout << "Heading: " << headTel.heading_deg <<
-                //            " deg"
-                //                      << std::endl;
-                head_ = headTel.heading_deg;
-            });
+        telemetry.subscribe_heading([&head_](const Telemetry::Heading& headTel)
+                                    { head_ = headTel.heading_deg; });
 
         telemetry.subscribe_position(
-            [&lat_, &lon_, &alt_](const Telemetry::Position& position)
+            [&lat_, &lon_, &alt_, &altAbs_](const Telemetry::Position& position)
             {
-                //            std::cout << "Altitude: " <<
-                //            position.relative_altitude_m << " m"
-                //                      << std::endl
-                //                      << "Latitude: " << position.latitude_deg
-                //                      << std::endl
-                //                      << "Longitude: " <<
-                //                      position.longitude_deg
-                //                      << std::endl
-                //                      << std::endl;
-                lat_ = position.latitude_deg;
-                lon_ = position.longitude_deg;
-                alt_ = position.relative_altitude_m;
+                lat_    = position.latitude_deg;
+                lon_    = position.longitude_deg;
+                alt_    = position.relative_altitude_m;
+                altAbs_ = position.absolute_altitude_m;
             });
 
+        telemetry.subscribe_velocity_ned(
+            [&speed_](const Telemetry::VelocityNed& vel)
+            {
+                double vabs = std::sqrt(std::pow(vel.north_m_s, 2)
+                                        + std::pow(vel.east_m_s, 2)
+                                        + std::pow(vel.down_m_s, 2));
+                speed_      = vabs;
+            });
+
+        telemetry.subscribe_attitude_euler(
+            [&yaw_](const Telemetry::EulerAngle& euler)
+            { yaw_ = euler.yaw_deg; });
+
+        telemetry.subscribe_battery(
+            [&batt_](const Telemetry::Battery& battery)
+            { batt_ = battery.remaining_percent / 100.0; });
+
         // Wait until we are ready to arm.
+        setColor("cyan");
         while (!telemetry.health_all_ok()) {
             std::cout << "Waiting for vehicle to be ready to arm...\n";
-            sleep_for(seconds(1));
+            sleep_for(seconds(2));
         }
 
         // Arm vehicle
-        std::cout << "Arming.\n";
-        const Action::Result arm_result = action.arm();
-
-        if (arm_result != Action::Result::Success) {
+        setColor("red");
+        Action::Result arm_result = action.arm();
+        while (arm_result != Action::Result::Success) {
             std::cerr << "Arming failed: " << arm_result << '\n';
-            return;
+            sleep_for(seconds(2));
+            arm_result = action.arm();
         }
 
-        action.set_takeoff_altitude(200.0f);
-        sleep_for(seconds(2));
+        // take off altitude
+        double height = 150.0;
+        action.set_takeoff_altitude(height);
 
         // Take off
-        std::cout << "Taking off.\n";
-        const Action::Result takeoff_result = action.takeoff();
-        if (takeoff_result != Action::Result::Success) {
-            std::cerr << "Takeoff failed:n" << takeoff_result << '\n';
-            return;
+        setColor("red");
+        Action::Result takeoff_result = action.takeoff();
+        while (takeoff_result != Action::Result::Success) {
+            std::cerr << "Takeoff failed: " << takeoff_result << '\n';
+            sleep_for(seconds(2));
+            takeoff_result = action.takeoff();
         }
 
         // Wait while it takes off.
-        while (alt_ <= 199.0f) {
-            sleep_for(seconds(2));
+        setColor("yellow");
+        std::cout << "Waiting to reach takeoff altitude...\n";
+        while (alt_ <= height - 2) {
+            sleep_for(seconds(1));
         }
-        sleep_for(seconds(3));
 
-        std::cout << "Transition to fixedwing.\n";
-        const Action::Result fw_result = action.transition_to_fixedwing();
-
-        if (fw_result != Action::Result::Success) {
+        // transition to fixed wing
+        setColor("red");
+        Action::Result fw_result = action.transition_to_fixedwing();
+        while (fw_result != Action::Result::Success) {
             std::cerr << "Transition to fixed wing failed: " << fw_result
                       << '\n';
-            return;
+            sleep_for(seconds(1));
+            fw_result = action.transition_to_fixedwing();
         }
 
         // Let it transition and start loitering.
-        sleep_for(seconds(10));
+        setColor("yellow");
+        std::cout << "loitering...\n";
+        sleep_for(seconds(3));
 
+        // go through path
+        setColor("red");
         bool outOfPath = false;
-
         for (auto& [longitude, latitude] : waypoints) {
             std::cout << "Sending it to location: (" << latitude << ", "
                       << longitude << ")" << std::endl;
 
-            const Action::Result goto_result =
+            Action::Result goto_result =
                 action.goto_location(latitude, longitude, NAN, NAN);
 
-            if (goto_result != Action::Result::Success) {
-                std::cerr << "Goto command failed: " << goto_result << '\n';
-                return;
+            while (goto_result != Action::Result::Success) {
+                std::cerr << "Goto command failed: " << goto_result << " ["
+                          << latitude << ", " << longitude << "]\n";
+                sleep_for(seconds(3));
+                goto_result =
+                    action.goto_location(latitude, longitude, NAN, NAN);
             }
             while (std::abs(lat_ - latitude) > 0.001
                    || std::abs(lon_ - longitude) > 0.001)
@@ -221,20 +247,23 @@ namespace sardinos
             }
         }
 
+        // RTL
+
         // Let's stop before reaching the goto point and go back to hover.
-        std::cout << "Transition back to multicopter...\n";
-        const Action::Result mc_result = action.transition_to_multicopter();
-        if (mc_result != Action::Result::Success) {
+        setColor("red");
+        Action::Result mc_result = action.transition_to_multicopter();
+        while (mc_result != Action::Result::Success) {
             std::cerr << "Transition to multi copter failed: " << mc_result
                       << '\n';
-            return;
+            sleep_for(seconds(2));
+            mc_result = action.transition_to_multicopter();
         }
 
         // Wait for the transition to be carried out.
         sleep_for(seconds(5));
 
         // Now just land here.
-        std::cout << "Landing...\n";
+        setColor("red");
         const Action::Result land_result = action.land();
         if (land_result != Action::Result::Success) {
             std::cerr << "Land failed: " << land_result << '\n';
@@ -242,9 +271,10 @@ namespace sardinos
         }
 
         // Wait until disarmed.
+        setColor("yellow");
         while (telemetry.armed()) {
-            std::cout << "Waiting for vehicle to land and disarm\n.";
-            sleep_for(seconds(1));
+            std::cout << "Waiting for vehicle to land and disarm\n";
+            sleep_for(seconds(2));
         }
 
         std::cout << "Disarmed, exiting.\n";

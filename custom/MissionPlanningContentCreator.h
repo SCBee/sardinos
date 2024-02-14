@@ -142,6 +142,7 @@ private:
     volatile static double latitude;  // WGS84
     volatile static double longitude;  // WGS84
     volatile static double altitude;  // relative altitude, m
+    volatile static double altitudeAbs;  // absolute altitude, m
     volatile static double heading;  // degrees, 0 to 360
     volatile static double speed;  // meters per second
     volatile static double yaw;  // degrees, 0 to 360

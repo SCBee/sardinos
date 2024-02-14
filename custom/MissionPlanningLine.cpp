@@ -14,8 +14,8 @@ MissionPlanningLine::~MissionPlanningLine() = default;
 QPen MissionPlanningLine::pen() const
 {
     QPen pen = QPen(Qt::SolidLine);
-    pen.setWidth(2);
-    pen.setColor(QColor(9, 60, 214, 170));
+    pen.setWidth(3);
+    pen.setColor(QColor(72, 0, 102, 212));
     return pen;
 }
 

@@ -168,7 +168,7 @@ StatementMacros:
   - Q_UNUSED
   - QT_REQUIRE_VERSION
 TabWidth: 8
-UseCRLF: false
+UseCRLF: true
 UseTab: Never
 WhitespaceSensitiveMacros:
   - STRINGIZE

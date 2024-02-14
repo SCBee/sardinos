@@ -8,6 +8,7 @@ Drone::Drone(LmCdl::I_VcsiMapExtensionApi& mapApi)
     : visible_(false)
     , color_(deselectedColor_)
     , droneWidget_(new DroneWidget())
+    , battery_(0.0)
 {
     widget_ = &mapApi.addGraphicsWidget(droneWidget_);
 }
