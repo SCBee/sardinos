@@ -75,8 +75,7 @@ public:
         LmCdl::I_MissionDrawingApi& missionApi,
         LmCdl::I_RouteApi& routeApi,
         LmCdl::I_TrackDrawingApi& trackApi,
-        LmCdl::I_VideoStreamApiCollection& videoCollectionApi,
-        LmCdl::I_GroundElevationApi& elevationApi);
+        LmCdl::I_VideoStreamApiCollection& videoCollectionApi);
 
     ~MissionPlanningContentCreator() override;
 
@@ -131,7 +130,6 @@ private:
     LmCdl::I_RouteApi& routeApi_;
     LmCdl::I_TrackDrawingApi& trackApi_;
     LmCdl::I_VideoStreamApiCollection& videoCollectionApi_;
-    LmCdl::I_GroundElevationApi& elevationApi_;
 
     LmCdl::I_VideoStreamApi* liveDroneFeed_;
 

@@ -46,9 +46,8 @@ QList<LmCdl::PluginRequirement> MissionPlanningPlugin::requiredApis() const
         LmCdl::PluginRequirement(ROUTE_API_CAPABILITY_NAME, 1, 0, 0),
         LmCdl::PluginRequirement(TRACK_DRAWING_API_CAPABILITY_NAME, 1, 0, 0),
         LmCdl::PluginRequirement(
-            VIDEO_STREAM_API_COLLECTION_CAPABILITY_NAME, 1, 0, 0),
-        LmCdl::PluginRequirement(
-            GROUND_ELEVATION_API_CAPABILITY_NAME, 1, 0, 0)};
+            VIDEO_STREAM_API_COLLECTION_CAPABILITY_NAME, 1, 0, 0)
+    };
 }
 
 LmCdl::PluginCapabilityIdentifier MissionPlanningPlugin::providedApi() const
@@ -103,11 +102,11 @@ bool MissionPlanningPlugin::setRequiredApi(LmCdl::PluginCapabilityIdentifier id,
         capabilityFound = true;
     }
 
-    else if (id.capabilityName() == GROUND_ELEVATION_API_CAPABILITY_NAME)
-    {
-        elevationApi_ = dynamic_cast<LmCdl::I_GroundElevationApi*>(api);
-        capabilityFound = true;
-    }
+    // else if (id.capabilityName() == GROUND_ELEVATION_API_CAPABILITY_NAME)
+    // {
+    //     elevationApi_ = dynamic_cast<LmCdl::I_GroundElevationApi*>(api);
+    //     capabilityFound = true;
+    // }
 
     startPluginIfInitialized();
     return capabilityFound;
@@ -122,7 +121,7 @@ bool MissionPlanningPlugin::isFullyInitialized() const
 {
     return (pointOfInterestApi_ && applicationApi_ && vectorDrawingApi_
             && missionDrawingApi_ && routeApi_ && trackApi_
-            && videoCollectionApi_ && elevationApi_);
+            && videoCollectionApi_);
 }
 
 void MissionPlanningPlugin::startPluginIfInitialized()
@@ -151,7 +150,6 @@ void MissionPlanningPlugin::startPluginIfInitialized()
             *missionDrawingApi_,
             *routeApi_,
             *trackApi_,
-            *videoCollectionApi_,
-            *elevationApi_));
+            *videoCollectionApi_));
     }
 }

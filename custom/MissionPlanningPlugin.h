@@ -70,7 +70,5 @@ private:
 
     LmCdl::I_VideoStreamApiCollection* videoCollectionApi_;
 
-    LmCdl::I_GroundElevationApi* elevationApi_;
-
     QScopedPointer<MissionPlanningContentCreator> pluginContentCreator_;
 };

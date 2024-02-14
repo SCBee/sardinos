@@ -46,8 +46,7 @@ MissionPlanningContentCreator::MissionPlanningContentCreator(
     LmCdl::I_MissionDrawingApi& missionApi,
     LmCdl::I_RouteApi& routeApi,
     LmCdl::I_TrackDrawingApi& trackApi,
-    LmCdl::I_VideoStreamApiCollection& videoCollectionApi,
-    LmCdl::I_GroundElevationApi& elevationApi)
+    LmCdl::I_VideoStreamApiCollection& videoCollectionApi)
     : missionBoundMenuItem_(mapApi.terrainContextMenu().registerMenuItem())
     , submitMissionMenuItem_(mapApi.terrainContextMenu().registerMenuItem())
     , poiApi_(poiApi)
@@ -57,7 +56,6 @@ MissionPlanningContentCreator::MissionPlanningContentCreator(
     , routeApi_(routeApi)
     , trackApi_(trackApi)
     , videoCollectionApi_(videoCollectionApi)
-    , elevationApi_(elevationApi)
     , notification_(nullptr)
     , m_state(STARTUP)
     , mission_()
