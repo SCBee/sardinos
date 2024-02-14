@@ -1,11 +1,11 @@
 #include <MissionPlanningPolygon.h>
 
-MissionPlanningPolygon::MissionPlanningPolygon(QGeoPolygon polygon)
+MissionPlanningPolygon::MissionPlanningPolygon(const QGeoPolygon& polygon)
     : polygon_(polygon)
 {
 }
 
-MissionPlanningPolygon::~MissionPlanningPolygon() {}
+MissionPlanningPolygon::~MissionPlanningPolygon() = default;
 
 QGeoPolygon MissionPlanningPolygon::polygon() const
 {
@@ -22,5 +22,5 @@ QPen MissionPlanningPolygon::pen() const
 
 QBrush MissionPlanningPolygon::brush() const
 {
-    return QBrush(Qt::NoBrush);
+    return {Qt::NoBrush};
 }

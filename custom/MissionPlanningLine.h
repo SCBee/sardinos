@@ -9,15 +9,15 @@
 class MissionPlanningLine : public LmCdl::I_VectorDataLineDrawing
 {
 public:
-    MissionPlanningLine(QGeoCoordinate start, QGeoCoordinate end);
-    virtual ~MissionPlanningLine();
+    MissionPlanningLine(const QGeoCoordinate& start, const QGeoCoordinate& end);
+    ~MissionPlanningLine() override;
 
-    QGeoPath path() const override;
+    [[nodiscard]] QGeoPath path() const override;
 
-    QPen pen() const override;
+    [[nodiscard]] QPen pen() const override;
 
-    void updateStart(QGeoCoordinate newStart);
-    void updateEnd(QGeoCoordinate newEnd);
+    [[maybe_unused]] void updateStart(const QGeoCoordinate& newStart);
+    [[maybe_unused]] void updateEnd(const QGeoCoordinate& newEnd);
 
 private:
     QGeoCoordinate start_;

@@ -1,13 +1,13 @@
 #include <QColor>
+#include <utility>
 
+#include <FlightPather.h>
 #include <MissionDomain.h>
-
-#include "FlightPather.h"
 
 QList<MissionPlanningWaypoint*> MissionDomain::waypoints() const
 {
     auto waypoints = QList<MissionPlanningWaypoint*>();
-    for (auto pair : waypoints_) {
+    for (const auto& pair : waypoints_) {
         waypoints.append(pair.first);
     }
 
@@ -18,7 +18,7 @@ QList<LmCdl::I_SimpleWaypointConnector*> MissionDomain::waypointConnectors()
     const
 {
     auto connectors = QList<LmCdl::I_SimpleWaypointConnector*>();
-    for (auto pair : waypoints_) {
+    for (const auto& pair : waypoints_) {
         for (auto c : pair.second)
             connectors.append(c);
     }
@@ -28,7 +28,7 @@ QList<LmCdl::I_SimpleWaypointConnector*> MissionDomain::waypointConnectors()
 
 void MissionDomain::setPath(QList<QGeoCoordinate> coordinates)
 {
-    setupWaypoints(coordinates);
+    setupWaypoints(std::move(coordinates));
     setupConnectors();
     connectDraggingForWaypoints();
 }
@@ -45,8 +45,8 @@ void MissionDomain::setupWaypoints(QList<QGeoCoordinate> coordinates)
         waypoint->setSelectionEnabled(true);
         waypoint->setDraggingEnabled(true);
         waypoint->setVisible(true);
-        waypoints_.push_back(std::make_pair(
-            waypoint, QList<MissionPlanningWaypointConnector*>()));
+        waypoints_.emplace_back(waypoint,
+                                QList<MissionPlanningWaypointConnector*>());
     }
 }
 
@@ -100,7 +100,7 @@ void MissionDomain::connectDraggingForWaypoint(
     connect(&waypoint,
             &MissionPlanningWaypoint::draggingOccuredFromDrawing,
             this,
-            [this, connectedWaypoint](const QGeoCoordinate& dragLocation)
+            [connectedWaypoint](const QGeoCoordinate& dragLocation)
             { dragWaypointAndConnectors(dragLocation, connectedWaypoint); });
 
     connect(&waypoint,
@@ -124,7 +124,7 @@ void MissionDomain::initializeDragging(MissionPlanningWaypoint& waypoint)
 
 void MissionDomain::dragWaypointAndConnectors(
     const QGeoCoordinate& dragCoordinate,
-    ConnectedWaypointRef waypointAndConnectors) const
+    ConnectedWaypointRef waypointAndConnectors)
 {
     waypointAndConnectors.setLocation(dragCoordinate);
 }
@@ -146,7 +146,7 @@ void MissionDomain::abortDrag(ConnectedWaypointRef waypointAndConnectors)
     dragInProgress_ = DragInProgress();
 }
 
-MissionDomain::DragInProgress::DragInProgress() {}
+MissionDomain::DragInProgress::DragInProgress() = default;
 
 MissionDomain::DragInProgress::DragInProgress(
     const MissionPlanningWaypoint& waypointBeingDragged)
@@ -180,7 +180,7 @@ void MissionDomain::ConnectedWaypointRef::setLocation(
 
 void MissionDomain::startMission()
 {
-    for (auto i = 0; i < waypoints_.size(); i++) {
-        waypoints_[i].first->setDraggingEnabled(false);
+    for (auto& waypoint : waypoints_) {
+        waypoint.first->setDraggingEnabled(false);
     }
 }

@@ -9,40 +9,39 @@ class MissionPlanningWaypoint : public LmCdl::I_GeospatialSimpleWaypoint
     Q_OBJECT
 public:
     explicit MissionPlanningWaypoint();
-    ~MissionPlanningWaypoint();
+    ~MissionPlanningWaypoint() override;
 
     void setLocation(const QGeoCoordinate& location);
-    QGeoCoordinate location() const override;
+    [[nodiscard]] QGeoCoordinate location() const override;
 
     void setShape(const LmCdl::I_GeospatialSimpleWaypoint::Shape& shape);
-    LmCdl::I_GeospatialSimpleWaypoint::Shape shape() const override;
+    [[nodiscard]] LmCdl::I_GeospatialSimpleWaypoint::Shape shape()
+        const override;
 
     void setLabel(const QString& label);
-    QString label() const override;
+    [[nodiscard]] QString label() const override;
 
-    void setLabelOffset(const QVector2D& labelOffset);
-    QVector2D labelOffset() const override;
+    [[nodiscard]] QVector2D labelOffset() const override;
 
     void setColor(const QColor& color);
-    QColor color() const override;
+    [[nodiscard]] QColor color() const override;
 
     void setVisible(bool visible);
-    bool visible() const override;
+    [[nodiscard]] bool visible() const override;
 
-    void setRelativeZOrder(int relativeZOrder);
-    int relativeZOrder() const override;
+    [[nodiscard]] int relativeZOrder() const override;
 
     void selected() override;
     void deselected() override;
 
     void setSelectionEnabled(bool selectionEnabled);
-    bool selectionEnabled() const override;
+    [[nodiscard]] bool selectionEnabled() const override;
 
     void setHighlighted(bool highlighted);
-    bool highlighted() const override;
+    [[nodiscard]] bool highlighted() const override;
 
     void setDraggingEnabled(bool dragging);
-    bool draggingEnabled() const override;
+    [[nodiscard]] bool draggingEnabled() const override;
 
     void dragStarted() override;
     void dragging(const QGeoCoordinate& dragLocation) override;

@@ -36,18 +36,19 @@ class MissionPlanningPlugin
 public:
     MissionPlanningPlugin();
 
-    virtual ~MissionPlanningPlugin();
+    ~MissionPlanningPlugin() override;
 
-    QList<LmCdl::PluginRequirement> requiredApis() const override;
+    [[nodiscard]] QList<LmCdl::PluginRequirement> requiredApis() const override;
 
-    LmCdl::PluginCapabilityIdentifier providedApi() const override;
+    [[nodiscard]] LmCdl::PluginCapabilityIdentifier providedApi()
+        const override;
 
     bool setRequiredApi(LmCdl::PluginCapabilityIdentifier id,
                         QObject* api) override;
 
     QObject* getProvidedApi() override;
 
-    bool isFullyInitialized() const override;
+    [[nodiscard]] bool isFullyInitialized() const override;
 
 private:
     void startPluginIfInitialized();

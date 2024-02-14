@@ -7,14 +7,14 @@
 class MissionPlanningPolygon : public LmCdl::I_VectorDataPolygonDrawing
 {
 public:
-    MissionPlanningPolygon(QGeoPolygon polygon);
-    virtual ~MissionPlanningPolygon();
+    explicit MissionPlanningPolygon(const QGeoPolygon& polygon);
+    ~MissionPlanningPolygon() override;
 
-    QGeoPolygon polygon() const override;
+    [[nodiscard]] QGeoPolygon polygon() const override;
 
-    QPen pen() const override;
+    [[nodiscard]] QPen pen() const override;
 
-    QBrush brush() const override;
+    [[nodiscard]] QBrush brush() const override;
 
 private:
     QGeoPolygon polygon_;

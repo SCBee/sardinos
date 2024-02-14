@@ -22,8 +22,9 @@ public:
 
     void startMission();
 
-    QList<MissionPlanningWaypoint*> waypoints() const;
-    QList<LmCdl::I_SimpleWaypointConnector*> waypointConnectors() const;
+    [[nodiscard]] QList<MissionPlanningWaypoint*> waypoints() const;
+    [[nodiscard]] QList<LmCdl::I_SimpleWaypointConnector*> waypointConnectors()
+        const;
 
     void setPath(QList<QGeoCoordinate> coordinates);
 
@@ -68,9 +69,9 @@ private:
 
     void initializeDragging(MissionPlanningWaypoint& waypoint);
 
-    void dragWaypointAndConnectors(
+    static void dragWaypointAndConnectors(
         const QGeoCoordinate& dragCoordinate,
-        ConnectedWaypointRef waypointAndConnectors) const;
+        ConnectedWaypointRef waypointAndConnectors);
 
     void completeDrag(const QGeoCoordinate& dragCoordinate,
                       ConnectedWaypointRef waypointAndConnectors);
