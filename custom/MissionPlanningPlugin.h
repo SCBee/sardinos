@@ -23,7 +23,6 @@ namespace LmCdl
     class I_RouteApi;
     class I_TrackDrawingApi;
     class I_VideoStreamApiCollection;
-    class I_GroundElevationApi;
 }  // namespace LmCdl
 
 class MissionPlanningPlugin
