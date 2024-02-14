@@ -54,7 +54,7 @@ public:
 
     void setYaw(const LmCdl::WrappedAnglePlusMinusPi& yaw);
 
-    void setBattery(double battery);
+    void setBattery(const double& battery);
 
 private:
     const QColor selectedColor_   = QColor(50, 150, 255);

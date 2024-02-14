@@ -109,7 +109,7 @@ void Drone::setYaw(const LmCdl::WrappedAnglePlusMinusPi& yaw)
     yaw_ = yaw;
 }
 
-void Drone::setBattery(double battery)
+void Drone::setBattery(const double& battery)
 {
     battery_ = battery;
 }
