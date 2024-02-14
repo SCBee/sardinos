@@ -108,16 +108,14 @@ private:
 
     void notify(const std::string& msg, Severity severity = Severity::Message);
 
-    void draw(QList<MissionPlanningPolygon*> polygons,
-              QList<MissionPlanningLine*> lines);
+    void draw(const QList<MissionPlanningPolygon*>& polygons,
+              const QList<MissionPlanningLine*>& lines);
 
     void drawFlightPath();
 
     void clearMissionArea();
 
     void clearFlightPath();
-
-    void notifyPeriodically();
 
     LmCdl::I_ContextMenuItem& missionBoundMenuItem_;
     LmCdl::I_ContextMenuItem& submitMissionMenuItem_;
@@ -135,7 +133,6 @@ private:
 
     ImageProcessor imageProcessor_ = ImageProcessor();
 
-    LmCdl::I_UserNotification* notification_;
     MissionPlanningDrawing* drawing_ = new MissionPlanningDrawing();
     BoundingBox missionBounds_;
 

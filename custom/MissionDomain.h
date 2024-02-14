@@ -17,8 +17,8 @@ class MissionDomain : public QObject
 {
     Q_OBJECT
 public:
-    MissionDomain() {}
-    ~MissionDomain() override {}
+    MissionDomain()           = default;
+    ~MissionDomain() override = default;
 
     void startMission();
 
