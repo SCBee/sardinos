@@ -98,7 +98,7 @@ void MissionDomain::connectDraggingForWaypoint(
             [this, &waypoint]() { initializeDragging(waypoint); });
 
     connect(&waypoint,
-            &MissionPlanningWaypoint::draggingOccuredFromDrawing,
+            &MissionPlanningWaypoint::draggingOccurredFromDrawing,
             this,
             [connectedWaypoint](const QGeoCoordinate& dragLocation)
             { dragWaypointAndConnectors(dragLocation, connectedWaypoint); });

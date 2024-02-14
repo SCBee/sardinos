@@ -21,7 +21,7 @@ QPen MissionPlanningLine::pen() const
 
 QGeoPath MissionPlanningLine::path() const
 {
-    return QGeoPath(path_);
+    return path_;
 }
 
 [[maybe_unused]] void MissionPlanningLine::updateStart(

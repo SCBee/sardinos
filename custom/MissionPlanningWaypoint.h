@@ -50,7 +50,7 @@ public:
 
 signals:
     void dragStartedFromDrawing();
-    void draggingOccuredFromDrawing(const QGeoCoordinate& dragLocation);
+    void draggingOccurredFromDrawing(const QGeoCoordinate& dragLocation);
     void dragConfirmedFromDrawing(const QGeoCoordinate& dragLocation);
     void dragCancelledFromDrawing();
 

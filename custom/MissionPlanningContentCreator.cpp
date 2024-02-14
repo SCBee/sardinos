@@ -61,6 +61,7 @@ MissionPlanningContentCreator::MissionPlanningContentCreator(
     , mission_()
     , drone_(new Drone(mapApi))
     , timer_(new QTimer())
+    , liveDroneFeed_(nullptr)
 {
     initContextMenuItems();
 

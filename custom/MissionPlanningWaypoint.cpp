@@ -150,7 +150,7 @@ void MissionPlanningWaypoint::dragStarted()
 
 void MissionPlanningWaypoint::dragging(const QGeoCoordinate& dragLocation)
 {
-    emit draggingOccuredFromDrawing(dragLocation);
+    emit draggingOccurredFromDrawing(dragLocation);
 }
 
 void MissionPlanningWaypoint::dragConfirmed(const QGeoCoordinate& dragLocation)
