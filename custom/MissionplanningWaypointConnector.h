@@ -10,22 +10,23 @@ class MissionPlanningWaypointConnector : public LmCdl::I_SimpleWaypointConnector
 public:
     MissionPlanningWaypointConnector();
 
-    [[nodiscard]] QGeoCoordinate startLocation() const override;
+    QGeoCoordinate startLocation() const override;
     void setStartLocation(const QGeoCoordinate& newLocation);
 
-    [[nodiscard]] QGeoCoordinate endLocation() const override;
+    QGeoCoordinate endLocation() const override;
     void setEndLocation(const QGeoCoordinate& newLocation);
 
-    [[nodiscard]] QColor color() const override;
-    void setColor(const QColor& color);
+    QColor color() const override;
+    void setColor(QColor color);
 
-    [[nodiscard]] bool visible() const override;
+    bool visible() const override;
     void setVisible(bool isVisible);
 
-    [[nodiscard]] bool directionalIndicatorVisible() const override;
+    bool directionalIndicatorVisible() const override;
     void setDirectionalIndicatorVisible(bool isVisible);
 
-    [[nodiscard]] int relativeZOrder() const override;
+    int relativeZOrder() const override;
+    void setRelativeZOrder(int order);
 
 private:
     Q_DISABLE_COPY(MissionPlanningWaypointConnector)
