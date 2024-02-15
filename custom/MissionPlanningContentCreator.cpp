@@ -173,16 +173,16 @@ void MissionPlanningContentCreator::runMission()
 
     drone_->setVisible(true);
 
-    //    mission_.startMission();
-    //
-    //    auto uri =
-    //        "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/"
-    //        "BigBuckBunny.mp4";
-    //
-    //    liveDroneFeed_ =
-    //        &videoCollectionApi_.registerStream(uri, "Live drone stream");
-    //
-    //    imageProcessor_.init(uri);
+    mission_.startMission();
+
+    auto uri =
+        "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/"
+        "BigBuckBunny.mp4";
+
+    liveDroneFeed_ =
+        &videoCollectionApi_.registerStream(uri, "Live drone stream");
+
+    imageProcessor_.init(uri);
 
     QFuture<void> future = QtConcurrent::run(sardinos::executeMissionVTOL,
                                              mavWaypoints,
