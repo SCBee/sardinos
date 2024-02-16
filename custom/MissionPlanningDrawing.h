@@ -16,7 +16,7 @@ class MissionPlanningDrawing : public LmCdl::I_VectorDataDrawing
 public:
     MissionPlanningDrawing();
 
-    virtual ~MissionPlanningDrawing();
+    ~MissionPlanningDrawing() override;
 
     [[nodiscard]] const QSet<LmCdl::I_VectorDataPointDrawing*>& pointDrawings(
         const QGeoRectangle& area) const override;
@@ -29,23 +29,17 @@ public:
 
     void addPolygon(MissionPlanningPolygon* polygon);
 
-    void addPolygons(QList<MissionPlanningPolygon*> polygon);
+    void addPolygons(const QList<MissionPlanningPolygon*>& polygon);
 
     void addLine(MissionPlanningLine* line);
 
-    void addLines(QList<MissionPlanningLine*> lines);
+    void addLines(const QList<MissionPlanningLine*>& lines);
 
     void clear();
 
     void update();
 
     [[nodiscard]] bool visible() const override;
-
-signals:
-
-    void visibilityChanged(bool visible);
-
-    void drawingChanged();
 
 private:
     QSet<LmCdl::I_VectorDataPointDrawing*> points_;

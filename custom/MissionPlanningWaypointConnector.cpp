@@ -41,7 +41,7 @@ QColor MissionPlanningWaypointConnector::color() const
     return color_;
 }
 
-void MissionPlanningWaypointConnector::setColor(QColor color)
+void MissionPlanningWaypointConnector::setColor(const QColor& color)
 {
     if (color != color_) {
         color_ = color;
@@ -80,12 +80,4 @@ void MissionPlanningWaypointConnector::setDirectionalIndicatorVisible(
 int MissionPlanningWaypointConnector::relativeZOrder() const
 {
     return relativeZOrder_;
-}
-
-void MissionPlanningWaypointConnector::setRelativeZOrder(int order)
-{
-    if (order != relativeZOrder_) {
-        relativeZOrder_ = order;
-        emit relativeZOrderChanged(relativeZOrder_);
-    }
 }

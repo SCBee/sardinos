@@ -4,9 +4,8 @@
 #include <QLabel>
 #include <QTime>
 #include <QTimer>
-#include <cmath>
-#include <iostream>
 #include <thread>
+#include <utility>
 
 #include <Drone.h>
 #include <LmCdl/ContextMenuEvent.h>
@@ -30,13 +29,14 @@
 using std::chrono::seconds;
 using std::this_thread::sleep_for;
 
-volatile double MissionPlanningContentCreator::latitude = 51.0f;
-volatile double MissionPlanningContentCreator::longitude = -114.0f;
-volatile double MissionPlanningContentCreator::altitude = 0.0f;
-volatile double MissionPlanningContentCreator::heading = 0.0f;
-volatile double MissionPlanningContentCreator::speed = 0.0f;
-volatile double MissionPlanningContentCreator::yaw = 0.0f;
-volatile double MissionPlanningContentCreator::battery = 0.0f;
+volatile double MissionPlanningContentCreator::latitude    = 51.0f;
+volatile double MissionPlanningContentCreator::longitude   = -114.0f;
+volatile double MissionPlanningContentCreator::altitude    = 0.0f;
+volatile double MissionPlanningContentCreator::altitudeAbs = 0.0f;
+volatile double MissionPlanningContentCreator::heading     = 0.0f;
+volatile double MissionPlanningContentCreator::speed       = 0.0f;
+volatile double MissionPlanningContentCreator::yaw         = 0.0f;
+volatile double MissionPlanningContentCreator::battery     = 0.0f;
 
 MissionPlanningContentCreator::MissionPlanningContentCreator(
     LmCdl::I_VcsiMapExtensionApi& mapApi,
@@ -56,11 +56,11 @@ MissionPlanningContentCreator::MissionPlanningContentCreator(
     , routeApi_(routeApi)
     , trackApi_(trackApi)
     , videoCollectionApi_(videoCollectionApi)
-    , notification_(nullptr)
     , m_state(STARTUP)
     , mission_()
     , drone_(new Drone(mapApi))
     , timer_(new QTimer())
+    , liveDroneFeed_(nullptr)
 {
     initContextMenuItems();
 
@@ -73,7 +73,7 @@ MissionPlanningContentCreator::MissionPlanningContentCreator(
     updatePois();
 }
 
-MissionPlanningContentCreator::~MissionPlanningContentCreator() {};
+MissionPlanningContentCreator::~MissionPlanningContentCreator() = default;
 
 void MissionPlanningContentCreator::initContextMenuItems()
 {
@@ -98,9 +98,9 @@ void MissionPlanningContentCreator::startLoop()
         timer_,
         &QTimer::timeout,
         this,
-        [=]()
+        [this]()
         {
-            drone_->updateValues(
+            this->drone_->updateValues(
                 latitude, longitude, altitude, heading, speed, yaw, battery);
         });
 
@@ -146,7 +146,7 @@ void MissionPlanningContentCreator::getFlightPath()
 
     notify("Building Flight Path.");
 
-    mission_.setPath(flightPather_.getPath(missionBounds_));
+    mission_.setPath(sardinos::FlightPather::getPath(missionBounds_));
 
     drawFlightPath();
 
@@ -155,7 +155,7 @@ void MissionPlanningContentCreator::getFlightPath()
 
 void MissionPlanningContentCreator::runMission()
 {
-    if (!flightPather_.canFly(mission_.waypoints())) {
+    if (!sardinos::FlightPather::canFly(mission_.waypoints())) {
         notify("Flight path is too long.", Severity::Warning);
         return;
     }
@@ -184,12 +184,19 @@ void MissionPlanningContentCreator::runMission()
 
     imageProcessor_.init(uri);
 
-    QFuture<void> future = QtConcurrent::run(sardinos::executeMissionVTOL,
-                                             mavWaypoints,
-                                             std::ref(latitude),
-                                             std::ref(longitude),
-                                             std::ref(altitude),
-                                             std::ref(heading));
+    QFuture<void> future = QtConcurrent::run(
+        [mavWaypoints]()
+        {
+            sardinos::executeMissionVTOL(std::ref(mavWaypoints),
+                                         std::ref(latitude),
+                                         std::ref(longitude),
+                                         std::ref(altitude),
+                                         std::ref(altitudeAbs),
+                                         std::ref(heading),
+                                         std::ref(speed),
+                                         std::ref(yaw),
+                                         std::ref(battery));
+        });
 }
 
 void MissionPlanningContentCreator::cancelMission()
@@ -205,11 +212,11 @@ void MissionPlanningContentCreator::cancelMission()
 
 void MissionPlanningContentCreator::updatePois()
 {
-    MathExt().delay(20);
+    sardinos::MathExt::delay(20);
 
     auto points = poiApi_.pointsOfInterest();
 
-    missionBounds_ = MathExt().findSmallestBoundingBox(points);
+    missionBounds_ = sardinos::MathExt::findSmallestBoundingBox(points);
 
     pois_.clear();
 
@@ -234,7 +241,7 @@ Q_SLOT void MissionPlanningContentCreator::drawMissionArea()
 
     auto lines = QList<MissionPlanningLine*>();
 
-    MathExt().cvhull(pois_);
+    sardinos::MathExt::cvhull(pois_);
 
     for (auto i = 1; i < pois_.size(); i++) {
         lines.push_back(new MissionPlanningLine(pois_[i][0], pois_[i - 1][0]));
@@ -246,7 +253,8 @@ Q_SLOT void MissionPlanningContentCreator::drawMissionArea()
 }
 
 void MissionPlanningContentCreator::draw(
-    QList<MissionPlanningPolygon*> polygons, QList<MissionPlanningLine*> lines)
+    const QList<MissionPlanningPolygon*>& polygons,
+    const QList<MissionPlanningLine*>& lines)
 {
     drawing_->clear();
     drawing_->addPolygons(polygons);
@@ -328,7 +336,7 @@ void MissionPlanningContentCreator::changeUI(
             submitMissionMenuItem_.setDescription("Get Flight Path");
             clearFlightPath();
             break;
-    };
+    }
 }
 
 void MissionPlanningContentCreator::executeMissionAction()
@@ -345,7 +353,7 @@ void MissionPlanningContentCreator::executeMissionAction()
             break;
         default:
             break;
-    };
+    }
 }
 
 void MissionPlanningContentCreator::updateUIState(const State& newState)
@@ -376,15 +384,5 @@ void MissionPlanningContentCreator::notify(const std::string& msg,
         case Danger:
             notApi_.addNotification(label).setBackgroundColor(Qt::red);
             break;
-    };
-}
-
-void MissionPlanningContentCreator::notifyPeriodically()
-{
-    // (lat, long, alt) [heading]
-    std::string msg = "(" + std::to_string(latitude) + ", "
-        + std::to_string(longitude) + ", " + std::to_string(altitude) + ") ["
-        + std::to_string(heading) + "]";
-
-    notApi_.addNotification(new QLabel(QString(msg.c_str())));
+    }
 }

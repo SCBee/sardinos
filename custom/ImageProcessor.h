@@ -1,10 +1,10 @@
 #pragma once
 
 #include <QObject>
-#include <xstring>
+#include <string>
 
-#include <opencv2/imgcodecs.hpp>
-#include <opencv2/videoio.hpp>
+//#include <opencv2/imgcodecs.hpp>
+//#include <opencv2/videoio.hpp>
 
 class ImageProcessor : public QObject
 {

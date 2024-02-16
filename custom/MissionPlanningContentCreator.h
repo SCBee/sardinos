@@ -38,11 +38,11 @@
 
 namespace LmCdl
 {
-class I_VcsiMapExtensionApi;
+    class I_VcsiMapExtensionApi;
 
-class I_PointOfInterestApi;
+    class I_PointOfInterestApi;
 
-class I_VcsiApplicationApi;
+    class I_VcsiApplicationApi;
 }  // namespace LmCdl
 
 class MissionPlanningContentCreator : public QObject
@@ -108,16 +108,14 @@ private:
 
     void notify(const std::string& msg, Severity severity = Severity::Message);
 
-    void draw(QList<MissionPlanningPolygon*> polygons,
-              QList<MissionPlanningLine*> lines);
+    void draw(const QList<MissionPlanningPolygon*>& polygons,
+              const QList<MissionPlanningLine*>& lines);
 
     void drawFlightPath();
 
     void clearMissionArea();
 
     void clearFlightPath();
-
-    void notifyPeriodically();
 
     LmCdl::I_ContextMenuItem& missionBoundMenuItem_;
     LmCdl::I_ContextMenuItem& submitMissionMenuItem_;
@@ -135,11 +133,8 @@ private:
 
     ImageProcessor imageProcessor_ = ImageProcessor();
 
-    LmCdl::I_UserNotification* notification_;
     MissionPlanningDrawing* drawing_ = new MissionPlanningDrawing();
     BoundingBox missionBounds_;
-
-    FlightPather flightPather_ = FlightPather();
 
     MissionDomain mission_;
 
@@ -147,6 +142,7 @@ private:
     volatile static double latitude;  // WGS84
     volatile static double longitude;  // WGS84
     volatile static double altitude;  // relative altitude, m
+    volatile static double altitudeAbs;  // absolute altitude, m
     volatile static double heading;  // degrees, 0 to 360
     volatile static double speed;  // meters per second
     volatile static double yaw;  // degrees, 0 to 360
