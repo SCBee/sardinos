@@ -4,8 +4,6 @@
 #include <QLabel>
 #include <QTime>
 #include <QTimer>
-#include <cmath>
-#include <iostream>
 #include <thread>
 #include <utility>
 

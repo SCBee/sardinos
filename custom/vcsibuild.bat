@@ -15,7 +15,6 @@ if exist "C:\Program Files\LMCDL\vcsi\bin\plugins\vcsi\%1.dll" (
 
 move "..\build\%1.dll" "C:\Program Files\LMCDL\vcsi\bin\plugins\vcsi"
 move "..\build\%1.pdb" "C:\Program Files\LMCDL\vcsi\bin\plugins\vcsi"
-rmdir /s /q "%localappdata%\vcsi\cache"
 
 
 goto :end
