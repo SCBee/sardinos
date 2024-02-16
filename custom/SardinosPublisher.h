@@ -14,10 +14,13 @@
 #include <MathExt.h>
 #include <MissionPlanningContentCreator.h>
 #include <mavsdk/mavsdk.h>
+#include <mavlink/common/mavlink.h>
 #include <mavsdk/plugins/action/action.h>
 #include <mavsdk/plugins/mission/mission.h>
 #include <mavsdk/plugins/telemetry/telemetry.h>
 #include <windows.h>
+
+#include <mavsdk/plugins/mavlink_passthrough/mavlink_passthrough.h>
 
 using namespace mavsdk;
 using std::chrono::seconds;
@@ -90,6 +93,8 @@ namespace sardinos
         volatile double& batt_)
     {
         auto connectStr = "udp://:14550";
+        //auto connectStr = "serial://COM3:57600";
+
         Mavsdk mavsdk {
             Mavsdk::Configuration {Mavsdk::ComponentType::GroundStation}};
         ConnectionResult connection_result =
