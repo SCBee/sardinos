@@ -182,7 +182,9 @@ void MissionPlanningContentCreator::runMission()
     //    liveDroneFeed_ =
     //        &videoCollectionApi_.registerStream(uri, "Live drone stream");
     //
-    //    imageProcessor_.init(uri);
+    QFuture<void> testImageProcFuture = QtConcurrent::run([this]() {
+                                                              sardinos::test();
+                                        });
 
     QFuture<void> future = QtConcurrent::run(
         [mavWaypoints]()
