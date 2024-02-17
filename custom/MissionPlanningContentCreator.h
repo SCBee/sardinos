@@ -132,7 +132,7 @@ private:
 
     LmCdl::I_VideoStreamApi* liveDroneFeed_;
 
-    ImageProcessor imageProcessor_ = ImageProcessor();
+//    ImageProcessor imageProcessor_ = ImageProcessor();
 
     MissionPlanningDrawing* drawing_ = new MissionPlanningDrawing();
     BoundingBox missionBounds_;
