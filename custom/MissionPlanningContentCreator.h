@@ -121,6 +121,7 @@ private:
     LmCdl::I_ContextMenuItem& submitMissionMenuItem_;
 
     std::vector<std::vector<QGeoCoordinate>> pois_;
+
     LmCdl::I_PointOfInterestApi& poiApi_;
     LmCdl::I_VcsiUserNotificationApi& notApi_;
     LmCdl::I_VectorDataDrawingApi& drawApi_;

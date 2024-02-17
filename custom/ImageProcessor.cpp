@@ -1,4 +1,6 @@
 #include <iostream>
+#include <opencv2/videoio.hpp>
+#include <opencv2/opencv.hpp>
 
 #include <ImageProcessor.h>
 

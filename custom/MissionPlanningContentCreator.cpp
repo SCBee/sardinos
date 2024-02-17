@@ -77,16 +77,16 @@ MissionPlanningContentCreator::~MissionPlanningContentCreator() = default;
 
 void MissionPlanningContentCreator::initContextMenuItems()
 {
-    missionBoundMenuItem_.setBackgroundColor(QColor(235, 12, 12, 180));
+    missionBoundMenuItem_.setBackgroundColor(Qt::cyan);
     missionBoundMenuItem_.setDescription("Add Mission Bound");
     missionBoundMenuItem_.setGrouping(LmCdl::ContextMenuItemGrouping::Bottom);
-    missionBoundMenuItem_.setIcon(":/MissionPlanning/missionPlanningDinoIcon");
+    missionBoundMenuItem_.setIcon(":/MissionPlanning/SelectIcon");
     missionBoundMenuItem_.setVisible(true);
 
-    submitMissionMenuItem_.setBackgroundColor(QColor(50, 100, 235, 180));
+    submitMissionMenuItem_.setBackgroundColor(Qt::blue);
     submitMissionMenuItem_.setDescription("Get Flight Path");
     submitMissionMenuItem_.setGrouping(LmCdl::ContextMenuItemGrouping::Top);
-    submitMissionMenuItem_.setIcon(":/MissionPlanning/UCIcon");
+    submitMissionMenuItem_.setIcon(":/MissionPlanning/MissionIcon");
     submitMissionMenuItem_.setVisible(false);
 }
 
@@ -304,9 +304,9 @@ void MissionPlanningContentCreator::changeUI(
         case CanGetFlightPath:
             missionBoundMenuItem_.setVisible(true);
             submitMissionMenuItem_.setVisible(true);
-            submitMissionMenuItem_.setBackgroundColor(
-                QColor(50, 100, 235, 180));
+            submitMissionMenuItem_.setBackgroundColor(Qt::blue);
             submitMissionMenuItem_.setDescription("Get Flight Path");
+            submitMissionMenuItem_.setIcon(":/MissionPlanning/PathIcon");
             clearFlightPath();
             break;
         case CannotGetFlightPath:
@@ -317,23 +317,25 @@ void MissionPlanningContentCreator::changeUI(
         case CanRunMission:
             missionBoundMenuItem_.setVisible(true);
             submitMissionMenuItem_.setVisible(true);
-            submitMissionMenuItem_.setBackgroundColor(QColor(12, 235, 12, 180));
+            submitMissionMenuItem_.setBackgroundColor(Qt::green);
             submitMissionMenuItem_.setDescription("Begin Mission");
+            submitMissionMenuItem_.setIcon(":/MissionPlanning/MissionIcon");
             clearMissionArea();
             break;
         case CanCancelMission:
             missionBoundMenuItem_.setVisible(false);
             submitMissionMenuItem_.setVisible(true);
-            submitMissionMenuItem_.setBackgroundColor(QColor(235, 12, 12, 180));
+            submitMissionMenuItem_.setBackgroundColor(Qt::red);
             submitMissionMenuItem_.setDescription("Cancel Mission");
+            submitMissionMenuItem_.setIcon(":/MissionPlanning/CancelIcon");
             clearMissionArea();
             break;
         default:
             missionBoundMenuItem_.setVisible(true);
             submitMissionMenuItem_.setVisible(true);
-            submitMissionMenuItem_.setBackgroundColor(
-                QColor(50, 100, 235, 180));
+            submitMissionMenuItem_.setBackgroundColor(Qt::blue);
             submitMissionMenuItem_.setDescription("Get Flight Path");
+            submitMissionMenuItem_.setIcon(":/MissionPlanning/PathIcon");
             clearFlightPath();
             break;
     }
