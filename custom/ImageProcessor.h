@@ -4,34 +4,44 @@
 #include <string>
 #include <iostream>
 #include <opencv2/opencv.hpp>
+#include <opencv2/highgui/highgui.hpp>
+
 
 namespace sardinos {
     inline void test() {
-        std::cout << "hi\n";
-        // Path to the input image
-        std::string imagePath = R"(C:\Users\dev\Pictures\Screenshots\1.png)";
+        // GStreamer pipeline string adapted for OpenCV
+        std::string pipeline = "udpsrc port=5200 caps = \"application/x-rtp, media=(string)video, clock-rate=(int)90000, encoding-name=(string)H264, payload=(int)96\" ! rtph264depay ! decodebin ! videoconvert ! appsink";
 
-        // Load the image from the disk
-        cv::Mat image = cv::imread(imagePath, cv::IMREAD_COLOR);
-
-        // Check for failure
-        if (image.empty())
-        {
-            std::cout << "Could not open or find the image" << std::endl;
+        // Initialize VideoCapture with the GStreamer pipeline
+        cv::VideoCapture cap(pipeline, cv::CAP_GSTREAMER);
+        if (!cap.isOpened()) {
+            std::cerr << "Failed to open video stream." << std::endl;
             return;
         }
 
-        std::string windowName = "The Bitch"; //Name of the window
+        cv::Mat frame;
+        cv::namedWindow("Video Stream", cv::WINDOW_AUTOSIZE);
 
-        cv::namedWindow(windowName); // Create a window
+        // Main loop to read and display frames
+        std::cout << "Streaming inside of VCSi..." << std::endl;
+        while (true) {
+            if (!cap.read(frame)) { // Read a new frame from the video stream
+                std::cerr << "Failed to read frame from the stream." << std::endl;
+                break;
+            }
 
-        imshow(windowName, image); // Show our image inside the created window.
+            cv::imshow("[INTERNAL] VCSi Video Stream", frame); // Display the frame
 
-        cv::waitKey(0); // Wait for any keystroke in the window
+            // Break the loop when 'ESC' is pressed
+            if (cv::waitKey(1) == 27) {
+                break;
+            }
+        }
 
-        cv::destroyWindow(windowName); //destroy the created window
+        // Cleanup
+        cap.release();
+        cv::destroyAllWindows();
     }
-
 }
 
 //class ImageProcessor : public QObject
