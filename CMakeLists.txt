@@ -13,6 +13,7 @@ include_directories("C:/Users/dev/Documents/mavsdk/include")
 include_directories("C:/Users/dev/Documents/mavsdk/include/mavsdk")
 include_directories("C:/Users/dev/Documents/mavsdk/include/mavsdk/mavlink")
 include_directories("C:/Users/dev/Documents/mavsdk/include/mavsdk/plugins/*")
+include_directories("C:/Users/dev/repos/vcpkg/installed/x64-windows/include")
 include_directories(custom)
 
 add_executable(vcsi_sardinos

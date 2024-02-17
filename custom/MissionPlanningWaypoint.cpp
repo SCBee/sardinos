@@ -16,7 +16,7 @@ MissionPlanningWaypoint::MissionPlanningWaypoint()
 {
 }
 
-MissionPlanningWaypoint::~MissionPlanningWaypoint() {}
+MissionPlanningWaypoint::~MissionPlanningWaypoint() = default;
 
 void MissionPlanningWaypoint::setLocation(const QGeoCoordinate& location)
 {
@@ -58,14 +58,6 @@ QString MissionPlanningWaypoint::label() const
     return label_;
 }
 
-void MissionPlanningWaypoint::setLabelOffset(const QVector2D& labelOffset)
-{
-    if (labelOffset_ != labelOffset) {
-        labelOffset_ = labelOffset;
-        emit labelOffsetChanged(labelOffset_);
-    }
-}
-
 QVector2D MissionPlanningWaypoint::labelOffset() const
 {
     return labelOffset_;
@@ -95,14 +87,6 @@ void MissionPlanningWaypoint::setVisible(bool visible)
 bool MissionPlanningWaypoint::visible() const
 {
     return visible_;
-}
-
-void MissionPlanningWaypoint::setRelativeZOrder(int relativeZOrder)
-{
-    if (relativeZOrder_ != relativeZOrder) {
-        relativeZOrder_ = relativeZOrder;
-        emit relativeZOrderChanged(relativeZOrder_);
-    }
 }
 
 int MissionPlanningWaypoint::relativeZOrder() const
@@ -166,7 +150,7 @@ void MissionPlanningWaypoint::dragStarted()
 
 void MissionPlanningWaypoint::dragging(const QGeoCoordinate& dragLocation)
 {
-    emit draggingOccuredFromDrawing(dragLocation);
+    emit draggingOccurredFromDrawing(dragLocation);
 }
 
 void MissionPlanningWaypoint::dragConfirmed(const QGeoCoordinate& dragLocation)

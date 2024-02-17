@@ -5,18 +5,16 @@
 #include <BoundingBox.h>
 #include <MissionPlanningWaypoint.h>
 
-const double SCANWIDTHMETERS = 500.0;
-const double MAXDISTANCEMETERS = 200000000.0;
+const double SCANWIDTHMETERS     = 100.0;
+const double MAXDISTANCEMETERS   = 200000.0;
 const double TURNINGRADIUSMETERS = 200.0;
 
-class FlightPather
+namespace sardinos::FlightPather
 {
-public:
-    FlightPather();
-    ~FlightPather();
-
-    QList<QGeoCoordinate> getVerticalFlightPath(BoundingBox missionBounds);
-    QList<QGeoCoordinate> getHorizontalFlightPath(BoundingBox missionBounds);
-    QList<QGeoCoordinate> getPath(BoundingBox missionBounds);
-    bool canFly(QList<MissionPlanningWaypoint*> waypoints);
-};
+    QList<QGeoCoordinate> getVerticalFlightPath(
+        const BoundingBox& missionBounds);
+    QList<QGeoCoordinate> getHorizontalFlightPath(
+        const BoundingBox& missionBounds);
+    QList<QGeoCoordinate> getPath(const BoundingBox& missionBounds);
+    bool canFly(const QList<MissionPlanningWaypoint*>& waypoints);
+}  // namespace sardinos::FlightPather

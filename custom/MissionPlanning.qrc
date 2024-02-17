@@ -1,6 +1,9 @@
 <RCC>
     <qresource prefix="/MissionPlanning">
-        <file alias="missionPlanningDinoIcon">Dino.svg</file>
-        <file alias="UCIcon">UC.svg</file>
+        <file alias="MissionIcon">Mission.svg</file>
+        <file alias="SelectIcon">Select.svg</file>
+        <file alias="HomeIcon">Home.svg</file>
+        <file alias="CancelIcon">Cancel.svg</file>
+        <file alias="PathIcon">Path.svg</file>
     </qresource>
 </RCC>

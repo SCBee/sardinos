@@ -4,9 +4,9 @@
 #include <MissionPlanningDrawing.h>
 #include <MissionPlanningPolygon.h>
 
-MissionPlanningDrawing::MissionPlanningDrawing() {}
+MissionPlanningDrawing::MissionPlanningDrawing() = default;
 
-MissionPlanningDrawing::~MissionPlanningDrawing() {}
+MissionPlanningDrawing::~MissionPlanningDrawing() = default;
 
 const QSet<LmCdl::I_VectorDataPointDrawing*>&
 MissionPlanningDrawing::pointDrawings(const QGeoRectangle& area) const
@@ -32,7 +32,7 @@ void MissionPlanningDrawing::addPolygon(MissionPlanningPolygon* polygon)
 }
 
 void MissionPlanningDrawing::addPolygons(
-    QList<MissionPlanningPolygon*> polygons)
+    const QList<MissionPlanningPolygon*>& polygons)
 {
     for (auto polygon : polygons)
         addPolygon(polygon);
@@ -43,7 +43,7 @@ void MissionPlanningDrawing::addLine(MissionPlanningLine* line)
     lines_.insert(line);
 }
 
-void MissionPlanningDrawing::addLines(QList<MissionPlanningLine*> lines)
+void MissionPlanningDrawing::addLines(const QList<MissionPlanningLine*>& lines)
 {
     for (auto line : lines)
         addLine(line);

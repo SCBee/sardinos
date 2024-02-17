@@ -2,15 +2,11 @@
 #include <MathExt.h>
 #include <qmath.h>
 
-FlightPather::FlightPather() {}
-
-FlightPather::~FlightPather() {}
-
-QList<QGeoCoordinate> FlightPather::getVerticalFlightPath(
-    BoundingBox missionBounds)
+QList<QGeoCoordinate> sardinos::FlightPather::getVerticalFlightPath(
+    const BoundingBox& missionBounds)
 {
     auto longSpreadMeters =
-        MathExt().getDistance(missionBounds.NE, missionBounds.NW);
+        sardinos::MathExt::getDistance(missionBounds.NE, missionBounds.NW);
 
     auto longSpread =
         abs(missionBounds.eastBound() - missionBounds.westBound());
@@ -65,11 +61,11 @@ QList<QGeoCoordinate> FlightPather::getVerticalFlightPath(
     return wayPoints;
 }
 
-QList<QGeoCoordinate> FlightPather::getHorizontalFlightPath(
-    BoundingBox missionBounds)
+QList<QGeoCoordinate> sardinos::FlightPather::getHorizontalFlightPath(
+    const BoundingBox& missionBounds)
 {
     auto latSpreadMeters =
-        MathExt().getDistance(missionBounds.NE, missionBounds.SE);
+        sardinos::MathExt::getDistance(missionBounds.NE, missionBounds.SE);
 
     auto latSpread =
         abs(missionBounds.northBound() - missionBounds.southBound());
@@ -126,24 +122,24 @@ QList<QGeoCoordinate> FlightPather::getHorizontalFlightPath(
     return wayPoints;
 }
 
-QList<QGeoCoordinate> FlightPather::getPath(BoundingBox missionBounds)
+QList<QGeoCoordinate> sardinos::FlightPather::getPath(
+    const BoundingBox& missionBounds)
 {
-    if (MathExt().isVertical(missionBounds))
+    if (sardinos::MathExt::isVertical(missionBounds))
         return getVerticalFlightPath(missionBounds);
     else
         return getHorizontalFlightPath(missionBounds);
 }
 
-bool FlightPather::canFly(QList<MissionPlanningWaypoint*> waypoints)
+bool sardinos::FlightPather::canFly(
+    const QList<MissionPlanningWaypoint*>& waypoints)
 {
-    auto sum = 0;
+    auto sum = 0.0;
 
     for (auto i = 0; i < waypoints.size() - 1; i++) {
-        sum += MathExt().getDistance(waypoints[i]->location(),
-                                     waypoints[i + 1]->location());
+        sum += sardinos::MathExt::getDistance(waypoints[i]->location(),
+                                              waypoints[i + 1]->location());
     }
 
-    if (sum <= MAXDISTANCEMETERS)
-        return true;
-    return false;
+    return sum <= MAXDISTANCEMETERS;
 }
