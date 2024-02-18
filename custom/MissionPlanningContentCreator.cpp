@@ -4,9 +4,8 @@
 #include <QLabel>
 #include <QTime>
 #include <QTimer>
-#include <cmath>
-#include <iostream>
 #include <thread>
+#include <utility>
 
 #include <Drone.h>
 #include <LmCdl/ContextMenuEvent.h>
@@ -30,13 +29,14 @@
 using std::chrono::seconds;
 using std::this_thread::sleep_for;
 
-volatile double MissionPlanningContentCreator::latitude = 51.0f;
-volatile double MissionPlanningContentCreator::longitude = -114.0f;
-volatile double MissionPlanningContentCreator::altitude = 0.0f;
-volatile double MissionPlanningContentCreator::heading = 0.0f;
-volatile double MissionPlanningContentCreator::speed = 0.0f;
-volatile double MissionPlanningContentCreator::yaw = 0.0f;
-volatile double MissionPlanningContentCreator::battery = 0.0f;
+volatile double MissionPlanningContentCreator::latitude    = 51.0f;
+volatile double MissionPlanningContentCreator::longitude   = -114.0f;
+volatile double MissionPlanningContentCreator::altitude    = 0.0f;
+volatile double MissionPlanningContentCreator::altitudeAbs = 0.0f;
+volatile double MissionPlanningContentCreator::heading     = 0.0f;
+volatile double MissionPlanningContentCreator::speed       = 0.0f;
+volatile double MissionPlanningContentCreator::yaw         = 0.0f;
+volatile double MissionPlanningContentCreator::battery     = 0.0f;
 
 MissionPlanningContentCreator::MissionPlanningContentCreator(
     LmCdl::I_VcsiMapExtensionApi& mapApi,
@@ -60,11 +60,12 @@ MissionPlanningContentCreator::MissionPlanningContentCreator(
     , mission_()
     , drone_(new Drone(mapApi))
     , timer_(new QTimer())
+    , liveDroneFeed_(nullptr)
 {
     init();
 }
 
-MissionPlanningContentCreator::~MissionPlanningContentCreator() {};
+MissionPlanningContentCreator::~MissionPlanningContentCreator() = default;
 
 void MissionPlanningContentCreator::init()
 {
@@ -83,9 +84,9 @@ void MissionPlanningContentCreator::startLoop()
         timer_,
         &QTimer::timeout,
         this,
-        [=]()
+        [this]()
         {
-            drone_->updateValues(
+            this->drone_->updateValues(
                 latitude, longitude, altitude, heading, speed, yaw, battery);
         });
 
@@ -131,7 +132,7 @@ void MissionPlanningContentCreator::getFlightPath()
 
     notis_.notify("Building Flight Path.", notApi_);
 
-    mission_.setPath(flightPather_.getPath(missionBounds_));
+    mission_.setPath(sardinos::FlightPather::getPath(missionBounds_));
 
     drawing_->drawFlightPath(mission_, missionApi_);
 
@@ -158,7 +159,7 @@ void MissionPlanningContentCreator::runMission()
 
     drone_->setVisible(true);
 
-    //    mission_.startMission();
+    mission_.startMission();
     //
     //    auto uri =
     //        "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/"
@@ -167,14 +168,23 @@ void MissionPlanningContentCreator::runMission()
     //    liveDroneFeed_ =
     //        &videoCollectionApi_.registerStream(uri, "Live drone stream");
     //
-    //    imageProcessor_.init(uri);
+    QFuture<void> testImageProcFuture = QtConcurrent::run([this]() {
+                                                              sardinos::test();
+                                        });
 
-    QFuture<void> future = QtConcurrent::run(sardinos::executeMissionVTOL,
-                                             mavWaypoints,
-                                             std::ref(latitude),
-                                             std::ref(longitude),
-                                             std::ref(altitude),
-                                             std::ref(heading));
+    QFuture<void> future = QtConcurrent::run(
+        [mavWaypoints]()
+        {
+            sardinos::executeMissionVTOL(std::ref(mavWaypoints),
+                                         std::ref(latitude),
+                                         std::ref(longitude),
+                                         std::ref(altitude),
+                                         std::ref(altitudeAbs),
+                                         std::ref(heading),
+                                         std::ref(speed),
+                                         std::ref(yaw),
+                                         std::ref(battery));
+        });
 }
 
 void MissionPlanningContentCreator::cancelMission()
@@ -190,11 +200,11 @@ void MissionPlanningContentCreator::cancelMission()
 
 void MissionPlanningContentCreator::updatePois()
 {
-    MathExt().delay(20);
+    sardinos::MathExt::delay(20);
 
     auto points = poiApi_.pointsOfInterest();
 
-    missionBounds_ = MathExt().findSmallestBoundingBox(points);
+    missionBounds_ = sardinos::MathExt::findSmallestBoundingBox(points);
 
     pois_.clear();
 
@@ -223,5 +233,5 @@ void MissionPlanningContentCreator::executeMissionAction()
             break;
         default:
             break;
-    };
+    }
 }

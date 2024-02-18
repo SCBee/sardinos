@@ -16,14 +16,13 @@ class MissionPlanningContentCreator;
 
 namespace LmCdl
 {
-class I_VectorDataDrawingApi;
-class I_PointOfInterestApi;
-class I_VcsiApplicationApi;
-class I_MissionDrawingApi;
-class I_RouteApi;
-class I_TrackDrawingApi;
-class I_VideoStreamApiCollection;
-class I_GroundElevationApi;
+    class I_VectorDataDrawingApi;
+    class I_PointOfInterestApi;
+    class I_VcsiApplicationApi;
+    class I_MissionDrawingApi;
+    class I_RouteApi;
+    class I_TrackDrawingApi;
+    class I_VideoStreamApiCollection;
 }  // namespace LmCdl
 
 class MissionPlanningPlugin
@@ -37,18 +36,19 @@ class MissionPlanningPlugin
 public:
     MissionPlanningPlugin();
 
-    virtual ~MissionPlanningPlugin();
+    ~MissionPlanningPlugin() override;
 
-    QList<LmCdl::PluginRequirement> requiredApis() const override;
+    [[nodiscard]] QList<LmCdl::PluginRequirement> requiredApis() const override;
 
-    LmCdl::PluginCapabilityIdentifier providedApi() const override;
+    [[nodiscard]] LmCdl::PluginCapabilityIdentifier providedApi()
+        const override;
 
     bool setRequiredApi(LmCdl::PluginCapabilityIdentifier id,
                         QObject* api) override;
 
     QObject* getProvidedApi() override;
 
-    bool isFullyInitialized() const override;
+    [[nodiscard]] bool isFullyInitialized() const override;
 
 private:
     void startPluginIfInitialized();
