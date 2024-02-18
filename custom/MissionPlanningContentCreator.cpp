@@ -141,7 +141,7 @@ void MissionPlanningContentCreator::getFlightPath()
 
 void MissionPlanningContentCreator::runMission()
 {
-    if (!flightPather_.canFly(mission_.waypoints())) {
+    if (!sardinos::FlightPather::canFly(mission_.waypoints())) {
         notis_.notify("Flight path is too long.", notApi_, Notifications::Severity::Warning);
         return;
     }

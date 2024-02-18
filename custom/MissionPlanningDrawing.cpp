@@ -123,7 +123,7 @@ Q_SLOT void MissionPlanningDrawing::drawMissionArea(std::vector<std::vector<QGeo
 
     auto lines = QList<MissionPlanningLine*>();
 
-    MathExt().cvhull(pois_);
+    sardinos::MathExt::cvhull(pois_);
 
     for (auto i = 1; i < pois_.size(); i++) {
         lines.push_back(new MissionPlanningLine(pois_[i][0], pois_[i - 1][0]));
