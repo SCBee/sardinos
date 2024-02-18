@@ -56,38 +56,23 @@ MissionPlanningContentCreator::MissionPlanningContentCreator(
     , routeApi_(routeApi)
     , trackApi_(trackApi)
     , videoCollectionApi_(videoCollectionApi)
-    , notification_(nullptr)
-    , m_state(STARTUP)
+    , m_state(UIHandler::State::STARTUP)
     , mission_()
     , drone_(new Drone(mapApi))
     , timer_(new QTimer())
 {
-    initContextMenuItems();
-
-    connectToApiSignals();
-
-    startLoop();
-
-    trackApi.addDrawingForTrack(*drone_);
-
-    updatePois();
+    init();
 }
 
 MissionPlanningContentCreator::~MissionPlanningContentCreator() {};
 
-void MissionPlanningContentCreator::initContextMenuItems()
+void MissionPlanningContentCreator::init()
 {
-    missionBoundMenuItem_.setBackgroundColor(QColor(235, 12, 12, 180));
-    missionBoundMenuItem_.setDescription("Add Mission Bound");
-    missionBoundMenuItem_.setGrouping(LmCdl::ContextMenuItemGrouping::Bottom);
-    missionBoundMenuItem_.setIcon(":/MissionPlanning/missionPlanningDinoIcon");
-    missionBoundMenuItem_.setVisible(true);
-
-    submitMissionMenuItem_.setBackgroundColor(QColor(50, 100, 235, 180));
-    submitMissionMenuItem_.setDescription("Get Flight Path");
-    submitMissionMenuItem_.setGrouping(LmCdl::ContextMenuItemGrouping::Top);
-    submitMissionMenuItem_.setIcon(":/MissionPlanning/UCIcon");
-    submitMissionMenuItem_.setVisible(false);
+    uiHandler_.initContextMenuItems(missionBoundMenuItem_, submitMissionMenuItem_);
+    connectToApiSignals();
+    startLoop();
+    trackApi_.addDrawingForTrack(*drone_);
+    updatePois();
 }
 
 void MissionPlanningContentCreator::startLoop()
@@ -137,32 +122,32 @@ void MissionPlanningContentCreator::getPoiProperties(
                                [this](const LmCdl::VcsiPointOfInterestId&)
                                { updatePois(); });
 
-    updateUIState(State::CanGetFlightPath);
+    uiHandler_.updateUIState(UIHandler::State::CanGetFlightPath, m_state, missionBoundMenuItem_, submitMissionMenuItem_, mission_, missionApi_, drawApi_);
 }
 
 void MissionPlanningContentCreator::getFlightPath()
 {
     updatePois();
 
-    notify("Building Flight Path.");
+    notis_.notify("Building Flight Path.", notApi_);
 
     mission_.setPath(flightPather_.getPath(missionBounds_));
 
-    drawFlightPath();
+    drawing_->drawFlightPath(mission_, missionApi_);
 
-    updateUIState(State::CanRunMission);
+    uiHandler_.updateUIState(UIHandler::State::CanRunMission, m_state, missionBoundMenuItem_, submitMissionMenuItem_, mission_, missionApi_, drawApi_);
 }
 
 void MissionPlanningContentCreator::runMission()
 {
     if (!flightPather_.canFly(mission_.waypoints())) {
-        notify("Flight path is too long.", Severity::Warning);
+        notis_.notify("Flight path is too long.", notApi_, Notifications::Severity::Warning);
         return;
     }
 
-    notify("Starting Mission.", Severity::Continue);
+    notis_.notify("Starting Mission.", notApi_, Notifications::Severity::Continue);
 
-    updateUIState(State::CanCancelMission);
+    uiHandler_.updateUIState(UIHandler::State::CanCancelMission, m_state, missionBoundMenuItem_, submitMissionMenuItem_, mission_, missionApi_, drawApi_);
 
     std::vector<std::pair<float, float>> mavWaypoints;
 
@@ -194,13 +179,13 @@ void MissionPlanningContentCreator::runMission()
 
 void MissionPlanningContentCreator::cancelMission()
 {
-    notify("Cancelling Mission.", Severity::Warning);
+    notis_.notify("Cancelling Mission.", notApi_, Notifications::Severity::Warning);
 
     videoCollectionApi_.unregisterStream(*liveDroneFeed_);
 
     updatePois();
 
-    updateUIState(State::CanGetFlightPath);
+    uiHandler_.updateUIState(UIHandler::State::CanGetFlightPath, m_state, missionBoundMenuItem_, submitMissionMenuItem_, mission_, missionApi_, drawApi_);
 }
 
 void MissionPlanningContentCreator::updatePois()
@@ -217,174 +202,26 @@ void MissionPlanningContentCreator::updatePois()
         pois_.push_back({p.pointOfInterest().location()});
 
     if (pois_.size() > 2)
-        updateUIState(State::CanGetFlightPath);
+        uiHandler_.updateUIState(UIHandler::State::CanGetFlightPath, m_state, missionBoundMenuItem_, submitMissionMenuItem_, mission_, missionApi_, drawApi_);
     else
-        updateUIState(State::CannotGetFlightPath);
+        uiHandler_.updateUIState(UIHandler::State::CannotGetFlightPath, m_state, missionBoundMenuItem_, submitMissionMenuItem_, mission_, missionApi_, drawApi_);
 
-    drawMissionArea();
-}
-
-Q_SLOT void MissionPlanningContentCreator::drawMissionArea()
-{
-    auto polygon = QGeoPolygon(missionBounds_.list());
-
-    auto polygons = QList<MissionPlanningPolygon*>();
-
-    polygons.append(new MissionPlanningPolygon(polygon));
-
-    auto lines = QList<MissionPlanningLine*>();
-
-    MathExt().cvhull(pois_);
-
-    for (auto i = 1; i < pois_.size(); i++) {
-        lines.push_back(new MissionPlanningLine(pois_[i][0], pois_[i - 1][0]));
-        if (i == pois_.size() - 1)
-            lines.push_back(new MissionPlanningLine(pois_[i][0], pois_[0][0]));
-    }
-
-    draw(polygons, lines);
-}
-
-void MissionPlanningContentCreator::draw(
-    QList<MissionPlanningPolygon*> polygons, QList<MissionPlanningLine*> lines)
-{
-    drawing_->clear();
-    drawing_->addPolygons(polygons);
-    drawing_->addLines(lines);
-    drawing_->update();
-
-    drawApi_.removeDrawingForVectorData(*drawing_);
-    drawApi_.addDrawingForVectorData(
-        *drawing_,
-        LmCdl::I_VectorDataDrawingApi::DrawingMode::
-            OptimizedForFrequentChanges);
-}
-
-void MissionPlanningContentCreator::clearMissionArea()
-{
-    draw(QList<MissionPlanningPolygon*>(), QList<MissionPlanningLine*>());
-}
-
-void MissionPlanningContentCreator::clearFlightPath()
-{
-    foreach(LmCdl::I_SimpleWaypointConnector* waypointConnector,
-            mission_.waypointConnectors())
-    {
-        missionApi_.removeDrawingForWaypointConnector(*waypointConnector);
-    }
-    foreach(MissionPlanningWaypoint* waypoint, mission_.waypoints()) {
-        missionApi_.removeDrawingForWaypoint(*waypoint);
-    }
-}
-
-void MissionPlanningContentCreator::drawFlightPath()
-{
-    foreach(MissionPlanningWaypoint* waypoint, mission_.waypoints()) {
-        missionApi_.addDrawingForWaypoint(*waypoint);
-    }
-    foreach(LmCdl::I_SimpleWaypointConnector* waypointConnector,
-            mission_.waypointConnectors())
-    {
-        missionApi_.addDrawingForWaypointConnector(*waypointConnector);
-    }
-}
-
-void MissionPlanningContentCreator::changeUI(
-    const MissionPlanningContentCreator::State& newState)
-{
-    switch (newState) {
-        case CanGetFlightPath:
-            missionBoundMenuItem_.setVisible(true);
-            submitMissionMenuItem_.setVisible(true);
-            submitMissionMenuItem_.setBackgroundColor(
-                QColor(50, 100, 235, 180));
-            submitMissionMenuItem_.setDescription("Get Flight Path");
-            clearFlightPath();
-            break;
-        case CannotGetFlightPath:
-            missionBoundMenuItem_.setVisible(true);
-            submitMissionMenuItem_.setVisible(false);
-            clearFlightPath();
-            break;
-        case CanRunMission:
-            missionBoundMenuItem_.setVisible(true);
-            submitMissionMenuItem_.setVisible(true);
-            submitMissionMenuItem_.setBackgroundColor(QColor(12, 235, 12, 180));
-            submitMissionMenuItem_.setDescription("Begin Mission");
-            clearMissionArea();
-            break;
-        case CanCancelMission:
-            missionBoundMenuItem_.setVisible(false);
-            submitMissionMenuItem_.setVisible(true);
-            submitMissionMenuItem_.setBackgroundColor(QColor(235, 12, 12, 180));
-            submitMissionMenuItem_.setDescription("Cancel Mission");
-            clearMissionArea();
-            break;
-        default:
-            missionBoundMenuItem_.setVisible(true);
-            submitMissionMenuItem_.setVisible(true);
-            submitMissionMenuItem_.setBackgroundColor(
-                QColor(50, 100, 235, 180));
-            submitMissionMenuItem_.setDescription("Get Flight Path");
-            clearFlightPath();
-            break;
-    };
+    drawing_->drawMissionArea(pois_, missionBounds_, drawApi_);
 }
 
 void MissionPlanningContentCreator::executeMissionAction()
 {
     switch (m_state) {
-        case CanGetFlightPath:
+        case UIHandler::State::CanGetFlightPath:
             getFlightPath();
             break;
-        case CanRunMission:
+        case UIHandler::State::CanRunMission:
             runMission();
             break;
-        case CanCancelMission:
+        case UIHandler::State::CanCancelMission:
             cancelMission();
             break;
         default:
             break;
     };
-}
-
-void MissionPlanningContentCreator::updateUIState(const State& newState)
-{
-    if (newState != m_state) {
-        m_state = newState;
-        changeUI(m_state);
-    }
-}
-
-void MissionPlanningContentCreator::notify(const std::string& msg,
-                                           Severity severity)
-{
-    auto label = new QLabel(QString(msg.c_str()));
-
-    label->setStyleSheet("color: black;");
-
-    switch (severity) {
-        case Message:
-            notApi_.addNotification(label).setBackgroundColor(Qt::white);
-            break;
-        case Continue:
-            notApi_.addNotification(label).setBackgroundColor(Qt::green);
-            break;
-        case Warning:
-            notApi_.addNotification(label).setBackgroundColor(Qt::yellow);
-            break;
-        case Danger:
-            notApi_.addNotification(label).setBackgroundColor(Qt::red);
-            break;
-    };
-}
-
-void MissionPlanningContentCreator::notifyPeriodically()
-{
-    // (lat, long, alt) [heading]
-    std::string msg = "(" + std::to_string(latitude) + ", "
-        + std::to_string(longitude) + ", " + std::to_string(altitude) + ") ["
-        + std::to_string(heading) + "]";
-
-    notApi_.addNotification(new QLabel(QString(msg.c_str())));
 }
