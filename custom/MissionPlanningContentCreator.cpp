@@ -160,17 +160,22 @@ void MissionPlanningContentCreator::runMission()
     drone_->setVisible(true);
 
     mission_.startMission();
-    //
-    //    auto uri =
-    //        "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/"
-    //        "BigBuckBunny.mp4";
-    //
-    //    liveDroneFeed_ =
-    //        &videoCollectionApi_.registerStream(uri, "Live drone stream");
-    //
-    QFuture<void> testImageProcFuture = QtConcurrent::run([this]() {
-                                                              sardinos::test();
-                                        });
+    
+    // Sample video
+    auto uri = "d:/Users/Adam/Downloads/1106551187-preview-ezgif.com-video-speed.mp4";
+
+    // GStreamer pipeline string adapted for OpenCV
+    auto pipeline =
+        "udpsrc port=5200 caps = \"application/x-rtp, media=(string)video, "
+        "clock-rate=(int)90000, encoding-name=(string)H264, payload=(int)96\" "
+        "! rtph264depay ! decodebin ! videoconvert ! appsink";
+
+    liveDroneFeed_ =
+        &videoCollectionApi_.registerStream(uri, "Live drone stream");
+
+    auto imageProcessor = new ImageProcessor();
+    
+    QFuture<void> testImageProcFuture = QtConcurrent::run([this, imageProcessor, uri, pipeline]() { imageProcessor->init(uri); });
 
     QFuture<void> future = QtConcurrent::run(
         [mavWaypoints]()
