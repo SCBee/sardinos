@@ -162,7 +162,7 @@ void MissionPlanningContentCreator::runMission()
     mission_.startMission();
     
     // Sample video
-    auto uri = "d:/Users/Adam/Downloads/1106551187-preview-ezgif.com-video-speed.mp4";
+    auto uri = "C:/Program Files/LMCDL/vcsi/sdk/examples/custom/SampleFeed.mp4";
 
     // GStreamer pipeline string adapted for OpenCV
     auto pipeline =
