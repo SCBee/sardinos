@@ -16,7 +16,7 @@ QPen MissionPlanningPolygon::pen() const
 {
     QPen pen = QPen(Qt::SolidLine);
     pen.setWidth(4);
-    pen.setColor(QColor(255, 255, 255, 200));
+    pen.setColor(QColor(255, 255, 255, 100));
     return pen;
 }
 
