@@ -34,6 +34,8 @@
 #include <MissionPlanningPolygon.h>
 #include <MissionPlanningWaypoint.h>
 #include <MissionPlanningWaypointConnector.h>
+#include <Notifications.h>
+#include <UIHandler.h>
 #include <qgeocoordinate.h>
 
 namespace LmCdl
@@ -50,22 +52,6 @@ class MissionPlanningContentCreator : public QObject
     Q_OBJECT
 
 public:
-    enum State
-    {
-        STARTUP,
-        CanGetFlightPath,
-        CannotGetFlightPath,
-        CanRunMission,
-        CanCancelMission,
-    };
-
-    enum Severity
-    {
-        Message,
-        Continue,
-        Warning,
-        Danger
-    };
 
     MissionPlanningContentCreator(
         LmCdl::I_VcsiMapExtensionApi& mapApi,
@@ -86,7 +72,7 @@ private:
 
     void startLoop();
 
-    void initContextMenuItems();
+    void init();
 
     void getFlightPath();
 
@@ -96,26 +82,9 @@ private:
 
     void connectToApiSignals();
 
-    void drawMissionArea();
-
     void updatePois();
 
     void executeMissionAction();
-
-    void changeUI(const State& newState);
-
-    void updateUIState(const State& newState);
-
-    void notify(const std::string& msg, Severity severity = Severity::Message);
-
-    void draw(const QList<MissionPlanningPolygon*>& polygons,
-              const QList<MissionPlanningLine*>& lines);
-
-    void drawFlightPath();
-
-    void clearMissionArea();
-
-    void clearFlightPath();
 
     LmCdl::I_ContextMenuItem& missionBoundMenuItem_;
     LmCdl::I_ContextMenuItem& submitMissionMenuItem_;
@@ -139,7 +108,11 @@ private:
 
     MissionDomain mission_;
 
-    State m_state;
+    UIHandler uiHandler_;
+
+    Notifications notis_;
+
+    UIHandler::State m_state;
     volatile static double latitude;  // WGS84
     volatile static double longitude;  // WGS84
     volatile static double altitude;  // relative altitude, m

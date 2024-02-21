@@ -3,6 +3,13 @@
 #include <QGeoCoordinate>
 
 #include <BoundingBox.h>
+#include <LmCdl/I_MissionDrawingApi.h>
+#include <LmCdl/I_VectorDataDrawingApi.h>
+#include <MissionDomain.h>
+#include <MissionPlanningDrawing.h>
+#include <MissionPlanningDrawing.h>
+#include <MissionPlanningLine.h>
+#include <MissionPlanningPolygon.h>
 #include <MissionPlanningWaypoint.h>
 
 const double SCANWIDTHMETERS     = 100.0;
