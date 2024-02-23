@@ -189,7 +189,7 @@ void MissionPlanningContentCreator::runMission()
     QFuture<void> future = QtConcurrent::run(
         [mavWaypoints]()
         {
-            sardinos::executeMissionVTOL(std::ref(mavWaypoints),
+            sardinos::executeMissionQuad(std::ref(mavWaypoints),
                                          std::ref(latitude),
                                          std::ref(longitude),
                                          std::ref(altitude),
