@@ -170,7 +170,7 @@ namespace sardinos
         }
 
         // take off altitude
-        double height = 50.0;
+        double height = 7.5;
         action.set_takeoff_altitude(height);
 
         // Take off
