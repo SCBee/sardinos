@@ -1,8 +1,9 @@
 #include <MissionPlanningPolygon.h>
 
-MissionPlanningPolygon::MissionPlanningPolygon(const QGeoPolygon& polygon)
+MissionPlanningPolygon::MissionPlanningPolygon(const QGeoPolygon& polygon, const QColor& color)
     : polygon_(polygon)
 {
+    this->color_ = color;
 }
 
 MissionPlanningPolygon::~MissionPlanningPolygon() = default;
@@ -16,7 +17,7 @@ QPen MissionPlanningPolygon::pen() const
 {
     QPen pen = QPen(Qt::SolidLine);
     pen.setWidth(4);
-    pen.setColor(QColor(255, 255, 255, 200));
+    pen.setColor(this->color_);
     return pen;
 }
 

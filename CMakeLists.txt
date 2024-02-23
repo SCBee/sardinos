@@ -44,6 +44,7 @@ add_executable(vcsi_sardinos
         custom/SardinosPublisher.h
         custom/ImageProcessor.h
         custom/ImageProcessor.cpp
+        custom/pathpoop.h
 )
 
 

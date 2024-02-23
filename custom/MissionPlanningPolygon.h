@@ -7,7 +7,7 @@
 class MissionPlanningPolygon : public LmCdl::I_VectorDataPolygonDrawing
 {
 public:
-    explicit MissionPlanningPolygon(const QGeoPolygon& polygon);
+    explicit MissionPlanningPolygon(const QGeoPolygon& polygon, const QColor& color);
     ~MissionPlanningPolygon() override;
 
     [[nodiscard]] QGeoPolygon polygon() const override;
@@ -18,4 +18,5 @@ public:
 
 private:
     QGeoPolygon polygon_;
+    QColor color_;
 };

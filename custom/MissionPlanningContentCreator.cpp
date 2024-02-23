@@ -25,6 +25,7 @@
 #include <QtConcurrent/QtConcurrent>
 #include <SardinosPublisher.h>
 #include <qicon.h>
+#include <pathpoop.h>
 
 using std::chrono::seconds;
 using std::this_thread::sleep_for;
@@ -235,20 +236,41 @@ void MissionPlanningContentCreator::updatePois()
 
 Q_SLOT void MissionPlanningContentCreator::drawMissionArea()
 {
+    // polygon is the bounding box
     auto polygon = QGeoPolygon(missionBounds_.list());
 
     auto polygons = QList<MissionPlanningPolygon*>();
 
-    polygons.append(new MissionPlanningPolygon(polygon));
+    polygons.append(new MissionPlanningPolygon(polygon, QColor(7, 59, 76, 255)));
 
+    // this is based on the convex hull
     auto lines = QList<MissionPlanningLine*>();
+
+    auto poisCopy = pois_; // this is going to be used for testing
 
     sardinos::MathExt::cvhull(pois_);
 
+    // BEGIN __QUARANTINE__
+    // THIS IS SMUT'S POOP. DO NOT TOUCH.
+    auto points_ = poop::convertGeoCoordinatesToPoints(poisCopy);
+    points_ = poop::generatePointsInsidePolygon(points_, 25, 25);
+    auto edges = poop::findSpanningTreeKruskal(points_);
+    auto lines_ = poop::convertPointsToGeoCoordinates(points_, edges);
+
+    for (auto& p : lines_) {
+        polygons.append(new MissionPlanningPolygon(QGeoPolygon({p[0]}), QColor(6, 214, 160, 255)));
+    }
+
+    for (auto& line : lines_ ){
+        lines.push_back(new MissionPlanningLine(line[0], line[1]));
+    }
+    // END __QUARANTINE__
+
     for (auto i = 1; i < pois_.size(); i++) {
         lines.push_back(new MissionPlanningLine(pois_[i][0], pois_[i - 1][0]));
-        if (i == pois_.size() - 1)
+        if (i == pois_.size() - 1) {
             lines.push_back(new MissionPlanningLine(pois_[i][0], pois_[0][0]));
+        }
     }
 
     draw(polygons, lines);
