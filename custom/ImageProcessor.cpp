@@ -1,4 +1,6 @@
 #include "ImageProcessor.h"
+#include <QLabel>
+#include <QPixmap>
 
 void ImageProcessor::init(std::string uri)
 {
@@ -20,7 +22,7 @@ void ImageProcessor::init(std::string uri)
             break;
         }
 
-        frame = processFrame(frame);
+        processFrame(frame);
 
         cv::imshow("[INTERNAL] VCSi Video Stream", frame);  // Display the frame
 
@@ -35,7 +37,7 @@ void ImageProcessor::init(std::string uri)
     cv::destroyAllWindows();
 }
 
-cv::Mat ImageProcessor::processFrame(cv::Mat frame)
+void ImageProcessor::processFrame(cv::Mat frame)
 {
     cv::Mat grayImage;
 
@@ -43,11 +45,13 @@ cv::Mat ImageProcessor::processFrame(cv::Mat frame)
 
     // Threshold the image to create a binary mask of 0-intensity pixels
     cv::Mat mask;
-    cv::threshold(grayImage, mask, 120, 255, cv::THRESH_BINARY_INV);
+    cv::threshold(grayImage, mask, 109, 255, cv::THRESH_BINARY_INV);
 
     // Find contours of the 0-intensity pixels
     std::vector<std::vector<cv::Point>> contours;
     cv::findContours(mask, contours, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_SIMPLE);
+
+    if (contours.size() == 0) return;
 
     // Find the largest contour
     size_t largestContourIndex = 0;
@@ -72,8 +76,17 @@ cv::Mat ImageProcessor::processFrame(cv::Mat frame)
     // Ensure the rectangle does not go out of bounds
     boundingRect &= cv::Rect(0, 0, frame.cols, frame.rows);
 
+    cv::Mat targetFoundMat = frame.clone();
     // Draw the rectangle around the largest contour on the original image
-    cv::rectangle(frame, boundingRect, cv::Scalar(255, 255, 0), 2);
+    cv::rectangle(targetFoundMat, boundingRect, cv::Scalar(255, 255, 0), 2);
 
-    return frame;
+    QImage image(targetFoundMat.data, targetFoundMat.cols, targetFoundMat.rows, targetFoundMat.step, QImage::Format_RGB888);
+
+    QLabel label;
+    label.setPixmap(QPixmap::fromImage(image));
+    
+    // Set window properties
+    label.setWindowTitle("Target Found");
+    label.show();
+    
 }

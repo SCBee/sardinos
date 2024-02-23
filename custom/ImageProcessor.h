@@ -10,7 +10,7 @@ class ImageProcessor : public QObject
    Q_OBJECT
 public:
    void init(std::string uri);
-   cv::Mat processFrame(cv::Mat frame);
+   void processFrame(cv::Mat frame);
 
 signals:
    void targetFound(cv::Mat mat);
