@@ -1,30 +1,29 @@
 #pragma once
 
 #include <QGeoCoordinate>
+#include <QImage>
 #include <QObject>
 #include <QWidget>
-#include <QImage>
-
-#include <TargetWidget.h>
 
 #include <LmCdl/I_GraphicsWidget.h>
+#include <TargetWidget.h>
 
 struct Target : public QObject
 {
     Q_OBJECT
 public:
-    Target(QGeoCoordinate location, TargetWidget* widget)
+    Target(QGeoCoordinate location, cv::Mat mat)
+        : Location(location)
+        , Mat(mat)
     {
-        Location = location;
-        Widget   = widget;
     }
 
     Target(const Target& target)
+        : Location(target.Location)
+        , Mat(target.Mat)
     {
-        Location = target.Location;
-        Widget   = target.Widget;
     }
 
     QGeoCoordinate Location;
-    TargetWidget* Widget;
+    cv::Mat Mat;
 };

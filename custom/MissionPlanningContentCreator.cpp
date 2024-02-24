@@ -33,7 +33,7 @@ std::mutex mutex;
 
 volatile double MissionPlanningContentCreator::latitude    = 51.0f;
 volatile double MissionPlanningContentCreator::longitude   = -114.0f;
-volatile double MissionPlanningContentCreator::altitude    = 1300.0f;
+volatile double MissionPlanningContentCreator::altitude    = 0.0f;
 volatile double MissionPlanningContentCreator::altitudeAbs = 0.0f;
 volatile double MissionPlanningContentCreator::heading     = 0.0f;
 volatile double MissionPlanningContentCreator::speed       = 0.0f;
@@ -90,8 +90,8 @@ void MissionPlanningContentCreator::startLoop()
             this,
             [this]()
             {
-                this->drone_->updateValues(latitude += 0.01,
-                                           longitude += 0.01,
+                this->drone_->updateValues(latitude,
+                                           longitude,
                                            altitude,
                                            heading,
                                            speed,
@@ -132,14 +132,19 @@ void MissionPlanningContentCreator::showTargets()
 
     mutex.unlock();
 
-    for (const Target& target : targets) {
-        auto lat = target.Location.latitude();
-        auto lon = target.Location.longitude();
+    for (Target& target : targets) {
+        auto loc = target.Location;
 
-        auto widget = &mapApi_.addGraphicsWidget(target.Widget);
-        widget->setLocation(target.Location);
+        auto lat = loc.latitude();
+        auto lon = loc.longitude();
+
+        auto targetWidget = new TargetWidget(loc.latitude(), loc.longitude(), target.Mat);
+
+        auto widget = &mapApi_.addGraphicsWidget(targetWidget);
+
+        widget->setLocation(loc);
         widget->setVisible(true);
-
+        
         notis_.notify("Target Found at: " + std::to_string(lat) + ", "
                           + std::to_string(lon),
                       notApi_,

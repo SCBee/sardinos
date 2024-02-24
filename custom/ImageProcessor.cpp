@@ -2,6 +2,7 @@
 #include <QLabel>
 #include <QPixmap>
 #include <QVBoxLayout>
+#include <QPointer>
 
 #include "ImageProcessor.h"
 
@@ -68,7 +69,7 @@ void ImageProcessor::processFrame(cv::Mat frame)
 
     // Threshold the image to create a binary mask of 0-intensity pixels
     cv::Mat mask;
-    cv::threshold(grayImage, mask, 119, 255, cv::THRESH_BINARY_INV);
+    cv::threshold(grayImage, mask, 95, 255, cv::THRESH_BINARY_INV);
 
     // Find contours of the 0-intensity pixels
     std::vector<std::vector<cv::Point>> contours;
@@ -113,13 +114,9 @@ void ImageProcessor::processFrame(cv::Mat frame)
 
 void ImageProcessor::addTarget(cv::Mat mat)
 {
-    QImage image(
-        (uchar*)mat.data, mat.cols, mat.rows, mat.step, QImage::Format_RGB888);
+    auto location = QGeoCoordinate(latitude_, longitude_, 1300);
 
-    TargetWidget* widget = new TargetWidget(latitude_, longitude_, image);
-
-    Target target = {
-        QGeoCoordinate(latitude_, longitude_, 1300), widget};
+    auto target = Target(location, mat);
 
     targets_.append(target);
 }

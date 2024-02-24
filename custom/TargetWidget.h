@@ -7,12 +7,16 @@
 #include <QTimer>
 #include <QVBoxLayout>
 #include <QWidget>
+#include <QPainter>
+
 #include <iostream>
+
+#include <opencv2/opencv.hpp>
 
 class TargetWidget : public QWidget
 {
 public:
-    TargetWidget(const double lat, const double lon, const QImage image)
+    TargetWidget(const double lat, const double lon, const cv::Mat mat)
     {
         // Create a QVBoxLayout to contain the button
         QVBoxLayout* layout = new QVBoxLayout(this);
@@ -26,10 +30,15 @@ public:
         lonLabel_   = new QLabel("Longitude: " + QString::number(lon));
         imageLabel_ = new QLabel();
 
+        auto image = QImage((uchar*)mat.data,
+                            mat.cols,
+                            mat.rows,
+                            mat.step,
+                            QImage::Format_RGB888);
+
         imageLabel_->setPixmap(QPixmap::fromImage(image));
 
         setLayout(layout);
-
 
         connect(button,
                 &QPushButton::clicked,
@@ -49,6 +58,15 @@ public:
                     }
                     update();
                 });
+    }
+
+protected:
+    void paintEvent(QPaintEvent *event) override {
+        Q_UNUSED(event);
+        QPainter painter(this);
+        painter.setBrush(Qt::red);
+        painter.setPen(Qt::NoPen);
+        painter.drawEllipse(rect().topLeft(), 5, 5); 
     }
 
 private:
