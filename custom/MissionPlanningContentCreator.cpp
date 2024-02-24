@@ -62,8 +62,7 @@ MissionPlanningContentCreator::MissionPlanningContentCreator(
     , m_state(UIHandler::State::STARTUP)
     , mission_()
     , drone_(new Drone(mapApi))
-    , imageProcessor_(
-          std::ref(targets_), std::ref(latitude), std::ref(longitude))
+    , imageProcessor_(std::ref(targets_), std::ref(latitude), std::ref(longitude))
     , timer_(new QTimer())
 {
     init();
@@ -85,7 +84,7 @@ void MissionPlanningContentCreator::init()
 
     QtConcurrent::run(
         [this, connectStr] {
-            missionManager_ = new MissionManager(connectStr, connectedToDrone_);
+            missionManager_ = new MissionManager(connectStr, std::ref(connectedToDrone_));
         });
 }
 
