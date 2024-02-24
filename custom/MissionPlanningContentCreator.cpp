@@ -99,6 +99,8 @@ void MissionPlanningContentCreator::startLoop()
                 latitude, longitude, altitude, heading, speed, yaw, battery);
 
             this->showTargets();
+
+            this->checkConnection();
         });
 
     timer_->start();
