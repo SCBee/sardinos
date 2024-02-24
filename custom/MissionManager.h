@@ -21,7 +21,7 @@ using std::this_thread::sleep_for;
 class MissionManager
 {
 public:
-    void init(std::string connectStr)
+    MissionManager(std::string connectStr, volatile bool& connected)
     {
         Mavsdk mavsdk {
             Mavsdk::Configuration {Mavsdk::ComponentType::GroundStation}};
@@ -45,6 +45,8 @@ public:
             sleep_for(seconds(3));
             connection_result = mavsdk.add_any_connection(connectStr);
         }
+
+        connected = true;
     }
 
     Mission::MissionItem make_mission_item(

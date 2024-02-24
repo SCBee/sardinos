@@ -28,6 +28,7 @@
 #include <LmCdl/VcsiMilStdCode.h>
 #include <LmCdl/VcsiPointOfInterestProperties.h>
 #include <MissionDomain.h>
+#include <MissionManager.h>
 #include <MissionPlanningDrawing.h>
 #include <MissionPlanningLine.h>
 #include <MissionPlanningPolygon.h>
@@ -36,7 +37,7 @@
 #include <Notifications.h>
 #include <UIHandler.h>
 #include <qgeocoordinate.h>
-#include <MissionManager.h>
+#include <QFuture>
 
 namespace LmCdl
 {
@@ -87,6 +88,8 @@ private:
 
     void showTargets();
 
+    void checkConnection();
+
     LmCdl::I_ContextMenuItem& missionBoundMenuItem_;
     LmCdl::I_ContextMenuItem& submitMissionMenuItem_;
 
@@ -113,6 +116,7 @@ private:
     Notifications notis_;
 
     UIHandler::State m_state;
+
     volatile static double latitude;  // WGS84
     volatile static double longitude;  // WGS84
     volatile static double altitude;  // relative altitude, m
@@ -122,11 +126,16 @@ private:
     volatile static double yaw;  // degrees, 0 to 360
     volatile static double battery;  // percentage, 0 to 1
 
+    volatile static bool connectedToDrone_;
+
     QList<Target> targets_;
 
     Drone* drone_;
 
     QTimer* timer_;
 
-    MissionManager missionManager_;
+    MissionManager* missionManager_;
+
+    QFuture<void> mavFut_;
+    QFuture<void> cancelFut_;
 };

@@ -38,6 +38,8 @@ volatile double MissionPlanningContentCreator::speed       = 0.0f;
 volatile double MissionPlanningContentCreator::yaw         = 0.0f;
 volatile double MissionPlanningContentCreator::battery     = 0.0f;
 
+volatile bool MissionPlanningContentCreator::connectedToDrone_ = false;
+
 MissionPlanningContentCreator::MissionPlanningContentCreator(
     LmCdl::I_VcsiMapExtensionApi& mapApi,
     LmCdl::I_PointOfInterestApi& poiApi,
@@ -71,12 +73,16 @@ MissionPlanningContentCreator::~MissionPlanningContentCreator() = default;
 
 void MissionPlanningContentCreator::init()
 {
-    uiHandler_.initContextMenuItems(missionBoundMenuItem_,
-                                    submitMissionMenuItem_);
+    uiHandler_.initContextMenuItems(missionBoundMenuItem_, submitMissionMenuItem_);
     connectToApiSignals();
     startLoop();
     trackApi_.addDrawingForTrack(*drone_);
     updatePois();
+
+    std::string connectStr = "udp://:14550";
+    // auto connectStr = "serial://COM3:57600";
+
+    QtConcurrent::run([this, connectStr] { missionManager_ = new MissionManager(connectStr, connectedToDrone_); });
 }
 
 void MissionPlanningContentCreator::startLoop()
@@ -147,6 +153,11 @@ void MissionPlanningContentCreator::showTargets()
     }
 }
 
+
+void MissionPlanningContentCreator::checkConnection(){
+    if (connectedToDrone_) notis_.notify("Successfully connect to drone", notApi_, Notifications::Continue);
+}
+
 void MissionPlanningContentCreator::getPoiProperties(
     const LmCdl::ContextMenuEvent& event)
 {
@@ -196,12 +207,14 @@ void MissionPlanningContentCreator::runMission()
         return;
     }
 
-    auto connectStr = "udp://:14550";
-    // auto connectStr = "serial://COM3:57600";
+    if (!connectedToDrone_){
+        notis_.notify("Not connected to a drone.", notApi_, Notifications::Severity::Danger);
+        return;
+    }
 
-    QtConcurrent::run([this, connectStr] { missionManager_.init(connectStr); });
+    cancelFut_.cancel();
 
-    notis_.notify("Starting Mission.", notApi_, Notifications::Severity::Continue);
+    notis_.notify("Starting Mission.", notApi_, Notifications::Continue);
 
     uiHandler_.updateUIState(UIHandler::State::CanCancelMission,
                              m_state,
@@ -234,10 +247,10 @@ void MissionPlanningContentCreator::runMission()
 
     QtConcurrent::run([this, uri] { imageProcessor_.init(uri); });
 
-    QFuture<void> mavFut = QtConcurrent::run(
+    mavFut_ = QtConcurrent::run(
         [this, mavWaypoints]()
         {
-            missionManager_.executeMissionQuad(std::ref(mavWaypoints),
+            missionManager_->executeMissionQuad(std::ref(mavWaypoints),
                                                std::ref(latitude),
                                                std::ref(longitude),
                                                std::ref(altitude),
@@ -251,9 +264,12 @@ void MissionPlanningContentCreator::runMission()
 
 void MissionPlanningContentCreator::cancelMission()
 {
-    notis_.notify("Cancelling Mission.", notApi_, Notifications::Severity::Warning);
+    notis_.notify(
+        "Cancelling Mission.", notApi_, Notifications::Severity::Warning);
 
-    QtConcurrent::run([this] {missionManager_.returnHome(); });
+    mavFut_.cancel();
+
+    cancelFut_ = QtConcurrent::run([this] { missionManager_->returnHome(); });
 
     updatePois();
 
