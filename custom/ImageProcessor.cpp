@@ -4,29 +4,23 @@
 #include <QVBoxLayout>
 
 #include "ImageProcessor.h"
-#include <TargetWidget.h>
 
 #include <LmCdl/I_Billboard.h>
 #include <MathExt.h>
+#include <TargetWidget.h>
 
-ImageProcessor::ImageProcessor(const volatile double& latitude,
+ImageProcessor::ImageProcessor(QList<Target>& targets,
+                               const volatile double& latitude,
                                const volatile double& longitude)
     : latitude_(latitude)
     , longitude_(longitude)
-    , processingTimer_(new QTimer)
+    , targets_(targets)
 {
-    processingTimer_->setInterval(1000);
 
-    connect(processingTimer_,
-            &QTimer::timeout,
-            this,
-            [this]() { this->processFrame(*currentFrame_); });
 }
 
 void ImageProcessor::init(std::string uri)
 {
-    processingTimer_->start();
-
     // Initialize VideoCapture with the GStreamer pipeline
     cv::VideoCapture cap(uri, cv::CAP_GSTREAMER);
     if (!cap.isOpened()) {
@@ -45,8 +39,9 @@ void ImageProcessor::init(std::string uri)
             break;
         }
 
-        cv::imshow("[INTERNAL] VCSi Video Stream",
-                   *currentFrame_);  // Display the frame
+        processFrame(*currentFrame_);
+        
+        cv::imshow("[INTERNAL] VCSi Video Stream", *currentFrame_);  // Display the frame
 
         // Break the loop when 'ESC' is pressed
         if (cv::waitKey(1) == 27) {
@@ -57,11 +52,16 @@ void ImageProcessor::init(std::string uri)
     // Cleanup
     cap.release();
     cv::destroyAllWindows();
-    processingTimer_->stop();
 }
 
 void ImageProcessor::processFrame(cv::Mat frame)
 {
+    auto currentTime = std::chrono::system_clock::now();
+
+    if ((currentTime - lastProcess_) < std::chrono::seconds(1)) return;
+
+    lastProcess_ = currentTime;
+
     cv::Mat grayImage;
 
     cv::cvtColor(frame, grayImage, cv::COLOR_RGB2GRAY);
@@ -76,10 +76,9 @@ void ImageProcessor::processFrame(cv::Mat frame)
         mask, contours, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_SIMPLE);
 
     if (contours.size() == 0) {
-        // std::cerr << "RETURNING\n";
         return;
     }
-    
+
     // Find the largest contour
     size_t largestContourIndex = 0;
     double largestContourArea  = 0.0;
@@ -109,18 +108,18 @@ void ImageProcessor::processFrame(cv::Mat frame)
 
     cv::cvtColor(targetFoundMat, targetFoundMat, cv::COLOR_BGR2RGB);
 
-    sendSignal(targetFoundMat);
+    addTarget(targetFoundMat);
 }
 
-void ImageProcessor::sendSignal(cv::Mat mat){
-
-    QImage image((uchar*) mat.data, mat.cols, mat.rows, mat.step, QImage::Format_RGB888);
+void ImageProcessor::addTarget(cv::Mat mat)
+{
+    QImage image(
+        (uchar*)mat.data, mat.cols, mat.rows, mat.step, QImage::Format_RGB888);
 
     TargetWidget* widget = new TargetWidget(latitude_, longitude_, image);
 
-    Target target = {QGeoCoordinate(latitude_, longitude_, 1300), widget, image};
+    Target target = {
+        QGeoCoordinate(latitude_, longitude_, 1300), widget};
 
-    //std::cerr << "EMITTING SIGNAL\n";
-
-    emit targetFound(target);
+    targets_.append(target);
 }

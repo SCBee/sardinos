@@ -29,6 +29,8 @@
 using std::chrono::seconds;
 using std::this_thread::sleep_for;
 
+std::mutex mutex;
+
 volatile double MissionPlanningContentCreator::latitude    = 51.0f;
 volatile double MissionPlanningContentCreator::longitude   = -114.0f;
 volatile double MissionPlanningContentCreator::altitude    = 1300.0f;
@@ -60,7 +62,8 @@ MissionPlanningContentCreator::MissionPlanningContentCreator(
     , m_state(UIHandler::State::STARTUP)
     , mission_()
     , drone_(new Drone(mapApi))
-    , imageProcessor_(std::ref(latitude), std::ref(longitude))
+    , imageProcessor_(
+          std::ref(targets_), std::ref(latitude), std::ref(longitude))
     , timer_(new QTimer())
 {
     init();
@@ -94,6 +97,8 @@ void MissionPlanningContentCreator::startLoop()
                                            speed,
                                            yaw,
                                            battery);
+
+                this->showTargets();
             });
 
     timer_->start();
@@ -115,24 +120,31 @@ void MissionPlanningContentCreator::connectToApiSignals()
             &LmCdl::I_PointOfInterestApi::pointOfInterestRemoved,
             this,
             &MissionPlanningContentCreator::updatePois);
-
-    connect(&imageProcessor_,
-            &ImageProcessor::targetFound,
-            this,
-            &MissionPlanningContentCreator::showTarget);
 }
 
-void MissionPlanningContentCreator::showTarget(Target target)
+void MissionPlanningContentCreator::showTargets()
 {
-    auto lat = target.Location.latitude();
-    auto lon = target.Location.longitude();
-    auto alt = target.Location.altitude();
+    mutex.lock();
 
-    notis_.notify("Target Found at: " + std::to_string(lat) + ", " + std::to_string(lon) + ", " + std::to_string(alt), notApi_, Notifications::Continue);
+    auto targets = targets_;
 
-    auto widget = &mapApi_.addGraphicsWidget(target.Widget);
-    widget->setLocation(target.Location);
-    widget->setVisible(true);
+    targets_.clear();
+
+    mutex.unlock();
+
+    for (const Target& target : targets) {
+        auto lat = target.Location.latitude();
+        auto lon = target.Location.longitude();
+
+        auto widget = &mapApi_.addGraphicsWidget(target.Widget);
+        widget->setLocation(target.Location);
+        widget->setVisible(true);
+
+        notis_.notify("Target Found at: " + std::to_string(lat) + ", "
+                          + std::to_string(lon),
+                      notApi_,
+                      Notifications::Continue);
+    }
 }
 
 void MissionPlanningContentCreator::getPoiProperties(
@@ -212,12 +224,14 @@ void MissionPlanningContentCreator::runMission()
     // GStreamer pipeline string adapted for OpenCV
     // auto uri =
     //     "udpsrc port=5200 caps = \"application/x-rtp, media=(string)video, "
-    //     "clock-rate=(int)90000, encoding-name=(string)H264, payload=(int)96\" "
+    //     "clock-rate=(int)90000, encoding-name=(string)H264, payload=(int)96\"
+    //     "
     //     "! rtph264depay ! decodebin ! videoconvert ! appsink";
 
-    imageProcessor_.init(uri); 
-    
-    QFuture<void> future = QtConcurrent::run(
+    QFuture<void> imageFut =
+        QtConcurrent::run([this, uri] { imageProcessor_.init(uri); });
+
+    QFuture<void> mavFut = QtConcurrent::run(
         [mavWaypoints]()
         {
             sardinos::executeMissionVTOL(std::ref(mavWaypoints),

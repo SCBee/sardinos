@@ -13,21 +13,18 @@ struct Target : public QObject
 {
     Q_OBJECT
 public:
-    Target(QGeoCoordinate location, TargetWidget* widget, QImage image)
+    Target(QGeoCoordinate location, TargetWidget* widget)
     {
         Location = location;
         Widget   = widget;
-        Image    = image;
     }
 
     Target(const Target& target)
     {
         Location = target.Location;
         Widget   = target.Widget;
-        Image    = target.Image;
     }
 
     QGeoCoordinate Location;
     TargetWidget* Widget;
-    QImage Image;
 };

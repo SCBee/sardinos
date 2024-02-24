@@ -5,6 +5,7 @@
 #include <QTimer>
 #include <iostream>
 #include <string>
+#include <chrono>
 
 #include <LmCdl/I_VcsiMapExtensionApi.h>
 #include <Target.h>
@@ -14,21 +15,21 @@ class ImageProcessor : public QObject
 {
     Q_OBJECT
 public:
-    ImageProcessor(const volatile double& latitude,
+    ImageProcessor(QList<Target>& targets,
+                   const volatile double& latitude,
                    const volatile double& longitude);
     void init(std::string uri);
     void processFrame(cv::Mat frame);
-
-signals:
-    void targetFound(Target target);
 
 private:
     const volatile double& latitude_;
     const volatile double& longitude_;
 
-    QTimer* processingTimer_;
+    QList<Target>& targets_;
+
+    std::chrono::system_clock::time_point lastProcess_;
 
     cv::Mat* currentFrame_ = new cv::Mat();
 
-    void sendSignal(cv::Mat mat);
+    void addTarget(cv::Mat mat);
 };

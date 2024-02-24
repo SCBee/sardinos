@@ -85,7 +85,7 @@ private:
 
     void executeMissionAction();
 
-    void showTarget(Target target);
+    void showTargets();
 
     LmCdl::I_ContextMenuItem& missionBoundMenuItem_;
     LmCdl::I_ContextMenuItem& submitMissionMenuItem_;
@@ -121,6 +121,8 @@ private:
     volatile static double speed;  // meters per second
     volatile static double yaw;  // degrees, 0 to 360
     volatile static double battery;  // percentage, 0 to 1
+
+    QList<Target> targets_;
 
     Drone* drone_;
 
