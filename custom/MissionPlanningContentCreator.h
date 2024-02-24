@@ -127,6 +127,7 @@ private:
     volatile static double battery;  // percentage, 0 to 1
 
     volatile static bool connectedToDrone_;
+    bool alreadyConnected_ = false;
 
     QList<Target> targets_;
 

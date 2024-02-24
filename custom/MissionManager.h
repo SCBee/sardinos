@@ -28,14 +28,6 @@ public:
         ConnectionResult connection_result =
             mavsdk.add_any_connection(connectStr);
 
-        // wait while we connect to the system
-        sardinos::setColor("red");
-        system_ = mavsdk.first_autopilot(3.0);
-        while (!system_) {
-            std::cerr << "Timed out waiting for system..." << std::endl;
-            sleep_for(seconds(3));
-        }
-
         // wait while we try to establish our connection (heartbeat needs to
         // be recorded)
         sardinos::setColor("red");
@@ -44,6 +36,15 @@ public:
                       << std::endl;
             sleep_for(seconds(3));
             connection_result = mavsdk.add_any_connection(connectStr);
+        }
+
+        // wait while we connect to the system
+        sardinos::setColor("red");
+        system_ = mavsdk.first_autopilot(3.0);
+        while (!system_) {
+            std::cerr << "Timed out waiting for system..." << std::endl;
+            sleep_for(seconds(3));
+            system_ = mavsdk.first_autopilot(3.0);
         }
 
         connected = true;
@@ -183,8 +184,8 @@ public:
             while (std::abs(lat_ - latitude) > 0.00001
                    || std::abs(lon_ - longitude) > 0.00001)
             {
-                double distance = sardinos::getDistance(
-                    lat_, lon_, latitude, longitude);
+                double distance =
+                    sardinos::getDistance(lat_, lon_, latitude, longitude);
 
                 if (distance > 5.0f) {
                     if (!outOfPath) {
@@ -348,8 +349,8 @@ public:
             while (std::abs(lat_ - latitude) > 0.001
                    || std::abs(lon_ - longitude) > 0.001)
             {
-                double distance = sardinos::getDistance(
-                    lat_, lon_, latitude, longitude);
+                double distance =
+                    sardinos::getDistance(lat_, lon_, latitude, longitude);
 
                 if (distance > 5.0f) {
                     if (!outOfPath) {

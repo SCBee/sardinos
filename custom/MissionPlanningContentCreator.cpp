@@ -73,7 +73,8 @@ MissionPlanningContentCreator::~MissionPlanningContentCreator() = default;
 
 void MissionPlanningContentCreator::init()
 {
-    uiHandler_.initContextMenuItems(missionBoundMenuItem_, submitMissionMenuItem_);
+    uiHandler_.initContextMenuItems(missionBoundMenuItem_,
+                                    submitMissionMenuItem_);
     connectToApiSignals();
     startLoop();
     trackApi_.addDrawingForTrack(*drone_);
@@ -82,7 +83,10 @@ void MissionPlanningContentCreator::init()
     std::string connectStr = "udp://:14550";
     // auto connectStr = "serial://COM3:57600";
 
-    QtConcurrent::run([this, connectStr] { missionManager_ = new MissionManager(connectStr, connectedToDrone_); });
+    QtConcurrent::run(
+        [this, connectStr] {
+            missionManager_ = new MissionManager(connectStr, connectedToDrone_);
+        });
 }
 
 void MissionPlanningContentCreator::startLoop()
@@ -155,9 +159,15 @@ void MissionPlanningContentCreator::showTargets()
     }
 }
 
-
-void MissionPlanningContentCreator::checkConnection(){
-    if (connectedToDrone_) notis_.notify("Successfully connect to drone", notApi_, Notifications::Continue);
+void MissionPlanningContentCreator::checkConnection()
+{
+    if (alreadyConnected_)
+        return;
+        
+    if (connectedToDrone_) {
+        notis_.notify("Successfully connect to drone", notApi_, Notifications::Continue);
+        alreadyConnected_ = true;
+    }
 }
 
 void MissionPlanningContentCreator::getPoiProperties(
@@ -209,8 +219,10 @@ void MissionPlanningContentCreator::runMission()
         return;
     }
 
-    if (!connectedToDrone_){
-        notis_.notify("Not connected to a drone.", notApi_, Notifications::Severity::Danger);
+    if (!connectedToDrone_) {
+        notis_.notify("Not connected to a drone.",
+                      notApi_,
+                      Notifications::Severity::Danger);
         return;
     }
 
@@ -253,14 +265,14 @@ void MissionPlanningContentCreator::runMission()
         [this, mavWaypoints]()
         {
             missionManager_->executeMissionQuad(std::ref(mavWaypoints),
-                                               std::ref(latitude),
-                                               std::ref(longitude),
-                                               std::ref(altitude),
-                                               std::ref(altitudeAbs),
-                                               std::ref(heading),
-                                               std::ref(speed),
-                                               std::ref(yaw),
-                                               std::ref(battery));
+                                                std::ref(latitude),
+                                                std::ref(longitude),
+                                                std::ref(altitude),
+                                                std::ref(altitudeAbs),
+                                                std::ref(heading),
+                                                std::ref(speed),
+                                                std::ref(yaw),
+                                                std::ref(battery));
         });
 }
 
