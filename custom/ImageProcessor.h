@@ -22,10 +22,13 @@ public:
                    const volatile double& longitude);
     void init(std::string uri);
     void processFrame(cv::Mat frame);
+    void stop();
 
 private:
     const volatile double& latitude_;
     const volatile double& longitude_;
+
+    bool processing_ = false;
 
     QList<Target>& targets_;
 

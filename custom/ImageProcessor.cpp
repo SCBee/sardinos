@@ -22,6 +22,8 @@ ImageProcessor::ImageProcessor(QList<Target>& targets,
 
 void ImageProcessor::init(std::string uri)
 {
+    processing_ = true;
+
     // Initialize VideoCapture with the GStreamer pipeline
     cv::VideoCapture cap(uri, cv::CAP_GSTREAMER);
     if (!cap.isOpened()) {
@@ -40,7 +42,7 @@ void ImageProcessor::init(std::string uri)
             break;
         }
 
-        processFrame(*currentFrame_);
+        if (processing_) processFrame(*currentFrame_);
         
         cv::imshow("[INTERNAL] VCSi Video Stream", *currentFrame_);  // Display the frame
 
@@ -119,4 +121,8 @@ void ImageProcessor::addTarget(cv::Mat mat)
     auto target = Target(location, mat);
 
     targets_.append(target);
+}
+
+void ImageProcessor::stop(){
+    processing_ = false;
 }

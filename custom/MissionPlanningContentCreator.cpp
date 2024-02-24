@@ -253,10 +253,13 @@ void MissionPlanningContentCreator::runMission()
 
 void MissionPlanningContentCreator::cancelMission()
 {
-    notis_.notify(
-        "Cancelling Mission.", notApi_, Notifications::Severity::Warning);
+    notis_.notify("Cancelling Mission.", notApi_, Notifications::Severity::Warning);
+
+    //should send drone home here
 
     updatePois();
+
+    imageProcessor_.stop();
 
     uiHandler_.updateUIState(UIHandler::State::CanGetFlightPath,
                              m_state,
