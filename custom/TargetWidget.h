@@ -33,7 +33,7 @@ public:
         auto image = QImage((uchar*)mat.data,
                             mat.cols,
                             mat.rows,
-                            mat.step,
+                            static_cast<int>(mat.step),
                             QImage::Format_RGB888);
 
         imageLabel_->setPixmap(QPixmap::fromImage(image));

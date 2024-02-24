@@ -1,7 +1,7 @@
 #include <QColor>
 #include <utility>
 
-#include <FlightPather.h>
+#include <Sardinos.h>
 #include <MissionDomain.h>
 
 QList<MissionPlanningWaypoint*> MissionDomain::waypoints() const

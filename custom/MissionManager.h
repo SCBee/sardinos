@@ -1,127 +1,95 @@
-//
-// Created by dev on 2/3/2024.
-//
-
-#ifndef VCSI_SARDINOS_SARDINOSPUBLISHER_H
-#define VCSI_SARDINOS_SARDINOSPUBLISHER_H
-
 #include <chrono>
 #include <functional>
 #include <future>
 #include <iostream>
 #include <thread>
 
-#include <MathExt.h>
 #include <MissionPlanningContentCreator.h>
-#include <mavsdk/mavsdk.h>
+#include <Sardinos.h>
 #include <mavlink/common/mavlink.h>
+#include <mavsdk/mavsdk.h>
 #include <mavsdk/plugins/action/action.h>
+#include <mavsdk/plugins/mavlink_passthrough/mavlink_passthrough.h>
 #include <mavsdk/plugins/mission/mission.h>
 #include <mavsdk/plugins/telemetry/telemetry.h>
 #include <windows.h>
-
-#include <mavsdk/plugins/mavlink_passthrough/mavlink_passthrough.h>
 
 using namespace mavsdk;
 using std::chrono::seconds;
 using std::this_thread::sleep_for;
 
-Mission::MissionItem make_mission_item(
-    double latitude_deg,
-    double longitude_deg,
-    float relative_altitude_m,
-    float speed_m_s,
-    bool is_fly_through,
-    float gimbal_pitch_deg,
-    float gimbal_yaw_deg,
-    Mission::MissionItem::CameraAction camera_action)
+class MissionManager
 {
-    Mission::MissionItem new_item {};
-    new_item.latitude_deg        = latitude_deg;
-    new_item.longitude_deg       = longitude_deg;
-    new_item.relative_altitude_m = relative_altitude_m;
-    new_item.speed_m_s           = speed_m_s;
-    new_item.is_fly_through      = is_fly_through;
-    new_item.gimbal_pitch_deg    = gimbal_pitch_deg;
-    new_item.gimbal_yaw_deg      = gimbal_yaw_deg;
-    new_item.camera_action       = camera_action;
-    return new_item;
-}
-
-namespace sardinos
-{
-    void setColor(const std::string& textColor = "default",
-                  const std::string& bgColor   = "black")
+public:
+    void init(std::string connectStr)
     {
-        // Map of color strings to their corresponding Windows Console color
-        // codes
-        std::map<std::string, int> colors {{"black", 0},
-                                           {"blue", 1},
-                                           {"green", 2},
-                                           {"cyan", 3},
-                                           {"red", 4},
-                                           {"magenta", 5},
-                                           {"brown", 6},
-                                           {"default", 7},
-                                           {"darkgray", 8},
-                                           {"lightblue", 9},
-                                           {"lightgreen", 10},
-                                           {"lightcyan", 11},
-                                           {"lightred", 12},
-                                           {"lightmagenta", 13},
-                                           {"yellow", 14},
-                                           {"white", 15}};
-
-        HANDLE consoleHandle = GetStdHandle(STD_OUTPUT_HANDLE);
-        // Find the color codes from the map, use light gray (7) if not found
-        int textCode =
-            colors.find(textColor) != colors.end() ? colors[textColor] : 7;
-        int bgCode = colors.find(bgColor) != colors.end() ? colors[bgColor] : 0;
-        SetConsoleTextAttribute(consoleHandle,
-                                (WORD)((bgCode << 4) | textCode));
-    }
-
-    void executeMissionQuad(const std::vector<std::pair<float, float>>& waypoints,
-                             volatile double& lat_,
-                             volatile double& lon_,
-                             volatile double& alt_,
-                             volatile double& altAbs_,
-                             volatile double& head_,
-                             volatile double& speed_,
-                             volatile double& yaw_,
-                             volatile double& batt_) {
-        auto connectStr = "udp://:14550";
         Mavsdk mavsdk {
             Mavsdk::Configuration {Mavsdk::ComponentType::GroundStation}};
         ConnectionResult connection_result =
             mavsdk.add_any_connection(connectStr);
 
-        // wait while we try to establish our connection (heartbeat needs to be
-        // recorded)
-        setColor("red");
-        while (connection_result != ConnectionResult::Success) {
-            std::cerr << "Connection failed: " << connection_result << std::endl;
-            sleep_for(seconds(3));
-            connection_result = mavsdk.add_any_connection(connectStr);
-        }
-
         // wait while we connect to the system
-        setColor("red");
-        auto system = mavsdk.first_autopilot(3.0);
-        while (!system) {
+        sardinos::setColor("red");
+        system_ = mavsdk.first_autopilot(3.0);
+        while (!system_) {
             std::cerr << "Timed out waiting for system..." << std::endl;
             sleep_for(seconds(3));
         }
 
+        // wait while we try to establish our connection (heartbeat needs to
+        // be recorded)
+        sardinos::setColor("red");
+        while (connection_result != ConnectionResult::Success) {
+            std::cerr << "Connection failed: " << connection_result
+                      << std::endl;
+            sleep_for(seconds(3));
+            connection_result = mavsdk.add_any_connection(connectStr);
+        }
+    }
+
+    Mission::MissionItem make_mission_item(
+        double latitude_deg,
+        double longitude_deg,
+        float relative_altitude_m,
+        float speed_m_s,
+        bool is_fly_through,
+        float gimbal_pitch_deg,
+        float gimbal_yaw_deg,
+        Mission::MissionItem::CameraAction camera_action)
+    {
+        Mission::MissionItem new_item {};
+        new_item.latitude_deg        = latitude_deg;
+        new_item.longitude_deg       = longitude_deg;
+        new_item.relative_altitude_m = relative_altitude_m;
+        new_item.speed_m_s           = speed_m_s;
+        new_item.is_fly_through      = is_fly_through;
+        new_item.gimbal_pitch_deg    = gimbal_pitch_deg;
+        new_item.gimbal_yaw_deg      = gimbal_yaw_deg;
+        new_item.camera_action       = camera_action;
+        return new_item;
+    }
+
+    void executeMissionQuad(
+        const std::vector<std::pair<float, float>>& waypoints,
+        volatile double& lat_,
+        volatile double& lon_,
+        volatile double& alt_,
+        volatile double& altAbs_,
+        volatile double& head_,
+        volatile double& speed_,
+        volatile double& yaw_,
+        volatile double& batt_)
+    {
         // Instantiate plugins.
-        auto telemetry = Telemetry {system.value()};
-        auto action    = Action {system.value()};
+        auto telemetry = Telemetry {system_.value()};
+        auto action    = Action {system_.value()};
 
         // TELEMETRY SUBSCRIPTIONS
-        setColor("red");
+        sardinos::setColor("red");
         Telemetry::Result set_rate_result = telemetry.set_rate_position(1.0);
         while (set_rate_result != Telemetry::Result::Success) {
-            std::cerr << "Setting rate failed: " << set_rate_result << std::endl;
+            std::cerr << "Setting rate failed: " << set_rate_result
+                      << std::endl;
             sleep_for(seconds(3));
             set_rate_result = telemetry.set_rate_position(1.0);
         }
@@ -132,19 +100,19 @@ namespace sardinos
         telemetry.subscribe_position(
             [&lat_, &lon_, &alt_, &altAbs_](const Telemetry::Position& position)
             {
-              lat_    = position.latitude_deg;
-              lon_    = position.longitude_deg;
-              alt_    = position.relative_altitude_m;
-              altAbs_ = position.absolute_altitude_m;
+                lat_    = position.latitude_deg;
+                lon_    = position.longitude_deg;
+                alt_    = position.relative_altitude_m;
+                altAbs_ = position.absolute_altitude_m;
             });
 
         telemetry.subscribe_velocity_ned(
             [&speed_](const Telemetry::VelocityNed& vel)
             {
-              double vabs = std::sqrt(std::pow(vel.north_m_s, 2)
-                                      + std::pow(vel.east_m_s, 2)
-                                      + std::pow(vel.down_m_s, 2));
-              speed_      = vabs;
+                double vabs = std::sqrt(std::pow(vel.north_m_s, 2)
+                                        + std::pow(vel.east_m_s, 2)
+                                        + std::pow(vel.down_m_s, 2));
+                speed_      = vabs;
             });
 
         telemetry.subscribe_attitude_euler(
@@ -157,14 +125,15 @@ namespace sardinos
         // END TELEMETRY SUBSCRIPTIONS
 
         // Wait until we are ready to arm.
-        setColor("cyan");
+        sardinos::setColor("cyan");
         while (!telemetry.health_all_ok()) {
-            std::cout << "Waiting for vehicle to be ready to arm..." << std::endl;
+            std::cout << "Waiting for vehicle to be ready to arm..."
+                      << std::endl;
             sleep_for(seconds(2));
         }
 
         // Arm vehicle
-        setColor("red");
+        sardinos::setColor("red");
         Action::Result arm_result = action.arm();
         while (arm_result != Action::Result::Success) {
             std::cerr << "Arming failed: " << arm_result << std::endl;
@@ -177,7 +146,7 @@ namespace sardinos
         action.set_takeoff_altitude(height);
 
         // Take off
-        setColor("red");
+        sardinos::setColor("red");
         Action::Result takeoff_result = action.takeoff();
         while (takeoff_result != Action::Result::Success) {
             std::cerr << "Takeoff failed: " << takeoff_result << std::endl;
@@ -186,14 +155,14 @@ namespace sardinos
         }
 
         // Wait while it takes off.
-        setColor("yellow");
+        sardinos::setColor("yellow");
         std::cout << "Waiting to reach takeoff altitude..." << std::endl;
         while (alt_ <= height - 2) {
             sleep_for(seconds(1));
         }
 
         // go through path
-        setColor("red");
+        sardinos::setColor("red");
         bool outOfPath = false;
         for (auto& [longitude, latitude] : waypoints) {
             std::cout << "Sending it to location: (" << latitude << ", "
@@ -212,7 +181,7 @@ namespace sardinos
             while (std::abs(lat_ - latitude) > 0.00001
                    || std::abs(lon_ - longitude) > 0.00001)
             {
-                double distance = sardinos::MathExt::getDistance(
+                double distance = sardinos::getDistance(
                     lat_, lon_, latitude, longitude);
 
                 if (distance > 5.0f) {
@@ -235,7 +204,7 @@ namespace sardinos
         }
 
         // RTL
-        setColor("yellow");
+        sardinos::setColor("yellow");
         Action::Result rtl_result = action.return_to_launch();
         while (rtl_result != Action::Result::Success) {
             std::cout << "Waiting for RTL...\n" << std::endl;
@@ -244,7 +213,7 @@ namespace sardinos
         }
 
         // Wait until disarmed.
-        setColor("yellow");
+        sardinos::setColor("yellow");
         while (telemetry.armed()) {
             std::cout << "Waiting for vehicle to land and disarm\n";
             sleep_for(seconds(1));
@@ -264,37 +233,12 @@ namespace sardinos
         volatile double& yaw_,
         volatile double& batt_)
     {
-        auto connectStr = "udp://:14550";
-        //auto connectStr = "serial://COM3:57600";
-
-        Mavsdk mavsdk {
-            Mavsdk::Configuration {Mavsdk::ComponentType::GroundStation}};
-        ConnectionResult connection_result =
-            mavsdk.add_any_connection(connectStr);
-
-        // wait while we try to establish our connection (heartbeat needs to be
-        // recorded)
-        setColor("red");
-        while (connection_result != ConnectionResult::Success) {
-            std::cerr << "Connection failed: " << connection_result << '\n';
-            sleep_for(seconds(3));
-            connection_result = mavsdk.add_any_connection(connectStr);
-        }
-
-        // wait while we connect to the system
-        setColor("red");
-        auto system = mavsdk.first_autopilot(3.0);
-        while (!system) {
-            std::cerr << "Timed out waiting for system...\n";
-            sleep_for(seconds(3));
-        }
-
         // Instantiate plugins.
-        auto telemetry = Telemetry {system.value()};
-        auto action    = Action {system.value()};
+        auto telemetry = Telemetry {system_.value()};
+        auto action    = Action {system_.value()};
 
         // We want to listen to the altitude of the drone at 1 Hz.
-        setColor("red");
+        sardinos::setColor("red");
         Telemetry::Result set_rate_result = telemetry.set_rate_position(1.0);
         while (set_rate_result != Telemetry::Result::Success) {
             std::cerr << "Setting rate failed: " << set_rate_result << '\n';
@@ -332,14 +276,14 @@ namespace sardinos
             { batt_ = battery.remaining_percent / 100.0; });
 
         // Wait until we are ready to arm.
-        setColor("cyan");
+        sardinos::setColor("cyan");
         while (!telemetry.health_all_ok()) {
             std::cout << "Waiting for vehicle to be ready to arm...\n";
             sleep_for(seconds(2));
         }
 
         // Arm vehicle
-        setColor("red");
+        sardinos::setColor("red");
         Action::Result arm_result = action.arm();
         while (arm_result != Action::Result::Success) {
             std::cerr << "Arming failed: " << arm_result << '\n';
@@ -352,7 +296,7 @@ namespace sardinos
         action.set_takeoff_altitude(height);
 
         // Take off
-        setColor("red");
+        sardinos::setColor("red");
         Action::Result takeoff_result = action.takeoff();
         while (takeoff_result != Action::Result::Success) {
             std::cerr << "Takeoff failed: " << takeoff_result << '\n';
@@ -361,14 +305,14 @@ namespace sardinos
         }
 
         // Wait while it takes off.
-        setColor("yellow");
+        sardinos::setColor("yellow");
         std::cout << "Waiting to reach takeoff altitude...\n";
         while (alt_ <= height - 2) {
             sleep_for(seconds(1));
         }
 
         // transition to fixed wing
-        setColor("red");
+        sardinos::setColor("red");
         Action::Result fw_result = action.transition_to_fixedwing();
         while (fw_result != Action::Result::Success) {
             std::cerr << "Transition to fixed wing failed: " << fw_result
@@ -378,12 +322,12 @@ namespace sardinos
         }
 
         // Let it transition and start loitering.
-        setColor("yellow");
+        sardinos::setColor("yellow");
         std::cout << "loitering...\n";
         sleep_for(seconds(3));
 
         // go through path
-        setColor("red");
+        sardinos::setColor("red");
         bool outOfPath = false;
         for (auto& [longitude, latitude] : waypoints) {
             std::cout << "Sending it to location: (" << latitude << ", "
@@ -402,7 +346,7 @@ namespace sardinos
             while (std::abs(lat_ - latitude) > 0.001
                    || std::abs(lon_ - longitude) > 0.001)
             {
-                double distance = sardinos::MathExt::getDistance(
+                double distance = sardinos::getDistance(
                     lat_, lon_, latitude, longitude);
 
                 if (distance > 5.0f) {
@@ -425,9 +369,16 @@ namespace sardinos
         }
 
         // RTL
+        sardinos::setColor("yellow");
+        Action::Result rtl_result = action.return_to_launch();
+        while (rtl_result != Action::Result::Success) {
+            std::cout << "Waiting for RTL...\n" << std::endl;
+            sleep_for(seconds(3));
+            rtl_result = action.return_to_launch();
+        }
 
         // Let's stop before reaching the goto point and go back to hover.
-        setColor("red");
+        sardinos::setColor("red");
         Action::Result mc_result = action.transition_to_multicopter();
         while (mc_result != Action::Result::Success) {
             std::cerr << "Transition to multi copter failed: " << mc_result
@@ -440,7 +391,7 @@ namespace sardinos
         sleep_for(seconds(5));
 
         // Now just land here.
-        setColor("red");
+        sardinos::setColor("red");
         const Action::Result land_result = action.land();
         if (land_result != Action::Result::Success) {
             std::cerr << "Land failed: " << land_result << '\n';
@@ -448,7 +399,7 @@ namespace sardinos
         }
 
         // Wait until disarmed.
-        setColor("yellow");
+        sardinos::setColor("yellow");
         while (telemetry.armed()) {
             std::cout << "Waiting for vehicle to land and disarm\n";
             sleep_for(seconds(2));
@@ -456,6 +407,23 @@ namespace sardinos
 
         std::cout << "Disarmed, exiting.\n";
     }
-}  // namespace sardinos
 
-#endif  // VCSI_SARDINOS_SARDINOSPUBLISHER_H
+    void returnHome()
+    {
+        // Instantiate plugins.
+        auto telemetry = Telemetry {system_.value()};
+        auto action    = Action {system_.value()};
+
+        // RTL
+        sardinos::setColor("yellow");
+        Action::Result rtl_result = action.return_to_launch();
+        while (rtl_result != Action::Result::Success) {
+            std::cout << "Waiting for RTL...\n" << std::endl;
+            sleep_for(seconds(3));
+            rtl_result = action.return_to_launch();
+        }
+    }
+
+private:
+    std::optional<std::shared_ptr<mavsdk::System>> system_;
+};

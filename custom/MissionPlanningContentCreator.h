@@ -9,7 +9,6 @@
 
 #include <BoundingBox.h>
 #include <Drone.h>
-#include <FlightPather.h>
 #include <ImageProcessor.h>
 #include <LmCdl/I_ContextMenu.h>
 #include <LmCdl/I_ContextMenuItem.h>
@@ -37,6 +36,7 @@
 #include <Notifications.h>
 #include <UIHandler.h>
 #include <qgeocoordinate.h>
+#include <MissionManager.h>
 
 namespace LmCdl
 {
@@ -127,4 +127,6 @@ private:
     Drone* drone_;
 
     QTimer* timer_;
+
+    MissionManager missionManager_;
 };

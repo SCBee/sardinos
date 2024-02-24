@@ -7,7 +7,6 @@
 #include "ImageProcessor.h"
 
 #include <LmCdl/I_Billboard.h>
-#include <MathExt.h>
 #include <TargetWidget.h>
 
 ImageProcessor::ImageProcessor(QList<Target>& targets,
