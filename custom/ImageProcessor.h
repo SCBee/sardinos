@@ -10,6 +10,8 @@
 #include <LmCdl/I_VcsiMapExtensionApi.h>
 #include <Target.h>
 #include <opencv2/opencv.hpp>
+#include <opencv2/highgui/highgui.hpp>
+
 
 class ImageProcessor : public QObject
 {
