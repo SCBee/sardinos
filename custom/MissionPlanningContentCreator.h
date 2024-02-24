@@ -52,7 +52,6 @@ class MissionPlanningContentCreator : public QObject
     Q_OBJECT
 
 public:
-
     MissionPlanningContentCreator(
         LmCdl::I_VcsiMapExtensionApi& mapApi,
         LmCdl::I_PointOfInterestApi& poiApi,
@@ -86,6 +85,8 @@ private:
 
     void executeMissionAction();
 
+    void showTargets();
+
     LmCdl::I_ContextMenuItem& missionBoundMenuItem_;
     LmCdl::I_ContextMenuItem& submitMissionMenuItem_;
 
@@ -98,10 +99,9 @@ private:
     LmCdl::I_RouteApi& routeApi_;
     LmCdl::I_TrackDrawingApi& trackApi_;
     LmCdl::I_VideoStreamApiCollection& videoCollectionApi_;
+    LmCdl::I_VcsiMapExtensionApi& mapApi_;
 
-    LmCdl::I_VideoStreamApi* liveDroneFeed_;
-
-//    ImageProcessor imageProcessor_ = ImageProcessor();
+    ImageProcessor imageProcessor_;
 
     MissionPlanningDrawing* drawing_ = new MissionPlanningDrawing();
     BoundingBox missionBounds_;
@@ -121,6 +121,8 @@ private:
     volatile static double speed;  // meters per second
     volatile static double yaw;  // degrees, 0 to 360
     volatile static double battery;  // percentage, 0 to 1
+
+    QList<Target> targets_;
 
     Drone* drone_;
 

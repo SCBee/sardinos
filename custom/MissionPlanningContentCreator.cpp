@@ -29,6 +29,8 @@
 using std::chrono::seconds;
 using std::this_thread::sleep_for;
 
+std::mutex mutex;
+
 volatile double MissionPlanningContentCreator::latitude    = 51.0f;
 volatile double MissionPlanningContentCreator::longitude   = -114.0f;
 volatile double MissionPlanningContentCreator::altitude    = 0.0f;
@@ -56,11 +58,13 @@ MissionPlanningContentCreator::MissionPlanningContentCreator(
     , routeApi_(routeApi)
     , trackApi_(trackApi)
     , videoCollectionApi_(videoCollectionApi)
+    , mapApi_(mapApi)
     , m_state(UIHandler::State::STARTUP)
     , mission_()
     , drone_(new Drone(mapApi))
+    , imageProcessor_(
+          std::ref(targets_), std::ref(latitude), std::ref(longitude))
     , timer_(new QTimer())
-    , liveDroneFeed_(nullptr)
 {
     init();
 }
@@ -69,7 +73,8 @@ MissionPlanningContentCreator::~MissionPlanningContentCreator() = default;
 
 void MissionPlanningContentCreator::init()
 {
-    uiHandler_.initContextMenuItems(missionBoundMenuItem_, submitMissionMenuItem_);
+    uiHandler_.initContextMenuItems(missionBoundMenuItem_,
+                                    submitMissionMenuItem_);
     connectToApiSignals();
     startLoop();
     trackApi_.addDrawingForTrack(*drone_);
@@ -80,15 +85,21 @@ void MissionPlanningContentCreator::startLoop()
 {
     timer_->setInterval(1000);
 
-    connect(
-        timer_,
-        &QTimer::timeout,
-        this,
-        [this]()
-        {
-            this->drone_->updateValues(
-                latitude, longitude, altitude, heading, speed, yaw, battery);
-        });
+    connect(timer_,
+            &QTimer::timeout,
+            this,
+            [this]()
+            {
+                this->drone_->updateValues(latitude,
+                                           longitude,
+                                           altitude,
+                                           heading,
+                                           speed,
+                                           yaw,
+                                           battery);
+
+                this->showTargets();
+            });
 
     timer_->start();
 }
@@ -111,6 +122,36 @@ void MissionPlanningContentCreator::connectToApiSignals()
             &MissionPlanningContentCreator::updatePois);
 }
 
+void MissionPlanningContentCreator::showTargets()
+{
+    mutex.lock();
+
+    auto targets = targets_;
+
+    targets_.clear();
+
+    mutex.unlock();
+
+    for (Target& target : targets) {
+        auto loc = target.Location;
+
+        auto lat = loc.latitude();
+        auto lon = loc.longitude();
+
+        auto targetWidget = new TargetWidget(loc.latitude(), loc.longitude(), target.Mat);
+
+        auto widget = &mapApi_.addGraphicsWidget(targetWidget);
+
+        widget->setLocation(loc);
+        widget->setVisible(true);
+        
+        notis_.notify("Target Found at: " + std::to_string(lat) + ", "
+                          + std::to_string(lon),
+                      notApi_,
+                      Notifications::Continue);
+    }
+}
+
 void MissionPlanningContentCreator::getPoiProperties(
     const LmCdl::ContextMenuEvent& event)
 {
@@ -123,7 +164,13 @@ void MissionPlanningContentCreator::getPoiProperties(
                                [this](const LmCdl::VcsiPointOfInterestId&)
                                { updatePois(); });
 
-    uiHandler_.updateUIState(UIHandler::State::CanGetFlightPath, m_state, missionBoundMenuItem_, submitMissionMenuItem_, mission_, missionApi_, drawApi_);
+    uiHandler_.updateUIState(UIHandler::State::CanGetFlightPath,
+                             m_state,
+                             missionBoundMenuItem_,
+                             submitMissionMenuItem_,
+                             mission_,
+                             missionApi_,
+                             drawApi_);
 }
 
 void MissionPlanningContentCreator::getFlightPath()
@@ -136,19 +183,34 @@ void MissionPlanningContentCreator::getFlightPath()
 
     drawing_->drawFlightPath(mission_, missionApi_);
 
-    uiHandler_.updateUIState(UIHandler::State::CanRunMission, m_state, missionBoundMenuItem_, submitMissionMenuItem_, mission_, missionApi_, drawApi_);
+    uiHandler_.updateUIState(UIHandler::State::CanRunMission,
+                             m_state,
+                             missionBoundMenuItem_,
+                             submitMissionMenuItem_,
+                             mission_,
+                             missionApi_,
+                             drawApi_);
 }
 
 void MissionPlanningContentCreator::runMission()
 {
     if (!sardinos::FlightPather::canFly(mission_.waypoints())) {
-        notis_.notify("Flight path is too long.", notApi_, Notifications::Severity::Warning);
+        notis_.notify("Flight path is too long.",
+                      notApi_,
+                      Notifications::Severity::Warning);
         return;
     }
 
-    notis_.notify("Starting Mission.", notApi_, Notifications::Severity::Continue);
+    notis_.notify(
+        "Starting Mission.", notApi_, Notifications::Severity::Continue);
 
-    uiHandler_.updateUIState(UIHandler::State::CanCancelMission, m_state, missionBoundMenuItem_, submitMissionMenuItem_, mission_, missionApi_, drawApi_);
+    uiHandler_.updateUIState(UIHandler::State::CanCancelMission,
+                             m_state,
+                             missionBoundMenuItem_,
+                             submitMissionMenuItem_,
+                             mission_,
+                             missionApi_,
+                             drawApi_);
 
     std::vector<std::pair<float, float>> mavWaypoints;
 
@@ -160,27 +222,24 @@ void MissionPlanningContentCreator::runMission()
     drone_->setVisible(true);
 
     mission_.startMission();
-    
+
     // Sample video
     auto uri = "C:/Program Files/LMCDL/vcsi/sdk/examples/custom/SampleFeed.mp4";
 
     // GStreamer pipeline string adapted for OpenCV
-    auto pipeline =
-        "udpsrc port=5200 caps = \"application/x-rtp, media=(string)video, "
-        "clock-rate=(int)90000, encoding-name=(string)H264, payload=(int)96\" "
-        "! rtph264depay ! decodebin ! videoconvert ! appsink";
+    // auto uri =
+    //     "udpsrc port=5200 caps = \"application/x-rtp, media=(string)video, "
+    //     "clock-rate=(int)90000, encoding-name=(string)H264, payload=(int)96\"
+    //     "
+    //     "! rtph264depay ! decodebin ! videoconvert ! appsink";
 
-    liveDroneFeed_ =
-        &videoCollectionApi_.registerStream(uri, "Live drone stream");
+    QFuture<void> imageFut =
+        QtConcurrent::run([this, uri] { imageProcessor_.init(uri); });
 
-    auto imageProcessor = new ImageProcessor();
-    
-    QFuture<void> testImageProcFuture = QtConcurrent::run([this, imageProcessor, uri, pipeline]() { imageProcessor->init(uri); });
-
-    QFuture<void> future = QtConcurrent::run(
+    QFuture<void> mavFut = QtConcurrent::run(
         [mavWaypoints]()
         {
-            sardinos::executeMissionVTOL(std::ref(mavWaypoints),
+            sardinos::executeMissionQuad(std::ref(mavWaypoints),
                                          std::ref(latitude),
                                          std::ref(longitude),
                                          std::ref(altitude),
@@ -196,11 +255,19 @@ void MissionPlanningContentCreator::cancelMission()
 {
     notis_.notify("Cancelling Mission.", notApi_, Notifications::Severity::Warning);
 
-    videoCollectionApi_.unregisterStream(*liveDroneFeed_);
+    //should send drone home here
 
     updatePois();
 
-    uiHandler_.updateUIState(UIHandler::State::CanGetFlightPath, m_state, missionBoundMenuItem_, submitMissionMenuItem_, mission_, missionApi_, drawApi_);
+    imageProcessor_.stop();
+
+    uiHandler_.updateUIState(UIHandler::State::CanGetFlightPath,
+                             m_state,
+                             missionBoundMenuItem_,
+                             submitMissionMenuItem_,
+                             mission_,
+                             missionApi_,
+                             drawApi_);
 }
 
 void MissionPlanningContentCreator::updatePois()
@@ -217,9 +284,21 @@ void MissionPlanningContentCreator::updatePois()
         pois_.push_back({p.pointOfInterest().location()});
 
     if (pois_.size() > 2)
-        uiHandler_.updateUIState(UIHandler::State::CanGetFlightPath, m_state, missionBoundMenuItem_, submitMissionMenuItem_, mission_, missionApi_, drawApi_);
+        uiHandler_.updateUIState(UIHandler::State::CanGetFlightPath,
+                                 m_state,
+                                 missionBoundMenuItem_,
+                                 submitMissionMenuItem_,
+                                 mission_,
+                                 missionApi_,
+                                 drawApi_);
     else
-        uiHandler_.updateUIState(UIHandler::State::CannotGetFlightPath, m_state, missionBoundMenuItem_, submitMissionMenuItem_, mission_, missionApi_, drawApi_);
+        uiHandler_.updateUIState(UIHandler::State::CannotGetFlightPath,
+                                 m_state,
+                                 missionBoundMenuItem_,
+                                 submitMissionMenuItem_,
+                                 mission_,
+                                 missionApi_,
+                                 drawApi_);
 
     drawing_->drawMissionArea(pois_, missionBounds_, drawApi_);
 }
