@@ -50,16 +50,16 @@ include_directories("C:/Program Files/LMCDL/vcsi/sdk/examples/custom")
 
 # MOC
 set(MOCS
-    build/obj/moc_Drone.cpp
-    build/obj/moc_ImageProcessor.cpp
-    build/obj/moc_MissionDomain.cpp
-    build/obj/moc_MissionPlanningContentCreator.cpp
-    build/obj/moc_MissionPlanningDrawing.cpp
-    build/obj/moc_MissionPlanningPlugin.cpp
-    build/obj/moc_MissionPlanningWaypoint.cpp
-    build/obj/moc_MissionPlanningWaypointConnector.cpp
-    build/obj/moc_predefs.h
-    build/obj/moc_Target.cpp
+        build/obj/moc_Drone.cpp
+        build/obj/moc_ImageProcessor.cpp
+        build/obj/moc_MissionDomain.cpp
+        build/obj/moc_MissionPlanningContentCreator.cpp
+        build/obj/moc_MissionPlanningDrawing.cpp
+        build/obj/moc_MissionPlanningPlugin.cpp
+        build/obj/moc_MissionPlanningWaypoint.cpp
+        build/obj/moc_MissionPlanningWaypointConnector.cpp
+        build/obj/moc_predefs.h
+        build/obj/moc_Target.cpp
 )
 
 add_executable(vcsi_sardinos
