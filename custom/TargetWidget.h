@@ -3,12 +3,11 @@
 #include <QApplication>
 #include <QGeoCoordinate>
 #include <QLabel>
+#include <QPainter>
 #include <QPushButton>
 #include <QTimer>
 #include <QVBoxLayout>
 #include <QWidget>
-#include <QPainter>
-
 #include <iostream>
 
 #include <opencv2/opencv.hpp>
@@ -61,12 +60,13 @@ public:
     }
 
 protected:
-    void paintEvent(QPaintEvent *event) override {
+    void paintEvent(QPaintEvent* event) override
+    {
         Q_UNUSED(event);
         QPainter painter(this);
         painter.setBrush(Qt::red);
         painter.setPen(Qt::NoPen);
-        painter.drawEllipse(rect().topLeft(), 5, 5); 
+        painter.drawEllipse(rect().topLeft(), 5, 5);
     }
 
 private:

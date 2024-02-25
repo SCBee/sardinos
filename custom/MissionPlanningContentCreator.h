@@ -135,7 +135,7 @@ private:
 
     QTimer* timer_;
 
-    MissionManager* missionManager_{};
+    MissionManager* missionManager_ {};
 
     QFuture<void> mavFut_;
     QFuture<void> cancelFut_;

@@ -17,7 +17,7 @@ public:
     void notify(const std::string& msg,
                 LmCdl::I_VcsiUserNotificationApi& notApi_,
                 Severity severity = Severity::Message,
-                int durationMs = 3000);
+                int durationMs    = 3000);
 
 private:
 };
