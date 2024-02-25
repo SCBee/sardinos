@@ -44,15 +44,15 @@ public:
 
     void update();
 
-    void drawFlightPath(MissionDomain& mission_, LmCdl::I_MissionDrawingApi& missionApi_);
+    static void drawFlightPath(MissionDomain& mission_, LmCdl::I_MissionDrawingApi& missionApi_);
 
     void drawMissionArea(std::vector<std::vector<QGeoCoordinate>> pois_, BoundingBox& missionBounds_, LmCdl::I_VectorDataDrawingApi& drawApi_);
 
-    void clearFlightPath(MissionDomain& mission_, LmCdl::I_MissionDrawingApi& missionApi_);
+    static void clearFlightPath(MissionDomain& mission_, LmCdl::I_MissionDrawingApi& missionApi_);
 
     void clearMissionArea(LmCdl::I_VectorDataDrawingApi& drawApi_);
 
-    void draw(QList<MissionPlanningPolygon*> polygons, QList<MissionPlanningLine*> lines, LmCdl::I_VectorDataDrawingApi& drawApi_);
+    void draw(const QList<MissionPlanningPolygon*>& polygons, const QList<MissionPlanningLine*>& lines, LmCdl::I_VectorDataDrawingApi& drawApi_);
 
     [[nodiscard]] bool visible() const override;
 

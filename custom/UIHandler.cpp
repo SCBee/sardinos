@@ -17,7 +17,7 @@ void UIHandler::initContextMenuItems(LmCdl::I_ContextMenuItem &missionBoundMenuI
     submitMissionMenuItem_.setVisible(false);
 }
 
-void UIHandler::changeUI(State &newState, LmCdl::I_ContextMenuItem &missionBoundMenuItem_, LmCdl::I_ContextMenuItem &submitMissionMenuItem_, MissionDomain &mission_, LmCdl::I_MissionDrawingApi &missionApi_, LmCdl::I_VectorDataDrawingApi &drawApi_)
+[[maybe_unused]] void UIHandler::changeUI(State &newState, LmCdl::I_ContextMenuItem &missionBoundMenuItem_, LmCdl::I_ContextMenuItem &submitMissionMenuItem_, MissionDomain &mission_, LmCdl::I_MissionDrawingApi &missionApi_, LmCdl::I_VectorDataDrawingApi &drawApi_)
 {
     switch (newState)
     {

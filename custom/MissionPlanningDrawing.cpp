@@ -1,5 +1,4 @@
 #include <QGeoRectangle>
-#include <QList>
 #include <QSet>
 
 #include <MissionPlanningDrawing.h>
@@ -104,8 +103,8 @@ void MissionPlanningDrawing::clearMissionArea(
          drawApi_);
 }
 
-void MissionPlanningDrawing::draw(QList<MissionPlanningPolygon*> polygons,
-                                  QList<MissionPlanningLine*> lines,
+void MissionPlanningDrawing::draw(const QList<MissionPlanningPolygon*>& polygons,
+                                  const QList<MissionPlanningLine*>& lines,
                                   LmCdl::I_VectorDataDrawingApi& drawApi_)
 {
     clear();

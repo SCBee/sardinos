@@ -1,7 +1,4 @@
-#include <QCoreApplication>
-#include <QFuture>
 #include <QGeoRectangle>
-#include <QLabel>
 #include <QTime>
 #include <QTimer>
 #include <thread>
@@ -18,11 +15,9 @@
 #include <LmCdl/StanagRoute.h>
 #include <LmCdl/StanagWaypoint.h>
 #include <LmCdl/VcsiPointOfInterestProperties.h>
-#include <LmCdl/VectorDataPolygonDrawing.h>
 #include <MissionDomain.h>
 #include <MissionPlanningContentCreator.h>
 #include <QtConcurrent/QtConcurrent>
-#include <qicon.h>
 
 using std::chrono::seconds;
 using std::this_thread::sleep_for;

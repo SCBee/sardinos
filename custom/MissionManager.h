@@ -37,7 +37,6 @@ public:
 
         // wait while we try to establish our connection (heartbeat needs to
         // be recorded)
-        sardinos::setColor("red");
         while (connection_result != ConnectionResult::Success) {
             std::cerr << "Connection failed: " << connection_result
                       << std::endl;
@@ -46,7 +45,6 @@ public:
         }
 
         // wait while we connect to the system
-        sardinos::setColor("red");
         system_ = mavsdk.first_autopilot(3.0);
         while (!system_) {
             std::cerr << "Timed out waiting for system..." << std::endl;
@@ -56,7 +54,6 @@ public:
 
         // TELEMETRY SUBSCRIPTIONS
         telemetry = std::make_unique<Telemetry>(system_.value());
-        sardinos::setColor("red");
         Telemetry::Result set_rate_result = telemetry->set_rate_position(1.0);
         while (set_rate_result != Telemetry::Result::Success) {
             std::cerr << "Setting rate failed: " << set_rate_result
@@ -132,7 +129,6 @@ public:
 
 
         // Wait until we are ready to arm.
-        sardinos::setColor("cyan");
         while (!telemetry->health_all_ok()) {
             std::cout << "Waiting for vehicle to be ready to arm..."
                       << std::endl;
@@ -140,7 +136,6 @@ public:
         }
 
         // Arm vehicle
-        sardinos::setColor("red");
         Action::Result arm_result = action.arm();
         while (arm_result != Action::Result::Success) {
             std::cerr << "Arming failed: " << arm_result << std::endl;
@@ -153,7 +148,6 @@ public:
         action.set_takeoff_altitude(height);
 
         // Take off
-        sardinos::setColor("red");
         Action::Result takeoff_result = action.takeoff();
         while (takeoff_result != Action::Result::Success) {
             std::cerr << "Takeoff failed: " << takeoff_result << std::endl;
@@ -162,14 +156,12 @@ public:
         }
 
         // Wait while it takes off.
-        sardinos::setColor("yellow");
         std::cout << "Waiting to reach takeoff altitude..." << std::endl;
         while (alt_ <= height - 2) {
             sleep_for(seconds(1));
         }
 
         // go through path
-        sardinos::setColor("red");
         bool outOfPath = false;
         for (auto& [longitude, latitude] : waypoints) {
             std::cout << "Sending it to location: (" << latitude << ", "
@@ -193,25 +185,21 @@ public:
 
                 if (distance > 5.0f) {
                     if (!outOfPath) {
-                        sardinos::setColor("red");
                         std::cout << "Drone is " << distance
                                   << " meters off the path!" << std::endl;
                         outOfPath = true;
                     }
                 } else {
                     if (outOfPath) {
-                        sardinos::setColor("green");
                         std::cout << "Drone is back on track" << std::endl;
                         outOfPath = false;
                     }
                 }
-                sardinos::setColor("default");
                 sleep_for(seconds(1));
             }
         }
 
         // RTL
-        sardinos::setColor("yellow");
         Action::Result rtl_result = action.return_to_launch();
         while (rtl_result != Action::Result::Success) {
             std::cout << "Waiting for RTL...\n" << std::endl;
@@ -220,7 +208,6 @@ public:
         }
 
         // Wait until disarmed.
-        sardinos::setColor("yellow");
         while (telemetry->armed()) {
             std::cout << "Waiting for vehicle to land and disarm\n";
             sleep_for(seconds(1));
@@ -245,7 +232,6 @@ public:
 //        auto action    = Action {system_.value()};
 //
 //        // We want to listen to the altitude of the drone at 1 Hz.
-//        sardinos::setColor("red");
 //        Telemetry::Result set_rate_result = telemetry.set_rate_position(1.0);
 //        while (set_rate_result != Telemetry::Result::Success) {
 //            std::cerr << "Setting rate failed: " << set_rate_result << '\n';
@@ -283,14 +269,12 @@ public:
 //            { batt_ = battery.remaining_percent / 100.0; });
 //
 //        // Wait until we are ready to arm.
-//        sardinos::setColor("cyan");
 //        while (!telemetry.health_all_ok()) {
 //            std::cout << "Waiting for vehicle to be ready to arm...\n";
 //            sleep_for(seconds(2));
 //        }
 //
 //        // Arm vehicle
-//        sardinos::setColor("red");
 //        Action::Result arm_result = action.arm();
 //        while (arm_result != Action::Result::Success) {
 //            std::cerr << "Arming failed: " << arm_result << '\n';
@@ -303,7 +287,6 @@ public:
 //        action.set_takeoff_altitude(height);
 //
 //        // Take off
-//        sardinos::setColor("red");
 //        Action::Result takeoff_result = action.takeoff();
 //        while (takeoff_result != Action::Result::Success) {
 //            std::cerr << "Takeoff failed: " << takeoff_result << '\n';
@@ -312,14 +295,12 @@ public:
 //        }
 //
 //        // Wait while it takes off.
-//        sardinos::setColor("yellow");
 //        std::cout << "Waiting to reach takeoff altitude...\n";
 //        while (alt_ <= height - 2) {
 //            sleep_for(seconds(1));
 //        }
 //
 //        // transition to fixed wing
-//        sardinos::setColor("red");
 //        Action::Result fw_result = action.transition_to_fixedwing();
 //        while (fw_result != Action::Result::Success) {
 //            std::cerr << "Transition to fixed wing failed: " << fw_result
@@ -329,12 +310,10 @@ public:
 //        }
 //
 //        // Let it transition and start loitering.
-//        sardinos::setColor("yellow");
 //        std::cout << "loitering...\n";
 //        sleep_for(seconds(3));
 //
 //        // go through path
-//        sardinos::setColor("red");
 //        bool outOfPath = false;
 //        for (auto& [longitude, latitude] : waypoints) {
 //            std::cout << "Sending it to location: (" << latitude << ", "
@@ -358,25 +337,21 @@ public:
 //
 //                if (distance > 5.0f) {
 //                    if (!outOfPath) {
-//                        sardinos::setColor("red");
 //                        std::cout << "Drone is " << distance
 //                                  << " meters off the path!" << std::endl;
 //                        outOfPath = true;
 //                    }
 //                } else {
 //                    if (outOfPath) {
-//                        sardinos::setColor("green");
 //                        std::cout << "Drone is back on track" << std::endl;
 //                        outOfPath = false;
 //                    }
 //                }
-//                sardinos::setColor("default");
 //                sleep_for(seconds(1));
 //            }
 //        }
 //
 //        // RTL
-//        sardinos::setColor("yellow");
 //        Action::Result rtl_result = action.return_to_launch();
 //        while (rtl_result != Action::Result::Success) {
 //            std::cout << "Waiting for RTL...\n" << std::endl;
@@ -385,7 +360,6 @@ public:
 //        }
 //
 //        // Let's stop before reaching the goto point and go back to hover.
-//        sardinos::setColor("red");
 //        Action::Result mc_result = action.transition_to_multicopter();
 //        while (mc_result != Action::Result::Success) {
 //            std::cerr << "Transition to multi copter failed: " << mc_result
@@ -398,7 +372,6 @@ public:
 //        sleep_for(seconds(5));
 //
 //        // Now just land here.
-//        sardinos::setColor("red");
 //        const Action::Result land_result = action.land();
 //        if (land_result != Action::Result::Success) {
 //            std::cerr << "Land failed: " << land_result << '\n';
@@ -406,7 +379,6 @@ public:
 //        }
 //
 //        // Wait until disarmed.
-//        sardinos::setColor("yellow");
 //        while (telemetry.armed()) {
 //            std::cout << "Waiting for vehicle to land and disarm\n";
 //            sleep_for(seconds(2));
@@ -418,11 +390,9 @@ public:
     void returnHome()
     {
         // Instantiate plugins.
-        auto telemetry = Telemetry {system_.value()};
         auto action    = Action {system_.value()};
 
         // RTL
-        sardinos::setColor("yellow");
         Action::Result rtl_result = action.return_to_launch();
         while (rtl_result != Action::Result::Success) {
             std::cout << "Waiting for RTL...\n" << std::endl;

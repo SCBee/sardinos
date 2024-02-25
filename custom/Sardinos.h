@@ -1,5 +1,7 @@
 #pragma once
 
+#include <iostream>
+#include <unordered_map>
 #include <QCoreApplication>
 #include <QGeoCoordinate>
 #include <QList>
@@ -12,11 +14,8 @@
 #include <LmCdl/VcsiIdentifiedPointOfInterest.h>
 #include <LmCdl/VcsiPointOfInterestProperties.h>
 #include <MissionPlanningWaypoint.h>
-#include <MissionplanningWaypointConnector.h>
+#include <MissionPlanningWaypointConnector.h>
 #include <qmath.h>
-
-#define NOMINMAX
-#include <Windows.h>
 
 class sardinos
 {
@@ -24,38 +23,6 @@ class sardinos
     static inline const double MAXDISTANCEMETERS = 200000.0;
 
 public:
-    static void setColor(const std::string& textColor = "default",
-                  const std::string& bgColor   = "black")
-    {
-        // Map of color strings to their corresponding Windows Console color
-        // codes
-        std::map<std::string, int> colors {{"black", 0},
-                                           {"blue", 1},
-                                           {"green", 2},
-                                           {"cyan", 3},
-                                           {"red", 4},
-                                           {"magenta", 5},
-                                           {"brown", 6},
-                                           {"default", 7},
-                                           {"darkgray", 8},
-                                           {"lightblue", 9},
-                                           {"lightgreen", 10},
-                                           {"lightcyan", 11},
-                                           {"lightred", 12},
-                                           {"lightmagenta", 13},
-                                           {"yellow", 14},
-                                           {"white", 15}};
-
-        HANDLE consoleHandle = GetStdHandle(STD_OUTPUT_HANDLE);
-        // Find the color codes from the map, use light gray (7) if not
-        // found
-        int textCode =
-            colors.find(textColor) != colors.end() ? colors[textColor] : 7;
-        int bgCode = colors.find(bgColor) != colors.end() ? colors[bgColor] : 0;
-        SetConsoleTextAttribute(consoleHandle,
-                                (WORD)((bgCode << 4) | textCode));
-    }
-
     static void delay(const int& ms)
     {
         QTime dieTime = QTime::currentTime().addMSecs(ms);

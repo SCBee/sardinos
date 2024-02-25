@@ -180,12 +180,12 @@ void MissionDomain::ConnectedWaypointRef::setLocation(
 
 void MissionDomain::startMission()
 {
-    for (auto i = 0; i < waypoints_.size(); i++) {
-        waypoints_[i].first->setDraggingEnabled(false);
-        waypoints_[i].first->setSelectionEnabled(false);
-        waypoints_[i].first->setColor(Qt::darkGreen);
-        for (auto j = 0; j < waypoints_[i].second.size(); j++){
-            waypoints_[i].second[j]->setColor(Qt::darkGreen);
+    for (auto & waypoint : waypoints_) {
+        waypoint.first->setDraggingEnabled(false);
+        waypoint.first->setSelectionEnabled(false);
+        waypoint.first->setColor(Qt::darkGreen);
+        for (auto & j : waypoint.second){
+            j->setColor(Qt::darkGreen);
         }
     }
 }

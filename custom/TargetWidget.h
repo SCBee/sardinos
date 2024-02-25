@@ -16,10 +16,10 @@
 class TargetWidget : public QWidget
 {
 public:
-    TargetWidget(const double lat, const double lon, const cv::Mat mat)
+    TargetWidget(const double lat, const double lon, const cv::Mat& mat)
     {
         // Create a QVBoxLayout to contain the button
-        QVBoxLayout* layout = new QVBoxLayout(this);
+        auto* layout = new QVBoxLayout(this);
 
         // Create a QPushButton
         auto button = new QPushButton("View Target");
@@ -42,7 +42,7 @@ public:
 
         connect(button,
                 &QPushButton::clicked,
-                [=]()
+                [&, this]()
                 {
                     visible_ = !visible_;
                     if (visible_) {

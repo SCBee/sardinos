@@ -64,7 +64,7 @@ private:
     LmCdl::WrappedAnglePlusMinusPi heading_;
     LmCdl::Speed speed_;
     LmCdl::WrappedAnglePlusMinusPi yaw_;
-    double battery_;
+    [[maybe_unused]] double battery_;
     QColor color_;
     bool visible_;
 

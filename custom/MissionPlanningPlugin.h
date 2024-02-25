@@ -9,7 +9,7 @@
 #ifdef DEBUG
 #    include <cstdio>
 
-#    include <windows.h>
+#    include <Windows.h>
 #endif
 
 class MissionPlanningContentCreator;

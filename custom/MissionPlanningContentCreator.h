@@ -1,5 +1,6 @@
 #pragma once
 
+#include <QFuture>
 #include <QList>
 #include <QObject>
 #include <QtGlobal>
@@ -37,7 +38,6 @@
 #include <Notifications.h>
 #include <UIHandler.h>
 #include <qgeocoordinate.h>
-#include <QFuture>
 
 namespace LmCdl
 {
@@ -99,7 +99,7 @@ private:
     LmCdl::I_VcsiUserNotificationApi& notApi_;
     LmCdl::I_VectorDataDrawingApi& drawApi_;
     LmCdl::I_MissionDrawingApi& missionApi_;
-    LmCdl::I_RouteApi& routeApi_;
+    [[maybe_unused]] LmCdl::I_RouteApi& routeApi_;
     LmCdl::I_TrackDrawingApi& trackApi_;
     LmCdl::I_VideoStreamApiCollection& videoCollectionApi_;
     LmCdl::I_VcsiMapExtensionApi& mapApi_;
@@ -135,7 +135,7 @@ private:
 
     QTimer* timer_;
 
-    MissionManager* missionManager_;
+    MissionManager* missionManager_{};
 
     QFuture<void> mavFut_;
     QFuture<void> cancelFut_;
