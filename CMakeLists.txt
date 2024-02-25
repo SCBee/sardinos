@@ -21,10 +21,6 @@ add_executable(vcsi_sardinos
         custom/Drone.cpp
         custom/Drone.h
         custom/DroneWidget.h
-        custom/FlightPather.h
-        custom/FlightPather.cpp
-        custom/MathExt.h
-        custom/MathExt.cpp
         custom/MissionDomain.cpp
         custom/MissionDomain.h
         custom/MissionPlanningContentCreator.cpp
@@ -41,9 +37,10 @@ add_executable(vcsi_sardinos
         custom/MissionPlanningWaypoint.h
         custom/MissionPlanningWaypointConnector.cpp
         custom/MissionPlanningWaypointConnector.h
-        custom/SardinosPublisher.h
         custom/ImageProcessor.h
         custom/ImageProcessor.cpp
+        custom/Sardinos.h
+        custom/MissionManager.h
 )
 
 
