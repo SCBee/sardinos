@@ -2,11 +2,17 @@
 #include <QPointer>
 #include <algorithm>
 #include <utility>
+#include <qmath.h>
+
 
 #include <ImageProcessor.h>
 #include <Sardinos.h>
 #include <TargetWidget.h>
 #include <qmath.h>
+
+const double DFOV = 72.64;
+const double HFOV = 57.12;
+const double VFOV = 42.44;
 
 const double DFOV = 72.64;
 const double HFOV = 57.12;
@@ -130,29 +136,26 @@ void ImageProcessor::addTarget(cv::Mat mat, cv::Rect boundingRect)
 {
     auto location = calcLocation(mat, boundingRect);
 
-    auto target = Target(location, std::move(mat));
+    auto target = Target(location, mat);
 
     targets_.append(target);
 }
 
 QGeoCoordinate ImageProcessor::calcLocation(cv::Mat mat, cv::Rect boundingRect)
 {
-    auto pixelWidth  = (double)mat.cols;
-    auto pixelHeight = (double)mat.rows;
+    auto midRectX = (double) boundingRect.width / 2;
+    auto midRectY = (double) boundingRect.height / 2;
 
-    auto midRectX = (double)boundingRect.width / 2 + boundingRect.x;
-    auto midRectY = (double)boundingRect.height / 2 + boundingRect.y;
+    auto xRatio = (midRectX / mat.cols) * 2 - 1;
+    auto yRatio = (midRectY / mat.rows) * 2 - 1;
 
-    auto xRatio = (std::min(std::max(midRectX, 0.0), pixelWidth) / pixelWidth) * 2 - 1;
-    auto yRatio = (std::min(std::max(midRectY, 0.0), pixelHeight) / pixelHeight) * 2 - 1;
+    auto widthMeters = (altitude_ / sin(HFOV)) * 2;
+    auto heightMeters = (altitude_ / sin(VFOV)) * 2;
 
-    auto widthMeters  = (altitude_ * tan((HFOV * (M_PI / 180))));
-    auto heightMeters = (altitude_ * tan((VFOV * (M_PI / 180))));
-
-    auto widthChange  = -xRatio * widthMeters;
+    auto widthChange = xRatio * widthMeters;
     auto heightChange = yRatio * heightMeters;
 
-    auto angle = atan2(widthChange, heightChange) * (180 / M_PI) + 180;
+    auto angle = atan(heightChange / widthChange);
 
     auto distance = sqrt(pow(widthChange, 2) + pow(heightChange, 2));
 
@@ -162,4 +165,3 @@ QGeoCoordinate ImageProcessor::calcLocation(cv::Mat mat, cv::Rect boundingRect)
 void ImageProcessor::stop()
 {
     processing_ = false;
-}
