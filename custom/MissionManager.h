@@ -40,13 +40,14 @@ public:
 
         // wait while we connect to the system
         sardinos::setColor("red");
-        system_ = mavsdk.first_autopilot(3.0);
+        auto system = mavsdk.first_autopilot(3.0);
         while (!system_) {
             std::cerr << "Timed out waiting for system..." << std::endl;
             sleep_for(seconds(3));
-            system_ = mavsdk.first_autopilot(3.0);
+            system = mavsdk.first_autopilot(3.0);
         }
 
+        system_ = system.value();
         connected = true;
     }
 
@@ -84,8 +85,8 @@ public:
         volatile double& batt_)
     {
         // Instantiate plugins.
-        auto telemetry = Telemetry {system_.value()};
-        auto action    = Action {system_.value()};
+        auto telemetry = Telemetry {system_};
+        auto action    = Action {system_};
 
         // TELEMETRY SUBSCRIPTIONS
         sardinos::setColor("red");
@@ -237,8 +238,8 @@ public:
         volatile double& batt_)
     {
         // Instantiate plugins.
-        auto telemetry = Telemetry {system_.value()};
-        auto action    = Action {system_.value()};
+        auto telemetry = Telemetry {system_};
+        auto action    = Action {system_};
 
         // We want to listen to the altitude of the drone at 1 Hz.
         sardinos::setColor("red");
@@ -414,8 +415,8 @@ public:
     void returnHome()
     {
         // Instantiate plugins.
-        auto telemetry = Telemetry {system_.value()};
-        auto action    = Action {system_.value()};
+        auto telemetry = Telemetry {system_};
+        auto action    = Action {system_};
 
         // RTL
         sardinos::setColor("yellow");
@@ -428,5 +429,5 @@ public:
     }
 
 private:
-    std::optional<std::shared_ptr<mavsdk::System>> system_;
+    std::shared_ptr<mavsdk::System> system_ = nullptr;
 };
