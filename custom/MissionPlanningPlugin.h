@@ -12,7 +12,7 @@
 #    include <Windows.h>
 #endif
 
-class MissionPlanningContentCreator;
+class ContentCreator;
 
 namespace LmCdl
 {
@@ -70,5 +70,5 @@ private:
 
     LmCdl::I_VideoStreamApiCollection* videoCollectionApi_;
 
-    QScopedPointer<MissionPlanningContentCreator> pluginContentCreator_;
+    QScopedPointer<ContentCreator> pluginContentCreator_;
 };

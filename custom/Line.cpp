@@ -1,6 +1,6 @@
-#include <MissionPlanningLine.h>
+#include <Line.h>
 
-MissionPlanningLine::MissionPlanningLine(const QGeoCoordinate& start,
+Line::Line(const QGeoCoordinate& start,
                                          const QGeoCoordinate& end)
     : start_(start)
     , end_(end)
@@ -9,9 +9,9 @@ MissionPlanningLine::MissionPlanningLine(const QGeoCoordinate& start,
     path_.append(end_);
 }
 
-MissionPlanningLine::~MissionPlanningLine() = default;
+Line::~Line() = default;
 
-QPen MissionPlanningLine::pen() const
+QPen Line::pen() const
 {
     QPen pen = QPen(Qt::SolidLine);
     pen.setWidth(3);
@@ -19,12 +19,12 @@ QPen MissionPlanningLine::pen() const
     return pen;
 }
 
-QGeoPath MissionPlanningLine::path() const
+QGeoPath Line::path() const
 {
     return path_;
 }
 
-[[maybe_unused]] void MissionPlanningLine::updateStart(
+[[maybe_unused]] void Line::updateStart(
     const QGeoCoordinate& newStart)
 {
     start_ = newStart;
@@ -34,7 +34,7 @@ QGeoPath MissionPlanningLine::path() const
     path_.append(end_);
 }
 
-[[maybe_unused]] void MissionPlanningLine::updateEnd(
+[[maybe_unused]] void Line::updateEnd(
     const QGeoCoordinate& newEnd)
 {
     end_ = newEnd;

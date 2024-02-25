@@ -13,8 +13,8 @@
 #include <BoundingBox.h>
 #include <LmCdl/VcsiIdentifiedPointOfInterest.h>
 #include <LmCdl/VcsiPointOfInterestProperties.h>
-#include <MissionPlanningWaypoint.h>
-#include <MissionPlanningWaypointConnector.h>
+#include <Waypoint.h>
+#include <WaypointConnector.h>
 #include <qmath.h>
 
 class sardinos
@@ -267,7 +267,7 @@ public:
             return getHorizontalFlightPath(missionBounds);
     }
 
-    static bool canFly(const QList<MissionPlanningWaypoint*>& waypoints)
+    static bool canFly(const QList<Waypoint*>& waypoints)
     {
         auto sum = 0.0;
 

@@ -4,11 +4,11 @@
 
 #include <LmCdl/VectorDataPolygonDrawing.h>
 
-class MissionPlanningPolygon : public LmCdl::I_VectorDataPolygonDrawing
+class Polygon : public LmCdl::I_VectorDataPolygonDrawing
 {
 public:
-    explicit MissionPlanningPolygon(const QGeoPolygon& polygon);
-    ~MissionPlanningPolygon() override;
+    explicit Polygon(const QGeoPolygon& polygon);
+    ~Polygon() override;
 
     [[nodiscard]] QGeoPolygon polygon() const override;
 

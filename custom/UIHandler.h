@@ -1,10 +1,10 @@
 #pragma once
 
+#include <Drawing.h>
 #include <LmCdl/I_ContextMenuItem.h>
 #include <LmCdl/I_MissionDrawingApi.h>
 #include <LmCdl/I_VectorDataDrawingApi.h>
 #include <MissionDomain.h>
-#include <MissionPlanningDrawing.h>
 
 class UIHandler
 {
@@ -36,5 +36,5 @@ public:
                        LmCdl::I_VectorDataDrawingApi& drawApi_);
 
 private:
-    MissionPlanningDrawing* drawing_ = new MissionPlanningDrawing();
+    Drawing* drawing_ = new Drawing();
 };

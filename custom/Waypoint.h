@@ -4,12 +4,12 @@
 
 #include <LmCdl/I_GeospatialSimpleWaypoint.h>
 
-class MissionPlanningWaypoint : public LmCdl::I_GeospatialSimpleWaypoint
+class Waypoint : public LmCdl::I_GeospatialSimpleWaypoint
 {
     Q_OBJECT
 public:
-    explicit MissionPlanningWaypoint();
-    ~MissionPlanningWaypoint() override;
+    explicit Waypoint();
+    ~Waypoint() override;
 
     void setLocation(const QGeoCoordinate& location);
     [[nodiscard]] QGeoCoordinate location() const override;

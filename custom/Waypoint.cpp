@@ -1,8 +1,8 @@
 #include <QColor>
 
-#include <MissionPlanningWaypoint.h>
+#include <Waypoint.h>
 
-MissionPlanningWaypoint::MissionPlanningWaypoint()
+Waypoint::Waypoint()
     : location_()
     , shape_(LmCdl::I_GeospatialSimpleWaypoint::Shape::Triangle)
     , label_()
@@ -16,9 +16,9 @@ MissionPlanningWaypoint::MissionPlanningWaypoint()
 {
 }
 
-MissionPlanningWaypoint::~MissionPlanningWaypoint() = default;
+Waypoint::~Waypoint() = default;
 
-void MissionPlanningWaypoint::setLocation(const QGeoCoordinate& location)
+void Waypoint::setLocation(const QGeoCoordinate& location)
 {
     if (location_ != location) {
         location_ = location;
@@ -26,12 +26,12 @@ void MissionPlanningWaypoint::setLocation(const QGeoCoordinate& location)
     }
 }
 
-QGeoCoordinate MissionPlanningWaypoint::location() const
+QGeoCoordinate Waypoint::location() const
 {
     return location_;
 }
 
-void MissionPlanningWaypoint::setShape(
+void Waypoint::setShape(
     const LmCdl::I_GeospatialSimpleWaypoint::Shape& shape)
 {
     if (shape_ != shape) {
@@ -40,12 +40,12 @@ void MissionPlanningWaypoint::setShape(
     }
 }
 
-LmCdl::I_GeospatialSimpleWaypoint::Shape MissionPlanningWaypoint::shape() const
+LmCdl::I_GeospatialSimpleWaypoint::Shape Waypoint::shape() const
 {
     return shape_;
 }
 
-void MissionPlanningWaypoint::setLabel(const QString& label)
+void Waypoint::setLabel(const QString& label)
 {
     if (label_ != label) {
         label_ = label;
@@ -53,17 +53,17 @@ void MissionPlanningWaypoint::setLabel(const QString& label)
     }
 }
 
-QString MissionPlanningWaypoint::label() const
+QString Waypoint::label() const
 {
     return label_;
 }
 
-QVector2D MissionPlanningWaypoint::labelOffset() const
+QVector2D Waypoint::labelOffset() const
 {
     return labelOffset_;
 }
 
-void MissionPlanningWaypoint::setColor(const QColor& color)
+void Waypoint::setColor(const QColor& color)
 {
     if (color_ != color) {
         color_ = color;
@@ -71,12 +71,12 @@ void MissionPlanningWaypoint::setColor(const QColor& color)
     }
 }
 
-QColor MissionPlanningWaypoint::color() const
+QColor Waypoint::color() const
 {
     return color_;
 }
 
-void MissionPlanningWaypoint::setVisible(bool visible)
+void Waypoint::setVisible(bool visible)
 {
     if (visible_ != visible) {
         visible_ = visible;
@@ -84,27 +84,27 @@ void MissionPlanningWaypoint::setVisible(bool visible)
     }
 }
 
-bool MissionPlanningWaypoint::visible() const
+bool Waypoint::visible() const
 {
     return visible_;
 }
 
-int MissionPlanningWaypoint::relativeZOrder() const
+int Waypoint::relativeZOrder() const
 {
     return relativeZOrder_;
 }
 
-void MissionPlanningWaypoint::selected()
+void Waypoint::selected()
 {
     setHighlighted(true);
 }
 
-void MissionPlanningWaypoint::deselected()
+void Waypoint::deselected()
 {
     setHighlighted(false);
 }
 
-void MissionPlanningWaypoint::setSelectionEnabled(bool selectionEnabled)
+void Waypoint::setSelectionEnabled(bool selectionEnabled)
 {
     if (selectionEnabled_ != selectionEnabled) {
         selectionEnabled_ = selectionEnabled;
@@ -112,12 +112,12 @@ void MissionPlanningWaypoint::setSelectionEnabled(bool selectionEnabled)
     }
 }
 
-bool MissionPlanningWaypoint::selectionEnabled() const
+bool Waypoint::selectionEnabled() const
 {
     return selectionEnabled_;
 }
 
-void MissionPlanningWaypoint::setHighlighted(bool highlighted)
+void Waypoint::setHighlighted(bool highlighted)
 {
     if (highlighted_ != highlighted) {
         highlighted_ = highlighted;
@@ -125,12 +125,12 @@ void MissionPlanningWaypoint::setHighlighted(bool highlighted)
     }
 }
 
-bool MissionPlanningWaypoint::highlighted() const
+bool Waypoint::highlighted() const
 {
     return highlighted_;
 }
 
-void MissionPlanningWaypoint::setDraggingEnabled(bool dragging)
+void Waypoint::setDraggingEnabled(bool dragging)
 {
     if (dragging != draggingEnabled_) {
         draggingEnabled_ = dragging;
@@ -138,27 +138,27 @@ void MissionPlanningWaypoint::setDraggingEnabled(bool dragging)
     }
 }
 
-bool MissionPlanningWaypoint::draggingEnabled() const
+bool Waypoint::draggingEnabled() const
 {
     return draggingEnabled_;
 }
 
-void MissionPlanningWaypoint::dragStarted()
+void Waypoint::dragStarted()
 {
     emit dragStartedFromDrawing();
 }
 
-void MissionPlanningWaypoint::dragging(const QGeoCoordinate& dragLocation)
+void Waypoint::dragging(const QGeoCoordinate& dragLocation)
 {
     emit draggingOccurredFromDrawing(dragLocation);
 }
 
-void MissionPlanningWaypoint::dragConfirmed(const QGeoCoordinate& dragLocation)
+void Waypoint::dragConfirmed(const QGeoCoordinate& dragLocation)
 {
     emit dragConfirmedFromDrawing(dragLocation);
 }
 
-void MissionPlanningWaypoint::dragCancelled()
+void Waypoint::dragCancelled()
 {
     emit dragCancelledFromDrawing();
 }

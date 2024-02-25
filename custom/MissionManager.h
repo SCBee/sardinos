@@ -5,7 +5,7 @@
 #include <memory>
 #include <thread>
 
-#include <MissionPlanningContentCreator.h>
+#include <ContentCreator.h>
 #include <Sardinos.h>
 #include <Windows.h>
 #include <mavlink/common/mavlink.h>

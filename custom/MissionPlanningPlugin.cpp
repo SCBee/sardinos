@@ -1,6 +1,7 @@
 #include <QList>
 #include <iostream>
 
+#include <ContentCreator.h>
 #include <LmCdl/I_Billboard.h>
 #include <LmCdl/I_MissionDrawingApi.h>
 #include <LmCdl/I_PointOfInterestApi.h>
@@ -12,7 +13,6 @@
 #include <LmCdl/I_VideoStreamApiCollection.h>
 #include <LmCdl/PluginCapabilityIdentifier.h>
 #include <LmCdl/PluginRequirement.h>
-#include <MissionPlanningContentCreator.h>
 #include <MissionPlanningPlugin.h>
 
 MissionPlanningPlugin::MissionPlanningPlugin()
@@ -129,7 +129,7 @@ void MissionPlanningPlugin::startPluginIfInitialized()
 #endif
 
     if (isFullyInitialized()) {
-        pluginContentCreator_.reset(new MissionPlanningContentCreator(
+        pluginContentCreator_.reset(new ContentCreator(
             applicationApi_->widgetExtensionApi().mapApi(),
             *pointOfInterestApi_,
             applicationApi_->userNotificationApi(),

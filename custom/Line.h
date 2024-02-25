@@ -6,11 +6,11 @@
 
 #include <LmCdl/VectorDataLineDrawing.h>
 
-class MissionPlanningLine : public LmCdl::I_VectorDataLineDrawing
+class Line : public LmCdl::I_VectorDataLineDrawing
 {
 public:
-    MissionPlanningLine(const QGeoCoordinate& start, const QGeoCoordinate& end);
-    ~MissionPlanningLine() override;
+    Line(const QGeoCoordinate& start, const QGeoCoordinate& end);
+    ~Line() override;
 
     [[nodiscard]] QGeoPath path() const override;
 
