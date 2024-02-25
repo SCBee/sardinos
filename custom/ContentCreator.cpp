@@ -46,6 +46,7 @@ ContentCreator::ContentCreator(
     LmCdl::I_VideoStreamApiCollection& videoCollectionApi)
     : missionBoundMenuItem_(mapApi.terrainContextMenu().registerMenuItem())
     , submitMissionMenuItem_(mapApi.terrainContextMenu().registerMenuItem())
+    , forceLandMissionMenuItem_(mapApi.terrainContextMenu().registerMenuItem())
     , poiApi_(poiApi)
     , notApi_(notApi)
     , drawApi_(drawApi)
@@ -69,7 +70,8 @@ ContentCreator::~ContentCreator() = default;
 void ContentCreator::init()
 {
     uiHandler_.initContextMenuItems(missionBoundMenuItem_,
-                                    submitMissionMenuItem_);
+                                    submitMissionMenuItem_,
+                                    forceLandMissionMenuItem_);
     connectToApiSignals();
     startLoop();
     trackApi_.addDrawingForTrack(*drone_);
@@ -127,10 +129,27 @@ void ContentCreator::connectToApiSignals()
             this,
             &ContentCreator::executeMissionAction);
 
+    connect(&forceLandMissionMenuItem_,
+            &LmCdl::I_ContextMenuItem::clicked,
+            this,
+            &ContentCreator::forceLand);
+
     connect(&poiApi_,
             &LmCdl::I_PointOfInterestApi::pointOfInterestRemoved,
             this,
             &ContentCreator::updatePois);
+}
+
+void ContentCreator::forceLand()
+{
+    if (!connectedToDrone_) {
+        notis_.notify("Not connected to a drone.",
+                      notApi_,
+                      Notifications::Severity::Danger);
+        return;
+    }
+
+    QtConcurrent::run([this] { missionManager_->returnHome(); });
 }
 
 void ContentCreator::showTargets()

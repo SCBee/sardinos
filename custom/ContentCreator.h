@@ -90,8 +90,11 @@ private:
 
     void checkConnection();
 
+    void forceLand();
+
     LmCdl::I_ContextMenuItem& missionBoundMenuItem_;
     LmCdl::I_ContextMenuItem& submitMissionMenuItem_;
+    LmCdl::I_ContextMenuItem& forceLandMissionMenuItem_;
 
     std::vector<std::vector<QGeoCoordinate>> pois_;
 
