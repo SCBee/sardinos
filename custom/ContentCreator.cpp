@@ -26,7 +26,7 @@ std::mutex mutex;
 
 volatile double ContentCreator::latitude    = 51.0f;
 volatile double ContentCreator::longitude   = -114.0f;
-volatile double ContentCreator::altitude    = 0.0f;
+volatile double ContentCreator::altitude    = 1500.0f;
 volatile double ContentCreator::altitudeAbs = 0.0f;
 volatile double ContentCreator::heading     = 0.0f;
 volatile double ContentCreator::speed       = 0.0f;
@@ -58,8 +58,7 @@ ContentCreator::ContentCreator(
     , m_state(UIHandler::State::STARTUP)
     , mission_()
     , drone_(new Drone(mapApi))
-    , imageProcessor_(
-          std::ref(targets_), std::ref(latitude), std::ref(longitude))
+    , imageProcessor_(std::ref(targets_), std::ref(latitude), std::ref(longitude), std::ref(altitude))
     , timer_(new QTimer())
 {
     init();
@@ -107,7 +106,7 @@ void ContentCreator::startLoop()
         [this]()
         {
             this->drone_->updateValues(
-                latitude, longitude, altitude, heading, speed, yaw, battery);
+                latitude+=0.01, longitude+=0.01, altitude, heading, speed, yaw, battery);
 
             this->showTargets();
 

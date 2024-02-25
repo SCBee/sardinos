@@ -21,6 +21,7 @@ class sardinos
 {
     static inline const double SCANWIDTHMETERS   = 100.0;
     static inline const double MAXDISTANCEMETERS = 200000.0;
+    static inline const double R                 = 6378.137;
 
 public:
     static void delay(const int& ms)
@@ -110,7 +111,6 @@ public:
     static double getDistance(const QGeoCoordinate& c1,
                               const QGeoCoordinate& c2)
     {
-        const double R = 6378.137;
         double dLat =
             (c2.latitude() * M_PI / 180) - (c1.latitude() * M_PI / 180);
         double dLon =
@@ -277,5 +277,25 @@ public:
         }
 
         return sum <= MAXDISTANCEMETERS;
+    }
+
+    static QGeoCoordinate getLocation(double lat1,
+                                      double lon1,
+                                      double alt,
+                                      double d,  // meters
+                                      double a)  // degrees
+    {
+        a *= M_PI / 180;  // to rads
+        d /= 1000.0;  // to kms
+        lat1 *= (M_PI / 180);
+        lon1 *= (M_PI / 180);
+
+        auto lat2 =
+            asin(sin(lat1) * cos(d / R) + cos(lat1) * sin(d / R) * cos(a));
+        auto lon2 = lon1
+            + atan2(sin(a) * sin(d / R) * cos(lat1),
+                    cos(d / R) - sin(lat1) * sin(lat2));
+
+        return QGeoCoordinate(lat2 * (180 / M_PI), lon2 * (180 / M_PI), alt);
     }
 };
