@@ -48,7 +48,7 @@ public:
         // wait while we connect to the system
         system_ = mavsdk.first_autopilot(3.0);
         while (!system_) {
-            std::cerr << "Timed out waiting for system..." << std::endl;
+            std::cerr << "Attempting to connect to the system..." << std::endl;
             sleep_for(seconds(3));
             system_ = mavsdk.first_autopilot(3.0);
         }
