@@ -84,7 +84,15 @@ void MissionPlanningContentCreator::init()
 
     QtConcurrent::run(
         [this, connectStr] {
-            missionManager_ = new MissionManager(connectStr, std::ref(connectedToDrone_));
+            missionManager_ = new MissionManager(connectStr, std::ref(connectedToDrone_),
+                                              std::ref(latitude),
+                                              std::ref(longitude),
+                                              std::ref(altitude),
+                                              std::ref(altitudeAbs),
+                                              std::ref(heading),
+                                              std::ref(speed),
+                                              std::ref(yaw),
+                                              std::ref(battery));
         });
 
 }
@@ -267,12 +275,7 @@ void MissionPlanningContentCreator::runMission()
             missionManager_->executeMissionQuad(std::ref(mavWaypoints),
                                                 std::ref(latitude),
                                                 std::ref(longitude),
-                                                std::ref(altitude),
-                                                std::ref(altitudeAbs),
-                                                std::ref(heading),
-                                                std::ref(speed),
-                                                std::ref(yaw),
-                                                std::ref(battery));
+                                                std::ref(altitude));
         });
 }
 
