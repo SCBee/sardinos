@@ -18,29 +18,35 @@ include_directories(custom)
 
 add_executable(vcsi_sardinos
         custom/BoundingBox.h
-        custom/Drone.cpp
         custom/Drone.h
+        custom/Drone.cpp
         custom/DroneWidget.h
-        custom/MissionDomain.cpp
-        custom/MissionDomain.h
-        custom/MissionPlanningContentCreator.cpp
-        custom/MissionPlanningContentCreator.h
-        custom/MissionPlanningDrawing.cpp
-        custom/MissionPlanningDrawing.h
-        custom/MissionPlanningLine.cpp
-        custom/MissionPlanningLine.h
-        custom/MissionPlanningPlugin.cpp
-        custom/MissionPlanningPlugin.h
-        custom/MissionPlanningPolygon.cpp
-        custom/MissionPlanningPolygon.h
-        custom/MissionPlanningWaypoint.cpp
-        custom/MissionPlanningWaypoint.h
-        custom/MissionPlanningWaypointConnector.cpp
-        custom/MissionPlanningWaypointConnector.h
         custom/ImageProcessor.h
         custom/ImageProcessor.cpp
-        custom/Sardinos.h
+        custom/MissionDomain.h
+        custom/MissionDomain.cpp
         custom/MissionManager.h
+        custom/MissionPlanningContentCreator.h
+        custom/MissionPlanningContentCreator.cpp
+        custom/MissionPlanningDrawing.h
+        custom/MissionPlanningDrawing.cpp
+        custom/MissionPlanningLine.h
+        custom/MissionPlanningLine.cpp
+        custom/MissionPlanningPlugin.h
+        custom/MissionPlanningPlugin.cpp
+        custom/MissionPlanningPolygon.h
+        custom/MissionPlanningPolygon.cpp
+        custom/MissionPlanningWaypoint.h
+        custom/MissionPlanningWaypoint.cpp
+        custom/MissionPlanningWaypointConnector.h
+        custom/MissionPlanningWaypointConnector.cpp
+        custom/Notifications.h
+        custom/Notifications.cpp
+        custom/Sardinos.h
+        custom/Target.h
+        custom/TargetWidget.h
+        custom/UIHandler.h
+        custom/UIHandler.cpp
 )
 
 
