@@ -41,7 +41,7 @@ public:
         // wait while we connect to the system
         sardinos::setColor("red");
         auto system = mavsdk.first_autopilot(3.0);
-        while (!system_) {
+        while (!system) {
             std::cerr << "Timed out waiting for system..." << std::endl;
             sleep_for(seconds(3));
             system = mavsdk.first_autopilot(3.0);
