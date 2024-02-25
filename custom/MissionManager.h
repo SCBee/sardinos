@@ -12,7 +12,7 @@
 #include <mavsdk/plugins/mavlink_passthrough/mavlink_passthrough.h>
 #include <mavsdk/plugins/mission/mission.h>
 #include <mavsdk/plugins/telemetry/telemetry.h>
-#include <windows.h>
+#include <Windows.h>
 
 using namespace mavsdk;
 using std::chrono::seconds;
@@ -21,10 +21,8 @@ using std::this_thread::sleep_for;
 class MissionManager
 {
 public:
-    MissionManager(std::string connectStr, volatile bool& connected)
+    MissionManager(const std::string& connectStr, volatile bool& connected)
     {
-        Mavsdk mavsdk {
-            Mavsdk::Configuration {Mavsdk::ComponentType::GroundStation}};
         ConnectionResult connection_result =
             mavsdk.add_any_connection(connectStr);
 
@@ -59,7 +57,7 @@ public:
         bool is_fly_through,
         float gimbal_pitch_deg,
         float gimbal_yaw_deg,
-        Mission::MissionItem::CameraAction camera_action)
+                                           int camera_action)
     {
         Mission::MissionItem new_item {};
         new_item.latitude_deg        = latitude_deg;
@@ -69,7 +67,8 @@ public:
         new_item.is_fly_through      = is_fly_through;
         new_item.gimbal_pitch_deg    = gimbal_pitch_deg;
         new_item.gimbal_yaw_deg      = gimbal_yaw_deg;
-        new_item.camera_action       = camera_action;
+        new_item.camera_action       =
+            static_cast<Mission::MissionItem::CameraAction>(camera_action);
         return new_item;
     }
 
@@ -429,5 +428,7 @@ public:
     }
 
 private:
-    std::shared_ptr<mavsdk::System> system_ = nullptr;
+    std::optional<std::shared_ptr<mavsdk::System>> system_;
+    Mavsdk mavsdk {
+        Mavsdk::Configuration {Mavsdk::ComponentType::GroundStation}};
 };

@@ -86,6 +86,7 @@ void MissionPlanningContentCreator::init()
         [this, connectStr] {
             missionManager_ = new MissionManager(connectStr, std::ref(connectedToDrone_));
         });
+
 }
 
 void MissionPlanningContentCreator::startLoop()
