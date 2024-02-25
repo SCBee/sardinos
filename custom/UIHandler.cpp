@@ -1,88 +1,77 @@
-#include "UIHandler.h"
-
 #include <qcolor.h>
 
-void UIHandler::initContextMenuItems(
-    LmCdl::I_ContextMenuItem& missionBoundMenuItem_,
-    LmCdl::I_ContextMenuItem& submitMissionMenuItem_)
-{
-    missionBoundMenuItem_.setBackgroundColor(Qt::cyan);
-    missionBoundMenuItem_.setDescription("Add Mission Bound");
-    missionBoundMenuItem_.setGrouping(LmCdl::ContextMenuItemGrouping::Bottom);
-    missionBoundMenuItem_.setIcon(":/MissionPlanning/SelectIcon");
-    missionBoundMenuItem_.setVisible(true);
+#include "UIHandler.h"
 
-    submitMissionMenuItem_.setBackgroundColor(Qt::blue);
-    submitMissionMenuItem_.setDescription("Get Flight Path");
-    submitMissionMenuItem_.setGrouping(LmCdl::ContextMenuItemGrouping::Top);
-    submitMissionMenuItem_.setIcon(":/MissionPlanning/MissionIcon");
-    submitMissionMenuItem_.setVisible(false);
+void UIHandler::initContextMenuItems(LmCdl::I_ContextMenuItem &missionBoundMenuItem, LmCdl::I_ContextMenuItem &submitMissionMenuItem, LmCdl::I_ContextMenuItem &forceLandMenuItem)
+{
+    missionBoundMenuItem.setBackgroundColor(Qt::cyan);
+    missionBoundMenuItem.setDescription("Add Mission Bound");
+    missionBoundMenuItem.setGrouping(LmCdl::ContextMenuItemGrouping::Bottom);
+    missionBoundMenuItem.setIcon(":/MissionPlanning/SelectIcon");
+    missionBoundMenuItem.setVisible(true);
+
+    submitMissionMenuItem.setBackgroundColor(Qt::blue);
+    submitMissionMenuItem.setDescription("Get Flight Path");
+    submitMissionMenuItem.setGrouping(LmCdl::ContextMenuItemGrouping::Top);
+    submitMissionMenuItem.setIcon(":/MissionPlanning/MissionIcon");
+    submitMissionMenuItem.setVisible(false);
+
+    forceLandMenuItem.setBackgroundColor(Qt::red);
+    forceLandMenuItem.setDescription("Force Land");
+    forceLandMenuItem.setGrouping(LmCdl::ContextMenuItemGrouping::Top);
+    forceLandMenuItem.setIcon(":/MissionPlanning/LandIcon");
+    forceLandMenuItem.setVisible(true);
 }
 
-[[maybe_unused]] void UIHandler::changeUI(
-    State& newState,
-    LmCdl::I_ContextMenuItem& missionBoundMenuItem_,
-    LmCdl::I_ContextMenuItem& submitMissionMenuItem_,
-    MissionDomain& mission_,
-    LmCdl::I_MissionDrawingApi& missionApi_,
-    LmCdl::I_VectorDataDrawingApi& drawApi_)
+void UIHandler::changeUI(State &newState, LmCdl::I_ContextMenuItem &missionBoundMenuItem, LmCdl::I_ContextMenuItem &submitMissionMenuItem, MissionDomain &mission, LmCdl::I_MissionDrawingApi &missionApi, LmCdl::I_VectorDataDrawingApi &drawApi)
 {
-    switch (newState) {
-        case State::CanGetFlightPath:
-            missionBoundMenuItem_.setVisible(true);
-            submitMissionMenuItem_.setVisible(true);
-            submitMissionMenuItem_.setBackgroundColor(Qt::blue);
-            submitMissionMenuItem_.setDescription("Get Flight Path");
-            submitMissionMenuItem_.setIcon(":/MissionPlanning/PathIcon");
-            drawing_->clearFlightPath(mission_, missionApi_);
-            break;
-        case State::CannotGetFlightPath:
-            missionBoundMenuItem_.setVisible(true);
-            submitMissionMenuItem_.setVisible(false);
-            drawing_->clearFlightPath(mission_, missionApi_);
-            break;
-        case State::CanRunMission:
-            missionBoundMenuItem_.setVisible(true);
-            submitMissionMenuItem_.setVisible(true);
-            submitMissionMenuItem_.setBackgroundColor(Qt::green);
-            submitMissionMenuItem_.setDescription("Begin Mission");
-            submitMissionMenuItem_.setIcon(":/MissionPlanning/MissionIcon");
-            drawing_->clearMissionArea(drawApi_);
-            break;
-        case State::CanCancelMission:
-            missionBoundMenuItem_.setVisible(false);
-            submitMissionMenuItem_.setVisible(true);
-            submitMissionMenuItem_.setBackgroundColor(Qt::red);
-            submitMissionMenuItem_.setDescription("Cancel Mission");
-            submitMissionMenuItem_.setIcon(":/MissionPlanning/CancelIcon");
-            drawing_->clearMissionArea(drawApi_);
-            break;
-        default:
-            missionBoundMenuItem_.setVisible(true);
-            submitMissionMenuItem_.setVisible(true);
-            submitMissionMenuItem_.setBackgroundColor(Qt::blue);
-            submitMissionMenuItem_.setDescription("Get Flight Path");
-            submitMissionMenuItem_.setIcon(":/MissionPlanning/PathIcon");
-            drawing_->clearFlightPath(mission_, missionApi_);
-            break;
+    switch (newState)
+    {
+    case State::CanGetFlightPath:
+        missionBoundMenuItem.setVisible(true);
+        submitMissionMenuItem.setVisible(true);
+        submitMissionMenuItem.setBackgroundColor(Qt::blue);
+        submitMissionMenuItem.setDescription("Get Flight Path");
+        submitMissionMenuItem.setIcon(":/MissionPlanning/PathIcon");
+        drawing_->clearFlightPath(mission, missionApi);
+        break;
+    case State::CannotGetFlightPath:
+        missionBoundMenuItem.setVisible(true);
+        submitMissionMenuItem.setVisible(false);
+        drawing_->clearFlightPath(mission, missionApi);
+        break;
+    case State::CanRunMission:
+        missionBoundMenuItem.setVisible(true);
+        submitMissionMenuItem.setVisible(true);
+        submitMissionMenuItem.setBackgroundColor(Qt::green);
+        submitMissionMenuItem.setDescription("Begin Mission");
+        submitMissionMenuItem.setIcon(":/MissionPlanning/MissionIcon");
+        drawing_->clearMissionArea(drawApi);
+        break;
+    case State::CanCancelMission:
+        missionBoundMenuItem.setVisible(false);
+        submitMissionMenuItem.setVisible(true);
+        submitMissionMenuItem.setBackgroundColor(Qt::red);
+        submitMissionMenuItem.setDescription("Cancel Mission");
+        submitMissionMenuItem.setIcon(":/MissionPlanning/CancelIcon");
+        drawing_->clearMissionArea(drawApi);
+        break;
+    default:
+        missionBoundMenuItem.setVisible(true);
+        submitMissionMenuItem.setVisible(true);
+        submitMissionMenuItem.setBackgroundColor(Qt::blue);
+        submitMissionMenuItem.setDescription("Get Flight Path");
+        submitMissionMenuItem.setIcon(":/MissionPlanning/PathIcon");
+        drawing_->clearFlightPath(mission, missionApi);
+        break;
     };
 }
 
-void UIHandler::updateUIState(const State& newState,
-                              State& m_state,
-                              LmCdl::I_ContextMenuItem& missionBoundMenuItem_,
-                              LmCdl::I_ContextMenuItem& submitMissionMenuItem_,
-                              MissionDomain& mission_,
-                              LmCdl::I_MissionDrawingApi& missionApi_,
-                              LmCdl::I_VectorDataDrawingApi& drawApi_)
+void UIHandler::updateUIState(const State &newState, State &m_state, LmCdl::I_ContextMenuItem &missionBoundMenuItem, LmCdl::I_ContextMenuItem &submitMissionMenuItem, MissionDomain &mission, LmCdl::I_MissionDrawingApi &missionApi, LmCdl::I_VectorDataDrawingApi &drawApi)
 {
-    if (newState != m_state) {
+    if (newState != m_state)
+    {
         m_state = newState;
-        changeUI(m_state,
-                 missionBoundMenuItem_,
-                 submitMissionMenuItem_,
-                 mission_,
-                 missionApi_,
-                 drawApi_);
+        changeUI(m_state, missionBoundMenuItem, submitMissionMenuItem, mission, missionApi, drawApi);
     }
 }

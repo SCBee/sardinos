@@ -50,16 +50,16 @@ include_directories("C:/Program Files/LMCDL/vcsi/sdk/examples/custom")
 
 # MOC
 set(MOCS
+        build/obj/moc_predefs.h
+        build/obj/moc_ContentCreator.cpp
+        build/obj/moc_Drawing.cpp
         build/obj/moc_Drone.cpp
         build/obj/moc_ImageProcessor.cpp
         build/obj/moc_MissionDomain.cpp
-        build/obj/moc_MissionPlanningContentCreator.cpp
-        build/obj/moc_MissionPlanningDrawing.cpp
         build/obj/moc_MissionPlanningPlugin.cpp
-        build/obj/moc_MissionPlanningWaypoint.cpp
-        build/obj/moc_MissionPlanningWaypointConnector.cpp
-        build/obj/moc_predefs.h
         build/obj/moc_Target.cpp
+        build/obj/moc_Waypoint.cpp
+        build/obj/moc_WaypointConnector.cpp
 )
 
 add_executable(vcsi_sardinos
@@ -72,20 +72,20 @@ add_executable(vcsi_sardinos
         custom/MissionDomain.h
         custom/MissionDomain.cpp
         custom/MissionManager.h
-        custom/MissionPlanningContentCreator.h
-        custom/MissionPlanningContentCreator.cpp
-        custom/MissionPlanningDrawing.h
-        custom/MissionPlanningDrawing.cpp
-        custom/MissionPlanningLine.h
-        custom/MissionPlanningLine.cpp
+        custom/ContentCreator.h
+        custom/ContentCreator.cpp
+        custom/Drawing.h
+        custom/Drawing.cpp
+        custom/Line.h
+        custom/Line.cpp
         custom/MissionPlanningPlugin.h
         custom/MissionPlanningPlugin.cpp
-        custom/MissionPlanningPolygon.h
-        custom/MissionPlanningPolygon.cpp
-        custom/MissionPlanningWaypoint.h
-        custom/MissionPlanningWaypoint.cpp
-        custom/MissionPlanningWaypointConnector.h
-        custom/MissionPlanningWaypointConnector.cpp
+        custom/Polygon.h
+        custom/Polygon.cpp
+        custom/Waypoint.h
+        custom/Waypoint.cpp
+        custom/WaypointConnector.h
+        custom/WaypointConnector.cpp
         custom/Notifications.h
         custom/Notifications.cpp
         custom/Sardinos.h

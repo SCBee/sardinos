@@ -1,56 +1,53 @@
 #include <QGeoRectangle>
 #include <QSet>
 
-#include <MissionPlanningDrawing.h>
-#include <MissionPlanningPolygon.h>
+#include <Drawing.h>
+#include <Polygon.h>
 #include <Sardinos.h>
 
-MissionPlanningDrawing::MissionPlanningDrawing() = default;
+Drawing::Drawing() = default;
 
-MissionPlanningDrawing::~MissionPlanningDrawing() = default;
+Drawing::~Drawing() = default;
 
-const QSet<LmCdl::I_VectorDataPointDrawing*>&
-MissionPlanningDrawing::pointDrawings(const QGeoRectangle&) const
+const QSet<LmCdl::I_VectorDataPointDrawing*>& Drawing::pointDrawings(const QGeoRectangle&) const
 {
     return points_;
 }
 
-const QSet<LmCdl::I_VectorDataLineDrawing*>&
-MissionPlanningDrawing::lineDrawings(const QGeoRectangle&) const
+const QSet<LmCdl::I_VectorDataLineDrawing*>& Drawing::lineDrawings(const QGeoRectangle&) const
 {
     return lines_;
 }
 
-const QSet<LmCdl::I_VectorDataPolygonDrawing*>&
-MissionPlanningDrawing::polygonDrawings(const QGeoRectangle&) const
+const QSet<LmCdl::I_VectorDataPolygonDrawing*>& Drawing::polygonDrawings(const QGeoRectangle&) const
 {
     return polygons_;
 }
 
-void MissionPlanningDrawing::addPolygon(MissionPlanningPolygon* polygon)
+void Drawing::addPolygon(Polygon* polygon)
 {
     polygons_.insert(polygon);
 }
 
-void MissionPlanningDrawing::addPolygons(
-    const QList<MissionPlanningPolygon*>& polygons)
+void Drawing::addPolygons(
+    const QList<Polygon*>& polygons)
 {
     for (auto polygon : polygons)
         addPolygon(polygon);
 }
 
-void MissionPlanningDrawing::addLine(MissionPlanningLine* line)
+void Drawing::addLine(Line* line)
 {
     lines_.insert(line);
 }
 
-void MissionPlanningDrawing::addLines(const QList<MissionPlanningLine*>& lines)
+void Drawing::addLines(const QList<Line*>& lines)
 {
     for (auto line : lines)
         addLine(line);
 }
 
-void MissionPlanningDrawing::clear()
+void Drawing::clear()
 {
     polygons_.clear();
     lines_.clear();
@@ -58,21 +55,21 @@ void MissionPlanningDrawing::clear()
     update();
 }
 
-void MissionPlanningDrawing::update()
+void Drawing::update()
 {
     emit visibilityChanged(true);
     emit drawingChanged();
 }
 
-bool MissionPlanningDrawing::visible() const
+bool Drawing::visible() const
 {
     return true;
 }
 
-void MissionPlanningDrawing::drawFlightPath(
+void Drawing::drawFlightPath(
     MissionDomain& mission_, LmCdl::I_MissionDrawingApi& missionApi_)
 {
-    foreach(MissionPlanningWaypoint* waypoint, mission_.waypoints()) {
+    foreach(Waypoint* waypoint, mission_.waypoints()) {
         missionApi_.addDrawingForWaypoint(*waypoint);
     }
     foreach(LmCdl::I_SimpleWaypointConnector* waypointConnector,
@@ -82,10 +79,10 @@ void MissionPlanningDrawing::drawFlightPath(
     }
 }
 
-void MissionPlanningDrawing::clearFlightPath(
+void Drawing::clearFlightPath(
     MissionDomain& mission_, LmCdl::I_MissionDrawingApi& missionApi_)
 {
-    foreach(MissionPlanningWaypoint* waypoint, mission_.waypoints()) {
+    foreach(Waypoint* waypoint, mission_.waypoints()) {
         missionApi_.removeDrawingForWaypoint(*waypoint);
     }
     foreach(LmCdl::I_SimpleWaypointConnector* waypointConnector,
@@ -95,17 +92,17 @@ void MissionPlanningDrawing::clearFlightPath(
     }
 }
 
-void MissionPlanningDrawing::clearMissionArea(
+void Drawing::clearMissionArea(
     LmCdl::I_VectorDataDrawingApi& drawApi_)
 {
-    draw(QList<MissionPlanningPolygon*>(),
-         QList<MissionPlanningLine*>(),
+    draw(QList<Polygon*>(),
+         QList<Line*>(),
          drawApi_);
 }
 
-void MissionPlanningDrawing::draw(
-    const QList<MissionPlanningPolygon*>& polygons,
-    const QList<MissionPlanningLine*>& lines,
+void Drawing::draw(
+    const QList<Polygon*>& polygons,
+    const QList<Line*>& lines,
     LmCdl::I_VectorDataDrawingApi& drawApi_)
 {
     clear();
@@ -120,25 +117,25 @@ void MissionPlanningDrawing::draw(
             OptimizedForFrequentChanges);
 }
 
-Q_SLOT void MissionPlanningDrawing::drawMissionArea(
+Q_SLOT void Drawing::drawMissionArea(
     std::vector<std::vector<QGeoCoordinate>> pois_,
     BoundingBox& missionBounds_,
     LmCdl::I_VectorDataDrawingApi& drawApi_)
 {
     auto polygon = QGeoPolygon(missionBounds_.list());
 
-    auto polygons = QList<MissionPlanningPolygon*>();
+    auto polygons = QList<Polygon*>();
 
-    polygons.append(new MissionPlanningPolygon(polygon));
+    polygons.append(new Polygon(polygon));
 
-    auto lines = QList<MissionPlanningLine*>();
+    auto lines = QList<Line*>();
 
     sardinos::cvhull(pois_);
 
     for (auto i = 1; i < pois_.size(); i++) {
-        lines.push_back(new MissionPlanningLine(pois_[i][0], pois_[i - 1][0]));
+        lines.push_back(new Line(pois_[i][0], pois_[i - 1][0]));
         if (i == pois_.size() - 1)
-            lines.push_back(new MissionPlanningLine(pois_[i][0], pois_[0][0]));
+            lines.push_back(new Line(pois_[i][0], pois_[0][0]));
     }
 
     draw(polygons, lines, drawApi_);

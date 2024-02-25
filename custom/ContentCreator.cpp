@@ -4,6 +4,7 @@
 #include <thread>
 #include <utility>
 
+#include <ContentCreator.h>
 #include <Drone.h>
 #include <LmCdl/ContextMenuEvent.h>
 #include <LmCdl/GroundElevation.h>
@@ -16,7 +17,6 @@
 #include <LmCdl/StanagWaypoint.h>
 #include <LmCdl/VcsiPointOfInterestProperties.h>
 #include <MissionDomain.h>
-#include <MissionPlanningContentCreator.h>
 #include <QtConcurrent/QtConcurrent>
 
 using std::chrono::seconds;
@@ -24,18 +24,18 @@ using std::this_thread::sleep_for;
 
 std::mutex mutex;
 
-volatile double MissionPlanningContentCreator::latitude    = 51.0f;
-volatile double MissionPlanningContentCreator::longitude   = -114.0f;
-volatile double MissionPlanningContentCreator::altitude    = 0.0f;
-volatile double MissionPlanningContentCreator::altitudeAbs = 0.0f;
-volatile double MissionPlanningContentCreator::heading     = 0.0f;
-volatile double MissionPlanningContentCreator::speed       = 0.0f;
-volatile double MissionPlanningContentCreator::yaw         = 0.0f;
-volatile double MissionPlanningContentCreator::battery     = 0.0f;
+volatile double ContentCreator::latitude    = 51.0f;
+volatile double ContentCreator::longitude   = -114.0f;
+volatile double ContentCreator::altitude    = 0.0f;
+volatile double ContentCreator::altitudeAbs = 0.0f;
+volatile double ContentCreator::heading     = 0.0f;
+volatile double ContentCreator::speed       = 0.0f;
+volatile double ContentCreator::yaw         = 0.0f;
+volatile double ContentCreator::battery     = 0.0f;
 
-volatile bool MissionPlanningContentCreator::connectedToDrone_ = false;
+volatile bool ContentCreator::connectedToDrone_ = false;
 
-MissionPlanningContentCreator::MissionPlanningContentCreator(
+ContentCreator::ContentCreator(
     LmCdl::I_VcsiMapExtensionApi& mapApi,
     LmCdl::I_PointOfInterestApi& poiApi,
     LmCdl::I_VcsiUserNotificationApi& notApi,
@@ -46,6 +46,7 @@ MissionPlanningContentCreator::MissionPlanningContentCreator(
     LmCdl::I_VideoStreamApiCollection& videoCollectionApi)
     : missionBoundMenuItem_(mapApi.terrainContextMenu().registerMenuItem())
     , submitMissionMenuItem_(mapApi.terrainContextMenu().registerMenuItem())
+    , forceLandMissionMenuItem_(mapApi.terrainContextMenu().registerMenuItem())
     , poiApi_(poiApi)
     , notApi_(notApi)
     , drawApi_(drawApi)
@@ -64,12 +65,13 @@ MissionPlanningContentCreator::MissionPlanningContentCreator(
     init();
 }
 
-MissionPlanningContentCreator::~MissionPlanningContentCreator() = default;
+ContentCreator::~ContentCreator() = default;
 
-void MissionPlanningContentCreator::init()
+void ContentCreator::init()
 {
     uiHandler_.initContextMenuItems(missionBoundMenuItem_,
-                                    submitMissionMenuItem_);
+                                    submitMissionMenuItem_,
+                                    forceLandMissionMenuItem_);
     connectToApiSignals();
     startLoop();
     trackApi_.addDrawingForTrack(*drone_);
@@ -94,7 +96,7 @@ void MissionPlanningContentCreator::init()
         });
 }
 
-void MissionPlanningContentCreator::startLoop()
+void ContentCreator::startLoop()
 {
     timer_->setInterval(1000);
 
@@ -115,25 +117,42 @@ void MissionPlanningContentCreator::startLoop()
     timer_->start();
 }
 
-void MissionPlanningContentCreator::connectToApiSignals()
+void ContentCreator::connectToApiSignals()
 {
     connect(&missionBoundMenuItem_,
             &LmCdl::I_ContextMenuItem::clicked,
             this,
-            &MissionPlanningContentCreator::getPoiProperties);
+            &ContentCreator::getPoiProperties);
 
     connect(&submitMissionMenuItem_,
             &LmCdl::I_ContextMenuItem::clicked,
             this,
-            &MissionPlanningContentCreator::executeMissionAction);
+            &ContentCreator::executeMissionAction);
+
+    connect(&forceLandMissionMenuItem_,
+            &LmCdl::I_ContextMenuItem::clicked,
+            this,
+            &ContentCreator::forceLand);
 
     connect(&poiApi_,
             &LmCdl::I_PointOfInterestApi::pointOfInterestRemoved,
             this,
-            &MissionPlanningContentCreator::updatePois);
+            &ContentCreator::updatePois);
 }
 
-void MissionPlanningContentCreator::showTargets()
+void ContentCreator::forceLand()
+{
+    if (!connectedToDrone_) {
+        notis_.notify("Not connected to a drone.",
+                      notApi_,
+                      Notifications::Severity::Danger);
+        return;
+    }
+
+    QtConcurrent::run([this] { missionManager_->returnHome(); });
+}
+
+void ContentCreator::showTargets()
 {
     mutex.lock();
 
@@ -164,7 +183,7 @@ void MissionPlanningContentCreator::showTargets()
     }
 }
 
-void MissionPlanningContentCreator::checkConnection()
+void ContentCreator::checkConnection()
 {
     if (alreadyConnected_)
         return;
@@ -177,7 +196,7 @@ void MissionPlanningContentCreator::checkConnection()
     }
 }
 
-void MissionPlanningContentCreator::getPoiProperties(
+void ContentCreator::getPoiProperties(
     const LmCdl::ContextMenuEvent& event)
 {
     const auto& location = event.worldLocation();
@@ -198,7 +217,7 @@ void MissionPlanningContentCreator::getPoiProperties(
                              drawApi_);
 }
 
-void MissionPlanningContentCreator::getFlightPath()
+void ContentCreator::getFlightPath()
 {
     updatePois();
 
@@ -217,7 +236,7 @@ void MissionPlanningContentCreator::getFlightPath()
                              drawApi_);
 }
 
-void MissionPlanningContentCreator::runMission()
+void ContentCreator::runMission()
 {
     if (!sardinos::canFly(mission_.waypoints())) {
         notis_.notify("Flight path is too long.",
@@ -247,7 +266,7 @@ void MissionPlanningContentCreator::runMission()
 
     std::vector<std::pair<float, float>> mavWaypoints;
 
-    foreach(MissionPlanningWaypoint* waypoint, mission_.waypoints()) {
+    foreach(Waypoint* waypoint, mission_.waypoints()) {
         mavWaypoints.emplace_back(waypoint->location().longitude(),
                                   waypoint->location().latitude());
     }
@@ -278,7 +297,7 @@ void MissionPlanningContentCreator::runMission()
         });
 }
 
-void MissionPlanningContentCreator::cancelMission()
+void ContentCreator::cancelMission()
 {
     notis_.notify(
         "Cancelling Mission.", notApi_, Notifications::Severity::Warning);
@@ -300,7 +319,7 @@ void MissionPlanningContentCreator::cancelMission()
                              drawApi_);
 }
 
-void MissionPlanningContentCreator::updatePois()
+void ContentCreator::updatePois()
 {
     sardinos::delay(20);
 
@@ -333,7 +352,7 @@ void MissionPlanningContentCreator::updatePois()
     drawing_->drawMissionArea(pois_, missionBounds_, drawApi_);
 }
 
-void MissionPlanningContentCreator::executeMissionAction()
+void ContentCreator::executeMissionAction()
 {
     switch (m_state) {
         case UIHandler::State::CanGetFlightPath:

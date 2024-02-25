@@ -3,6 +3,7 @@
 #include <QObject>
 
 #include <BoundingBox.h>
+#include <Line.h>
 #include <LmCdl/I_VcsiUserNotificationApi.h>
 #include <LmCdl/I_VectorDataDrawing.h>
 #include <LmCdl/I_VectorDataDrawingApi.h>
@@ -10,18 +11,17 @@
 #include <LmCdl/I_VectorDataPointDrawing.h>
 #include <LmCdl/I_VectorDataPolygonDrawing.h>
 #include <MissionDomain.h>
-#include <MissionPlanningLine.h>
-#include <MissionPlanningPolygon.h>
 #include <Notifications.h>
+#include <Polygon.h>
 
-class MissionPlanningDrawing : public LmCdl::I_VectorDataDrawing
+class Drawing : public LmCdl::I_VectorDataDrawing
 {
     Q_OBJECT
 
 public:
-    MissionPlanningDrawing();
+    Drawing();
 
-    ~MissionPlanningDrawing() override;
+    ~Drawing() override;
 
     [[nodiscard]] const QSet<LmCdl::I_VectorDataPointDrawing*>& pointDrawings(
         const QGeoRectangle& area) const override;
@@ -32,13 +32,13 @@ public:
     [[nodiscard]] const QSet<LmCdl::I_VectorDataPolygonDrawing*>&
     polygonDrawings(const QGeoRectangle& area) const override;
 
-    void addPolygon(MissionPlanningPolygon* polygon);
+    void addPolygon(Polygon* polygon);
 
-    void addPolygons(const QList<MissionPlanningPolygon*>& polygon);
+    void addPolygons(const QList<Polygon*>& polygon);
 
-    void addLine(MissionPlanningLine* line);
+    void addLine(Line* line);
 
-    void addLines(const QList<MissionPlanningLine*>& lines);
+    void addLines(const QList<Line*>& lines);
 
     void clear();
 
@@ -56,8 +56,8 @@ public:
 
     void clearMissionArea(LmCdl::I_VectorDataDrawingApi& drawApi_);
 
-    void draw(const QList<MissionPlanningPolygon*>& polygons,
-              const QList<MissionPlanningLine*>& lines,
+    void draw(const QList<Polygon*>& polygons,
+              const QList<Line*>& lines,
               LmCdl::I_VectorDataDrawingApi& drawApi_);
 
     [[nodiscard]] bool visible() const override;

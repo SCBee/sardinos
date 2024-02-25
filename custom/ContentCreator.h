@@ -9,8 +9,10 @@
 #include <vector>
 
 #include <BoundingBox.h>
+#include <Drawing.h>
 #include <Drone.h>
 #include <ImageProcessor.h>
+#include <Line.h>
 #include <LmCdl/I_ContextMenu.h>
 #include <LmCdl/I_ContextMenuItem.h>
 #include <LmCdl/I_GroundElevationApi.h>
@@ -30,13 +32,11 @@
 #include <LmCdl/VcsiPointOfInterestProperties.h>
 #include <MissionDomain.h>
 #include <MissionManager.h>
-#include <MissionPlanningDrawing.h>
-#include <MissionPlanningLine.h>
-#include <MissionPlanningPolygon.h>
-#include <MissionPlanningWaypoint.h>
-#include <MissionPlanningWaypointConnector.h>
 #include <Notifications.h>
+#include <Polygon.h>
 #include <UIHandler.h>
+#include <Waypoint.h>
+#include <WaypointConnector.h>
 #include <qgeocoordinate.h>
 
 namespace LmCdl
@@ -48,12 +48,12 @@ namespace LmCdl
     class I_VcsiApplicationApi;
 }  // namespace LmCdl
 
-class MissionPlanningContentCreator : public QObject
+class ContentCreator : public QObject
 {
     Q_OBJECT
 
 public:
-    MissionPlanningContentCreator(
+    ContentCreator(
         LmCdl::I_VcsiMapExtensionApi& mapApi,
         LmCdl::I_PointOfInterestApi& poiApi,
         LmCdl::I_VcsiUserNotificationApi& notApi,
@@ -63,10 +63,10 @@ public:
         LmCdl::I_TrackDrawingApi& trackApi,
         LmCdl::I_VideoStreamApiCollection& videoCollectionApi);
 
-    ~MissionPlanningContentCreator() override;
+    ~ContentCreator() override;
 
 private:
-    Q_DISABLE_COPY(MissionPlanningContentCreator);
+    Q_DISABLE_COPY(ContentCreator);
 
     void getPoiProperties(const LmCdl::ContextMenuEvent& event);
 
@@ -90,8 +90,11 @@ private:
 
     void checkConnection();
 
+    void forceLand();
+
     LmCdl::I_ContextMenuItem& missionBoundMenuItem_;
     LmCdl::I_ContextMenuItem& submitMissionMenuItem_;
+    LmCdl::I_ContextMenuItem& forceLandMissionMenuItem_;
 
     std::vector<std::vector<QGeoCoordinate>> pois_;
 
@@ -106,7 +109,7 @@ private:
 
     ImageProcessor imageProcessor_;
 
-    MissionPlanningDrawing* drawing_ = new MissionPlanningDrawing();
+    Drawing* drawing_ = new Drawing();
     BoundingBox missionBounds_;
 
     MissionDomain mission_;

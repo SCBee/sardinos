@@ -4,11 +4,11 @@
 
 #include <LmCdl/I_SimpleWaypointConnector.h>
 
-class MissionPlanningWaypointConnector : public LmCdl::I_SimpleWaypointConnector
+class WaypointConnector : public LmCdl::I_SimpleWaypointConnector
 {
     Q_OBJECT
 public:
-    MissionPlanningWaypointConnector();
+    WaypointConnector();
 
     [[nodiscard]] QGeoCoordinate startLocation() const override;
     void setStartLocation(const QGeoCoordinate& newLocation);
@@ -28,7 +28,7 @@ public:
     [[nodiscard]] int relativeZOrder() const override;
 
 private:
-    Q_DISABLE_COPY(MissionPlanningWaypointConnector)
+    Q_DISABLE_COPY(WaypointConnector)
 
     QGeoCoordinate startLocation_;
     QGeoCoordinate endLocation_;
