@@ -93,5 +93,6 @@ add_executable(vcsi_sardinos
         custom/TargetWidget.h
         custom/UIHandler.h
         custom/UIHandler.cpp
+        ${MOCS}
 )
 
