@@ -84,8 +84,8 @@ public:
         volatile double& batt_)
     {
         // Instantiate plugins.
-        auto telemetry = Telemetry {system_};
-        auto action    = Action {system_};
+        auto telemetry = Telemetry {system_.value()};
+        auto action    = Action {system_.value()};
 
         // TELEMETRY SUBSCRIPTIONS
         sardinos::setColor("red");
@@ -237,8 +237,8 @@ public:
         volatile double& batt_)
     {
         // Instantiate plugins.
-        auto telemetry = Telemetry {system_};
-        auto action    = Action {system_};
+        auto telemetry = Telemetry {system_.value()};
+        auto action    = Action {system_.value()};
 
         // We want to listen to the altitude of the drone at 1 Hz.
         sardinos::setColor("red");
@@ -414,8 +414,8 @@ public:
     void returnHome()
     {
         // Instantiate plugins.
-        auto telemetry = Telemetry {system_};
-        auto action    = Action {system_};
+        auto telemetry = Telemetry {system_.value()};
+        auto action    = Action {system_.value()};
 
         // RTL
         sardinos::setColor("yellow");
