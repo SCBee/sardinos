@@ -4,6 +4,8 @@
 #include <QImage>
 #include <QObject>
 #include <QWidget>
+#include <utility>
+#include <utility>
 
 #include <LmCdl/I_GraphicsWidget.h>
 #include <TargetWidget.h>
@@ -12,9 +14,9 @@ struct Target : public QObject
 {
     Q_OBJECT
 public:
-    Target(QGeoCoordinate location, cv::Mat mat)
+    Target(const QGeoCoordinate& location, cv::Mat mat)
         : Location(location)
-        , Mat(mat)
+        , Mat(std::move(std::move(mat)))
     {
     }
 

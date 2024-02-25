@@ -1,5 +1,6 @@
 #pragma once
 
+#include <QFuture>
 #include <QList>
 #include <QObject>
 #include <QtGlobal>
@@ -9,7 +10,6 @@
 
 #include <BoundingBox.h>
 #include <Drone.h>
-#include <FlightPather.h>
 #include <ImageProcessor.h>
 #include <LmCdl/I_ContextMenu.h>
 #include <LmCdl/I_ContextMenuItem.h>
@@ -29,6 +29,7 @@
 #include <LmCdl/VcsiMilStdCode.h>
 #include <LmCdl/VcsiPointOfInterestProperties.h>
 #include <MissionDomain.h>
+#include <MissionManager.h>
 #include <MissionPlanningDrawing.h>
 #include <MissionPlanningLine.h>
 #include <MissionPlanningPolygon.h>
@@ -87,6 +88,8 @@ private:
 
     void showTargets();
 
+    void checkConnection();
+
     LmCdl::I_ContextMenuItem& missionBoundMenuItem_;
     LmCdl::I_ContextMenuItem& submitMissionMenuItem_;
 
@@ -96,7 +99,7 @@ private:
     LmCdl::I_VcsiUserNotificationApi& notApi_;
     LmCdl::I_VectorDataDrawingApi& drawApi_;
     LmCdl::I_MissionDrawingApi& missionApi_;
-    LmCdl::I_RouteApi& routeApi_;
+    [[maybe_unused]] LmCdl::I_RouteApi& routeApi_;
     LmCdl::I_TrackDrawingApi& trackApi_;
     LmCdl::I_VideoStreamApiCollection& videoCollectionApi_;
     LmCdl::I_VcsiMapExtensionApi& mapApi_;
@@ -113,6 +116,7 @@ private:
     Notifications notis_;
 
     UIHandler::State m_state;
+
     volatile static double latitude;  // WGS84
     volatile static double longitude;  // WGS84
     volatile static double altitude;  // relative altitude, m
@@ -122,9 +126,17 @@ private:
     volatile static double yaw;  // degrees, 0 to 360
     volatile static double battery;  // percentage, 0 to 1
 
+    volatile static bool connectedToDrone_;
+    bool alreadyConnected_ = false;
+
     QList<Target> targets_;
 
     Drone* drone_;
 
     QTimer* timer_;
+
+    MissionManager* missionManager_{};
+
+    QFuture<void> mavFut_;
+    QFuture<void> cancelFut_;
 };

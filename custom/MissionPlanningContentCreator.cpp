@@ -1,7 +1,4 @@
-#include <QCoreApplication>
-#include <QFuture>
 #include <QGeoRectangle>
-#include <QLabel>
 #include <QTime>
 #include <QTimer>
 #include <thread>
@@ -18,13 +15,9 @@
 #include <LmCdl/StanagRoute.h>
 #include <LmCdl/StanagWaypoint.h>
 #include <LmCdl/VcsiPointOfInterestProperties.h>
-#include <LmCdl/VectorDataPolygonDrawing.h>
-#include <MathExt.h>
 #include <MissionDomain.h>
 #include <MissionPlanningContentCreator.h>
 #include <QtConcurrent/QtConcurrent>
-#include <SardinosPublisher.h>
-#include <qicon.h>
 
 using std::chrono::seconds;
 using std::this_thread::sleep_for;
@@ -39,6 +32,8 @@ volatile double MissionPlanningContentCreator::heading     = 0.0f;
 volatile double MissionPlanningContentCreator::speed       = 0.0f;
 volatile double MissionPlanningContentCreator::yaw         = 0.0f;
 volatile double MissionPlanningContentCreator::battery     = 0.0f;
+
+volatile bool MissionPlanningContentCreator::connectedToDrone_ = false;
 
 MissionPlanningContentCreator::MissionPlanningContentCreator(
     LmCdl::I_VcsiMapExtensionApi& mapApi,
@@ -62,8 +57,7 @@ MissionPlanningContentCreator::MissionPlanningContentCreator(
     , m_state(UIHandler::State::STARTUP)
     , mission_()
     , drone_(new Drone(mapApi))
-    , imageProcessor_(
-          std::ref(targets_), std::ref(latitude), std::ref(longitude))
+    , imageProcessor_(std::ref(targets_), std::ref(latitude), std::ref(longitude))
     , timer_(new QTimer())
 {
     init();
@@ -79,27 +73,42 @@ void MissionPlanningContentCreator::init()
     startLoop();
     trackApi_.addDrawingForTrack(*drone_);
     updatePois();
+
+    std::string connectStr = "udp://:14550";
+    // auto connectStr = "serial://COM3:57600";
+
+    QtConcurrent::run(
+        [this, connectStr] {
+            missionManager_ = new MissionManager(connectStr, std::ref(connectedToDrone_),
+                                              std::ref(latitude),
+                                              std::ref(longitude),
+                                              std::ref(altitude),
+                                              std::ref(altitudeAbs),
+                                              std::ref(heading),
+                                              std::ref(speed),
+                                              std::ref(yaw),
+                                              std::ref(battery));
+        });
+
 }
 
 void MissionPlanningContentCreator::startLoop()
 {
     timer_->setInterval(1000);
 
-    connect(timer_,
-            &QTimer::timeout,
-            this,
-            [this]()
-            {
-                this->drone_->updateValues(latitude,
-                                           longitude,
-                                           altitude,
-                                           heading,
-                                           speed,
-                                           yaw,
-                                           battery);
+    connect(
+        timer_,
+        &QTimer::timeout,
+        this,
+        [this]()
+        {
+            this->drone_->updateValues(
+                latitude, longitude, altitude, heading, speed, yaw, battery);
 
-                this->showTargets();
-            });
+            this->showTargets();
+
+            this->checkConnection();
+        });
 
     timer_->start();
 }
@@ -138,17 +147,29 @@ void MissionPlanningContentCreator::showTargets()
         auto lat = loc.latitude();
         auto lon = loc.longitude();
 
-        auto targetWidget = new TargetWidget(loc.latitude(), loc.longitude(), target.Mat);
+        auto targetWidget =
+            new TargetWidget(loc.latitude(), loc.longitude(), target.Mat);
 
         auto widget = &mapApi_.addGraphicsWidget(targetWidget);
 
         widget->setLocation(loc);
         widget->setVisible(true);
-        
+
         notis_.notify("Target Found at: " + std::to_string(lat) + ", "
                           + std::to_string(lon),
                       notApi_,
                       Notifications::Continue);
+    }
+}
+
+void MissionPlanningContentCreator::checkConnection()
+{
+    if (alreadyConnected_)
+        return;
+        
+    if (connectedToDrone_) {
+        notis_.notify("Successfully connected to drone", notApi_, Notifications::Continue);
+        alreadyConnected_ = true;
     }
 }
 
@@ -179,7 +200,7 @@ void MissionPlanningContentCreator::getFlightPath()
 
     notis_.notify("Building Flight Path.", notApi_);
 
-    mission_.setPath(sardinos::FlightPather::getPath(missionBounds_));
+    mission_.setPath(sardinos::getPath(missionBounds_));
 
     drawing_->drawFlightPath(mission_, missionApi_);
 
@@ -194,15 +215,23 @@ void MissionPlanningContentCreator::getFlightPath()
 
 void MissionPlanningContentCreator::runMission()
 {
-    if (!sardinos::FlightPather::canFly(mission_.waypoints())) {
+    if (!sardinos::canFly(mission_.waypoints())) {
         notis_.notify("Flight path is too long.",
                       notApi_,
                       Notifications::Severity::Warning);
         return;
     }
 
-    notis_.notify(
-        "Starting Mission.", notApi_, Notifications::Severity::Continue);
+    if (!connectedToDrone_) {
+        notis_.notify("Not connected to a drone.",
+                      notApi_,
+                      Notifications::Severity::Danger);
+        return;
+    }
+
+    cancelFut_.cancel();
+
+    notis_.notify("Starting Mission.", notApi_, Notifications::Continue);
 
     uiHandler_.updateUIState(UIHandler::State::CanCancelMission,
                              m_state,
@@ -233,29 +262,26 @@ void MissionPlanningContentCreator::runMission()
     //     "
     //     "! rtph264depay ! decodebin ! videoconvert ! appsink";
 
-    QFuture<void> imageFut =
-        QtConcurrent::run([this, uri] { imageProcessor_.init(uri); });
+    QtConcurrent::run([this, uri] { imageProcessor_.init(uri); });
 
-    QFuture<void> mavFut = QtConcurrent::run(
-        [mavWaypoints]()
+    mavFut_ = QtConcurrent::run(
+        [this, mavWaypoints]()
         {
-            sardinos::executeMissionQuad(std::ref(mavWaypoints),
-                                         std::ref(latitude),
-                                         std::ref(longitude),
-                                         std::ref(altitude),
-                                         std::ref(altitudeAbs),
-                                         std::ref(heading),
-                                         std::ref(speed),
-                                         std::ref(yaw),
-                                         std::ref(battery));
+            missionManager_->executeMissionQuad(std::ref(mavWaypoints),
+                                                std::ref(latitude),
+                                                std::ref(longitude),
+                                                std::ref(altitude));
         });
 }
 
 void MissionPlanningContentCreator::cancelMission()
 {
-    notis_.notify("Cancelling Mission.", notApi_, Notifications::Severity::Warning);
+    notis_.notify(
+        "Cancelling Mission.", notApi_, Notifications::Severity::Warning);
 
-    //should send drone home here
+    mavFut_.cancel();
+
+    cancelFut_ = QtConcurrent::run([this] { missionManager_->returnHome(); });
 
     updatePois();
 
@@ -272,11 +298,11 @@ void MissionPlanningContentCreator::cancelMission()
 
 void MissionPlanningContentCreator::updatePois()
 {
-    sardinos::MathExt::delay(20);
+    sardinos::delay(20);
 
     auto points = poiApi_.pointsOfInterest();
 
-    missionBounds_ = sardinos::MathExt::findSmallestBoundingBox(points);
+    missionBounds_ = sardinos::findSmallestBoundingBox(points);
 
     pois_.clear();
 

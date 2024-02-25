@@ -16,10 +16,10 @@
 class TargetWidget : public QWidget
 {
 public:
-    TargetWidget(const double lat, const double lon, const cv::Mat mat)
+    TargetWidget(const double lat, const double lon, const cv::Mat& mat)
     {
         // Create a QVBoxLayout to contain the button
-        QVBoxLayout* layout = new QVBoxLayout(this);
+        auto* layout = new QVBoxLayout(this);
 
         // Create a QPushButton
         auto button = new QPushButton("View Target");
@@ -33,7 +33,7 @@ public:
         auto image = QImage((uchar*)mat.data,
                             mat.cols,
                             mat.rows,
-                            mat.step,
+                            static_cast<int>(mat.step),
                             QImage::Format_RGB888);
 
         imageLabel_->setPixmap(QPixmap::fromImage(image));
@@ -42,7 +42,7 @@ public:
 
         connect(button,
                 &QPushButton::clicked,
-                [=]()
+                [&, this]()
                 {
                     visible_ = !visible_;
                     if (visible_) {

@@ -1,13 +1,9 @@
 #include <QGeoCoordinate>
-#include <QLabel>
-#include <QPixmap>
-#include <QVBoxLayout>
 #include <QPointer>
+#include <utility>
 
 #include "ImageProcessor.h"
 
-#include <LmCdl/I_Billboard.h>
-#include <MathExt.h>
 #include <TargetWidget.h>
 
 ImageProcessor::ImageProcessor(QList<Target>& targets,
@@ -20,7 +16,7 @@ ImageProcessor::ImageProcessor(QList<Target>& targets,
 
 }
 
-void ImageProcessor::init(std::string uri)
+void ImageProcessor::init(const std::string& uri)
 {
     processing_ = true;
 
@@ -57,7 +53,7 @@ void ImageProcessor::init(std::string uri)
     cv::destroyAllWindows();
 }
 
-void ImageProcessor::processFrame(cv::Mat frame)
+void ImageProcessor::processFrame(const cv::Mat& frame)
 {
     auto currentTime = std::chrono::system_clock::now();
 
@@ -78,7 +74,7 @@ void ImageProcessor::processFrame(cv::Mat frame)
     cv::findContours(
         mask, contours, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_SIMPLE);
 
-    if (contours.size() == 0) {
+    if (contours.empty()) {
         return;
     }
 
@@ -118,7 +114,7 @@ void ImageProcessor::addTarget(cv::Mat mat)
 {
     auto location = QGeoCoordinate(latitude_, longitude_, 1300);
 
-    auto target = Target(location, mat);
+    auto target = Target(location, std::move(mat));
 
     targets_.append(target);
 }

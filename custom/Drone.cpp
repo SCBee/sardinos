@@ -1,5 +1,4 @@
 #include <QTimer>
-#include <iostream>
 #include <utility>
 
 #include <Drone.h>

@@ -20,8 +20,8 @@ public:
     ImageProcessor(QList<Target>& targets,
                    const volatile double& latitude,
                    const volatile double& longitude);
-    void init(std::string uri);
-    void processFrame(cv::Mat frame);
+    void init(const std::string& uri);
+    void processFrame(const cv::Mat& frame);
     void stop();
 
 private:
