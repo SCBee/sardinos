@@ -17,9 +17,9 @@ public:
         CanCancelMission,
     };
 
-    void initContextMenuItems(LmCdl::I_ContextMenuItem& missionBoundMenuItem_, LmCdl::I_ContextMenuItem& submitMissionMenuItem_);
-    void changeUI(State& newState, LmCdl::I_ContextMenuItem& missionBoundMenuItem_, LmCdl::I_ContextMenuItem& submitMissionMenuItem_, MissionDomain& mission_, LmCdl::I_MissionDrawingApi& missionApi_, LmCdl::I_VectorDataDrawingApi& drawApi_);
-    void updateUIState(const State& newState, State& m_state, LmCdl::I_ContextMenuItem& missionBoundMenuItem_, LmCdl::I_ContextMenuItem& submitMissionMenuItem_, MissionDomain& mission_, LmCdl::I_MissionDrawingApi& missionApi_, LmCdl::I_VectorDataDrawingApi& drawApi_);
+    void initContextMenuItems(LmCdl::I_ContextMenuItem &missionBoundMenuItem, LmCdl::I_ContextMenuItem &submitMissionMenuItem, LmCdl::I_ContextMenuItem &forceLandMenuItem);
+    void changeUI(State& newState, LmCdl::I_ContextMenuItem& missionBoundMenuItem, LmCdl::I_ContextMenuItem& submitMissionMenuItem, MissionDomain& mission, LmCdl::I_MissionDrawingApi& missionApi, LmCdl::I_VectorDataDrawingApi& drawApi);
+    void updateUIState(const State& newState, State& m_state, LmCdl::I_ContextMenuItem& missionBoundMenuItem, LmCdl::I_ContextMenuItem& submitMissionMenuItem, MissionDomain& mission, LmCdl::I_MissionDrawingApi& missionApi, LmCdl::I_VectorDataDrawingApi& drawApi);
 private:
     MissionPlanningDrawing* drawing_ = new MissionPlanningDrawing();
 };
