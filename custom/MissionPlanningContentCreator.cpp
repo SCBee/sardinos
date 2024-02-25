@@ -164,7 +164,7 @@ void MissionPlanningContentCreator::checkConnection()
         return;
         
     if (connectedToDrone_) {
-        notis_.notify("Successfully connect to drone", notApi_, Notifications::Continue);
+        notis_.notify("Successfully connected to drone", notApi_, Notifications::Continue);
         alreadyConnected_ = true;
     }
 }
