@@ -103,9 +103,10 @@ void MissionPlanningDrawing::clearMissionArea(
          drawApi_);
 }
 
-void MissionPlanningDrawing::draw(const QList<MissionPlanningPolygon*>& polygons,
-                                  const QList<MissionPlanningLine*>& lines,
-                                  LmCdl::I_VectorDataDrawingApi& drawApi_)
+void MissionPlanningDrawing::draw(
+    const QList<MissionPlanningPolygon*>& polygons,
+    const QList<MissionPlanningLine*>& lines,
+    LmCdl::I_VectorDataDrawingApi& drawApi_)
 {
     clear();
     addPolygons(polygons);

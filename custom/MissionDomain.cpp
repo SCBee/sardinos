@@ -1,8 +1,8 @@
 #include <QColor>
 #include <utility>
 
-#include <Sardinos.h>
 #include <MissionDomain.h>
+#include <Sardinos.h>
 
 QList<MissionPlanningWaypoint*> MissionDomain::waypoints() const
 {
@@ -180,11 +180,11 @@ void MissionDomain::ConnectedWaypointRef::setLocation(
 
 void MissionDomain::startMission()
 {
-    for (auto & waypoint : waypoints_) {
+    for (auto& waypoint : waypoints_) {
         waypoint.first->setDraggingEnabled(false);
         waypoint.first->setSelectionEnabled(false);
         waypoint.first->setColor(Qt::darkGreen);
-        for (auto & j : waypoint.second){
+        for (auto& j : waypoint.second) {
             j->setColor(Qt::darkGreen);
         }
     }

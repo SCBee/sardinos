@@ -5,7 +5,6 @@
 #include <QObject>
 #include <QWidget>
 #include <utility>
-#include <utility>
 
 #include <LmCdl/I_GraphicsWidget.h>
 #include <TargetWidget.h>

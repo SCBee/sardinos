@@ -57,7 +57,8 @@ MissionPlanningContentCreator::MissionPlanningContentCreator(
     , m_state(UIHandler::State::STARTUP)
     , mission_()
     , drone_(new Drone(mapApi))
-    , imageProcessor_(std::ref(targets_), std::ref(latitude), std::ref(longitude))
+    , imageProcessor_(
+          std::ref(targets_), std::ref(latitude), std::ref(longitude))
     , timer_(new QTimer())
 {
     init();
@@ -78,18 +79,19 @@ void MissionPlanningContentCreator::init()
     // auto connectStr = "serial://COM3:57600";
 
     QtConcurrent::run(
-        [this, connectStr] {
-            missionManager_ = new MissionManager(connectStr, std::ref(connectedToDrone_),
-                                              std::ref(latitude),
-                                              std::ref(longitude),
-                                              std::ref(altitude),
-                                              std::ref(altitudeAbs),
-                                              std::ref(heading),
-                                              std::ref(speed),
-                                              std::ref(yaw),
-                                              std::ref(battery));
+        [this, connectStr]
+        {
+            missionManager_ = new MissionManager(connectStr,
+                                                 std::ref(connectedToDrone_),
+                                                 std::ref(latitude),
+                                                 std::ref(longitude),
+                                                 std::ref(altitude),
+                                                 std::ref(altitudeAbs),
+                                                 std::ref(heading),
+                                                 std::ref(speed),
+                                                 std::ref(yaw),
+                                                 std::ref(battery));
         });
-
 }
 
 void MissionPlanningContentCreator::startLoop()
@@ -166,9 +168,11 @@ void MissionPlanningContentCreator::checkConnection()
 {
     if (alreadyConnected_)
         return;
-        
+
     if (connectedToDrone_) {
-        notis_.notify("Successfully connected to drone", notApi_, Notifications::Continue);
+        notis_.notify("Successfully connected to drone",
+                      notApi_,
+                      Notifications::Continue);
         alreadyConnected_ = true;
     }
 }

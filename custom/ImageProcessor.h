@@ -3,15 +3,14 @@
 #include <QList>
 #include <QObject>
 #include <QTimer>
+#include <chrono>
 #include <iostream>
 #include <string>
-#include <chrono>
 
 #include <LmCdl/I_VcsiMapExtensionApi.h>
 #include <Target.h>
-#include <opencv2/opencv.hpp>
 #include <opencv2/highgui/highgui.hpp>
-
+#include <opencv2/opencv.hpp>
 
 class ImageProcessor : public QObject
 {

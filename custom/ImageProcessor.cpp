@@ -13,7 +13,6 @@ ImageProcessor::ImageProcessor(QList<Target>& targets,
     , longitude_(longitude)
     , targets_(targets)
 {
-
 }
 
 void ImageProcessor::init(const std::string& uri)
@@ -38,9 +37,11 @@ void ImageProcessor::init(const std::string& uri)
             break;
         }
 
-        if (processing_) processFrame(*currentFrame_);
-        
-        cv::imshow("[INTERNAL] VCSi Video Stream", *currentFrame_);  // Display the frame
+        if (processing_)
+            processFrame(*currentFrame_);
+
+        cv::imshow("[INTERNAL] VCSi Video Stream",
+                   *currentFrame_);  // Display the frame
 
         // Break the loop when 'ESC' is pressed
         if (cv::waitKey(1) == 27) {
@@ -57,7 +58,8 @@ void ImageProcessor::processFrame(const cv::Mat& frame)
 {
     auto currentTime = std::chrono::system_clock::now();
 
-    if ((currentTime - lastProcess_) < std::chrono::seconds(1)) return;
+    if ((currentTime - lastProcess_) < std::chrono::seconds(1))
+        return;
 
     lastProcess_ = currentTime;
 
@@ -119,6 +121,7 @@ void ImageProcessor::addTarget(cv::Mat mat)
     targets_.append(target);
 }
 
-void ImageProcessor::stop(){
+void ImageProcessor::stop()
+{
     processing_ = false;
 }

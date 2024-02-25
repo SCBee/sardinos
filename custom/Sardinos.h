@@ -1,14 +1,14 @@
 #pragma once
 
-#include <iostream>
-#include <unordered_map>
 #include <QCoreApplication>
 #include <QGeoCoordinate>
 #include <QList>
 #include <QTime>
 #include <algorithm>
+#include <iostream>
 #include <map>
 #include <string>
+#include <unordered_map>
 
 #include <BoundingBox.h>
 #include <LmCdl/VcsiIdentifiedPointOfInterest.h>
@@ -31,7 +31,7 @@ public:
     }
 
     static bool Comparator(const std::vector<QGeoCoordinate>& a,
-                    const std::vector<QGeoCoordinate>& b)
+                           const std::vector<QGeoCoordinate>& b)
     {
         if (a[1].longitude() != b[1].longitude()) {
             return a[1].longitude() < b[1].longitude();
@@ -41,7 +41,7 @@ public:
     }
 
     static std::vector<double> sqPolar(const QGeoCoordinate& point,
-                                const QGeoCoordinate& com)
+                                       const QGeoCoordinate& com)
     {
         double angle    = atan2(point.latitude() - com.latitude(),
                              point.longitude() - com.longitude());
@@ -107,7 +107,8 @@ public:
         return {southwest, northwest, southeast, northeast};
     }
 
-    static double getDistance(const QGeoCoordinate& c1, const QGeoCoordinate& c2)
+    static double getDistance(const QGeoCoordinate& c1,
+                              const QGeoCoordinate& c2)
     {
         const double R = 6378.137;
         double dLat =
@@ -122,7 +123,10 @@ public:
         return d * 1000;  // meters
     }
 
-    static double getDistance(double lat1, double lon1, double lat2, double lon2)
+    static double getDistance(double lat1,
+                              double lon1,
+                              double lat2,
+                              double lon2)
     {
         return getDistance(QGeoCoordinate(lat1, lon1),
                            QGeoCoordinate(lat2, lon2));
@@ -274,5 +278,4 @@ public:
 
         return sum <= MAXDISTANCEMETERS;
     }
-
-}; 
+};
