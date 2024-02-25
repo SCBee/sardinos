@@ -1,16 +1,24 @@
 #include <QGeoCoordinate>
 #include <QPointer>
 #include <utility>
+#include <qmath.h>
 
-#include "ImageProcessor.h"
 
+#include <ImageProcessor.h>
+#include <Sardinos.h>
 #include <TargetWidget.h>
+
+const double DFOV = 72.64;
+const double HFOV = 57.12;
+const double VFOV = 42.44;
 
 ImageProcessor::ImageProcessor(QList<Target>& targets,
                                const volatile double& latitude,
-                               const volatile double& longitude)
+                               const volatile double& longitude,
+                               const volatile double& altitude)
     : latitude_(latitude)
     , longitude_(longitude)
+    , altitude_(altitude)
     , targets_(targets)
 {
 }
@@ -109,16 +117,37 @@ void ImageProcessor::processFrame(const cv::Mat& frame)
 
     cv::cvtColor(targetFoundMat, targetFoundMat, cv::COLOR_BGR2RGB);
 
-    addTarget(targetFoundMat);
+    addTarget(targetFoundMat, boundingRect);
 }
 
-void ImageProcessor::addTarget(cv::Mat mat)
+void ImageProcessor::addTarget(cv::Mat mat, cv::Rect boundingRect)
 {
-    auto location = QGeoCoordinate(latitude_, longitude_, 1300);
+    auto location = calcLocation(mat, boundingRect);
 
-    auto target = Target(location, std::move(mat));
+    auto target = Target(location, mat);
 
     targets_.append(target);
+}
+
+QGeoCoordinate ImageProcessor::calcLocation(cv::Mat mat, cv::Rect boundingRect)
+{
+    auto midRectX = (double) boundingRect.width / 2;
+    auto midRectY = (double) boundingRect.height / 2;
+
+    auto xRatio = (midRectX / mat.cols) * 2 - 1;
+    auto yRatio = (midRectY / mat.rows) * 2 - 1;
+
+    auto widthMeters = (altitude_ / sin(HFOV)) * 2;
+    auto heightMeters = (altitude_ / sin(VFOV)) * 2;
+
+    auto widthChange = xRatio * widthMeters;
+    auto heightChange = yRatio * heightMeters;
+
+    auto angle = atan(heightChange / widthChange);
+
+    auto distance = sqrt(pow(widthChange, 2) + pow(heightChange, 2));
+
+    return sardinos::getLocation(latitude_, longitude_, altitude_, distance, angle);
 }
 
 void ImageProcessor::stop()

@@ -33,65 +33,65 @@ public:
                    volatile double& yaw_,
                    volatile double& batt_)
     {
-        ConnectionResult connection_result =
-            mavsdk.add_any_connection(connectStr);
+        // ConnectionResult connection_result =
+        //     mavsdk.add_any_connection(connectStr);
 
-        // wait while we try to establish our connection (heartbeat needs to
-        // be recorded)
-        while (connection_result != ConnectionResult::Success) {
-            std::cerr << "Connection failed: " << connection_result
-                      << std::endl;
-            sleep_for(seconds(3));
-            connection_result = mavsdk.add_any_connection(connectStr);
-        }
+        // // wait while we try to establish our connection (heartbeat needs to
+        // // be recorded)
+        // while (connection_result != ConnectionResult::Success) {
+        //     std::cerr << "Connection failed: " << connection_result
+        //               << std::endl;
+        //     sleep_for(seconds(3));
+        //     connection_result = mavsdk.add_any_connection(connectStr);
+        // }
 
-        // wait while we connect to the system
-        system_ = mavsdk.first_autopilot(3.0);
-        while (!system_) {
-            std::cerr << "Timed out waiting for system..." << std::endl;
-            sleep_for(seconds(3));
-            system_ = mavsdk.first_autopilot(3.0);
-        }
+        // // wait while we connect to the system
+        // system_ = mavsdk.first_autopilot(3.0);
+        // while (!system_) {
+        //     std::cerr << "Timed out waiting for system..." << std::endl;
+        //     sleep_for(seconds(3));
+        //     system_ = mavsdk.first_autopilot(3.0);
+        // }
 
-        // TELEMETRY SUBSCRIPTIONS
-        telemetry = std::make_unique<Telemetry>(system_.value());
-        Telemetry::Result set_rate_result = telemetry->set_rate_position(1.0);
-        while (set_rate_result != Telemetry::Result::Success) {
-            std::cerr << "Setting rate failed: " << set_rate_result
-                      << std::endl;
-            sleep_for(seconds(3));
-            set_rate_result = telemetry->set_rate_position(1.0);
-        }
+        // // TELEMETRY SUBSCRIPTIONS
+        // telemetry = std::make_unique<Telemetry>(system_.value());
+        // Telemetry::Result set_rate_result = telemetry->set_rate_position(1.0);
+        // while (set_rate_result != Telemetry::Result::Success) {
+        //     std::cerr << "Setting rate failed: " << set_rate_result
+        //               << std::endl;
+        //     sleep_for(seconds(3));
+        //     set_rate_result = telemetry->set_rate_position(1.0);
+        // }
 
-        telemetry->subscribe_heading([&head_](const Telemetry::Heading& headTel)
-                                     { head_ = headTel.heading_deg; });
+        // telemetry->subscribe_heading([&head_](const Telemetry::Heading& headTel)
+        //                              { head_ = headTel.heading_deg; });
 
-        telemetry->subscribe_position(
-            [&lat_, &lon_, &alt_, &altAbs_](const Telemetry::Position& position)
-            {
-                lat_    = position.latitude_deg;
-                lon_    = position.longitude_deg;
-                alt_    = position.relative_altitude_m;
-                altAbs_ = position.absolute_altitude_m;
-            });
+        // telemetry->subscribe_position(
+        //     [&lat_, &lon_, &alt_, &altAbs_](const Telemetry::Position& position)
+        //     {
+        //         lat_    = position.latitude_deg;
+        //         lon_    = position.longitude_deg;
+        //         alt_    = position.relative_altitude_m;
+        //         altAbs_ = position.absolute_altitude_m;
+        //     });
 
-        telemetry->subscribe_velocity_ned(
-            [&speed_](const Telemetry::VelocityNed& vel)
-            {
-                double vabs = std::sqrt(std::pow(vel.north_m_s, 2)
-                                        + std::pow(vel.east_m_s, 2)
-                                        + std::pow(vel.down_m_s, 2));
-                speed_      = vabs;
-            });
+        // telemetry->subscribe_velocity_ned(
+        //     [&speed_](const Telemetry::VelocityNed& vel)
+        //     {
+        //         double vabs = std::sqrt(std::pow(vel.north_m_s, 2)
+        //                                 + std::pow(vel.east_m_s, 2)
+        //                                 + std::pow(vel.down_m_s, 2));
+        //         speed_      = vabs;
+        //     });
 
-        telemetry->subscribe_attitude_euler(
-            [&yaw_](const Telemetry::EulerAngle& euler)
-            { yaw_ = euler.yaw_deg; });
+        // telemetry->subscribe_attitude_euler(
+        //     [&yaw_](const Telemetry::EulerAngle& euler)
+        //     { yaw_ = euler.yaw_deg; });
 
-        telemetry->subscribe_battery(
-            [&batt_](const Telemetry::Battery& battery)
-            { batt_ = battery.remaining_percent / 100.0; });
-        // END TELEMETRY SUBSCRIPTIONS
+        // telemetry->subscribe_battery(
+        //     [&batt_](const Telemetry::Battery& battery)
+        //     { batt_ = battery.remaining_percent / 100.0; });
+        // // END TELEMETRY SUBSCRIPTIONS
 
         connected = true;
     }

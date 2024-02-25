@@ -15,7 +15,7 @@ struct Target : public QObject
 public:
     Target(const QGeoCoordinate& location, cv::Mat mat)
         : Location(location)
-        , Mat(std::move(std::move(mat)))
+        , Mat(mat)
     {
     }
 
