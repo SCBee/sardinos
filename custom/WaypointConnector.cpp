@@ -13,8 +13,7 @@ QGeoCoordinate WaypointConnector::startLocation() const
     return startLocation_;
 }
 
-void WaypointConnector::setStartLocation(
-    const QGeoCoordinate& location)
+void WaypointConnector::setStartLocation(const QGeoCoordinate& location)
 {
     if (startLocation_ != location) {
         startLocation_ = location;
@@ -27,8 +26,7 @@ QGeoCoordinate WaypointConnector::endLocation() const
     return endLocation_;
 }
 
-void WaypointConnector::setEndLocation(
-    const QGeoCoordinate& location)
+void WaypointConnector::setEndLocation(const QGeoCoordinate& location)
 {
     if (endLocation_ != location) {
         endLocation_ = location;
@@ -67,8 +65,7 @@ bool WaypointConnector::directionalIndicatorVisible() const
     return directionalIndicatorVisible_;
 }
 
-void WaypointConnector::setDirectionalIndicatorVisible(
-    bool isVisible)
+void WaypointConnector::setDirectionalIndicatorVisible(bool isVisible)
 {
     if (isVisible != directionalIndicatorVisible_) {
         directionalIndicatorVisible_ = isVisible;

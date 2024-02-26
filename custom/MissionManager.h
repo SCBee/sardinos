@@ -5,7 +5,7 @@
 #include <memory>
 #include <thread>
 
-#include <ContentCreator.h>
+#include <DroneTelemetry.h>
 #include <Sardinos.h>
 #include <Windows.h>
 #include <mavlink/common/mavlink.h>
@@ -23,15 +23,7 @@ class MissionManager
 {
 public:
     MissionManager(const std::string& connectStr,
-                   volatile bool& connected,
-                   volatile double& lat_,
-                   volatile double& lon_,
-                   volatile double& alt_,
-                   volatile double& altAbs_,
-                   volatile double& head_,
-                   volatile double& speed_,
-                   volatile double& yaw_,
-                   volatile double& batt_)
+                   DroneTelemetry* droneTelemetry_)
     {
         ConnectionResult connection_result =
             mavsdk.add_any_connection(connectStr);
@@ -63,37 +55,39 @@ public:
             set_rate_result = telemetry->set_rate_position(1.0);
         }
 
-        telemetry->subscribe_heading([&head_](const Telemetry::Heading& headTel)
-                                     { head_ = headTel.heading_deg; });
+        telemetry->subscribe_heading(
+            [&droneTelemetry_](const Telemetry::Heading& headTel)
+            { droneTelemetry_->setHeading(headTel.heading_deg); });
 
         telemetry->subscribe_position(
-            [&lat_, &lon_, &alt_, &altAbs_](const Telemetry::Position& position)
+            [&droneTelemetry_](const Telemetry::Position& position)
             {
-                lat_    = position.latitude_deg;
-                lon_    = position.longitude_deg;
-                alt_    = position.relative_altitude_m;
-                altAbs_ = position.absolute_altitude_m;
+                droneTelemetry_->setLatitude(position.latitude_deg);
+                droneTelemetry_->setLongitude(position.longitude_deg);
+                droneTelemetry_->setAltitude(position.relative_altitude_m);
+                droneTelemetry_->setAltitudeAbs(position.absolute_altitude_m);
             });
 
         telemetry->subscribe_velocity_ned(
-            [&speed_](const Telemetry::VelocityNed& vel)
+            [&droneTelemetry_](const Telemetry::VelocityNed& vel)
             {
                 double vabs = std::sqrt(std::pow(vel.north_m_s, 2)
                                         + std::pow(vel.east_m_s, 2)
                                         + std::pow(vel.down_m_s, 2));
-                speed_      = vabs;
+                droneTelemetry_->setSpeed(vabs);
             });
 
         telemetry->subscribe_attitude_euler(
-            [&yaw_](const Telemetry::EulerAngle& euler)
-            { yaw_ = euler.yaw_deg; });
+            [&droneTelemetry_](const Telemetry::EulerAngle& euler)
+            { droneTelemetry_->setYaw(euler.yaw_deg); });
 
         telemetry->subscribe_battery(
-            [&batt_](const Telemetry::Battery& battery)
-            { batt_ = battery.remaining_percent / 100.0; });
+            [&droneTelemetry_](const Telemetry::Battery& battery) {
+                droneTelemetry_->setBattery(battery.remaining_percent / 100.0);
+            });
         // END TELEMETRY SUBSCRIPTIONS
 
-        connected = true;
+        droneTelemetry_->setConnectionStatus(true);
     }
 
     //    Mission::MissionItem make_mission_item(
@@ -121,9 +115,7 @@ public:
 
     void executeMissionQuad(
         const std::vector<std::pair<float, float>>& waypoints,
-        volatile double& lat_,
-        volatile double& lon_,
-        volatile double& alt_)
+        DroneTelemetry* droneTelemetry_)
     {
         // Instantiate plugins.
         auto action = Action {system_.value()};
@@ -157,7 +149,7 @@ public:
 
         // Wait while it takes off.
         std::cout << "Waiting to reach takeoff altitude..." << std::endl;
-        while (alt_ <= height - 2) {
+        while (droneTelemetry_->altitude() <= height - 2) {
             sleep_for(seconds(1));
         }
 
@@ -177,11 +169,15 @@ public:
                 goto_result =
                     action.goto_location(latitude, longitude, NAN, NAN);
             }
-            while (std::abs(lat_ - latitude) > 0.00001
-                   || std::abs(lon_ - longitude) > 0.00001)
+            while (std::abs(droneTelemetry_->latitude() - latitude) > 0.00001
+                   || std::abs(droneTelemetry_->longitude() - longitude)
+                       > 0.00001)
             {
                 double distance =
-                    sardinos::getDistance(lat_, lon_, latitude, longitude);
+                    sardinos::getDistance(droneTelemetry_->latitude(),
+                                          droneTelemetry_->longitude(),
+                                          latitude,
+                                          longitude);
 
                 if (distance > 5.0f) {
                     if (!outOfPath) {

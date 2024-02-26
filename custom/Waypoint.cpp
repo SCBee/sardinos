@@ -31,8 +31,7 @@ QGeoCoordinate Waypoint::location() const
     return location_;
 }
 
-void Waypoint::setShape(
-    const LmCdl::I_GeospatialSimpleWaypoint::Shape& shape)
+void Waypoint::setShape(const LmCdl::I_GeospatialSimpleWaypoint::Shape& shape)
 {
     if (shape_ != shape) {
         shape_ = shape;

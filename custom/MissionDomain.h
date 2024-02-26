@@ -34,8 +34,7 @@ private:
     class ConnectedWaypointRef
     {
     public:
-        ConnectedWaypointRef(
-            Waypoint& waypoint,
+        ConnectedWaypointRef(Waypoint& waypoint,
                              WaypointConnector& connectorEndingAtWaypoint,
                              WaypointConnector& connectorStartingAtWaypoint);
 
@@ -51,8 +50,7 @@ private:
     struct DragInProgress
     {
         DragInProgress();
-        explicit DragInProgress(
-            const Waypoint& waypointBeingDragged);
+        explicit DragInProgress(const Waypoint& waypointBeingDragged);
 
         QString label;
         QGeoCoordinate originalLocation;
@@ -78,8 +76,6 @@ private:
 
     void abortDrag(ConnectedWaypointRef waypointAndConnectors);
 
-    std::vector<std::pair<Waypoint*,
-                          QList<WaypointConnector*>>>
-        waypoints_;
+    std::vector<std::pair<Waypoint*, QList<WaypointConnector*>>> waypoints_;
     DragInProgress dragInProgress_;
 };

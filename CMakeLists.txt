@@ -60,12 +60,16 @@ set(MOCS
         build/obj/moc_Target.cpp
         build/obj/moc_Waypoint.cpp
         build/obj/moc_WaypointConnector.cpp
+        custom/DroneTelemetry.cpp
+        custom/DroneTelemetry.h
 )
 
 add_executable(vcsi_sardinos
         custom/BoundingBox.h
         custom/Drone.h
         custom/Drone.cpp
+        custom/DroneTelemetry.cpp
+        custom/DroneTelemetry.h
         custom/DroneWidget.h
         custom/ImageProcessor.h
         custom/ImageProcessor.cpp

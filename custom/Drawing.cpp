@@ -9,17 +9,20 @@ Drawing::Drawing() = default;
 
 Drawing::~Drawing() = default;
 
-const QSet<LmCdl::I_VectorDataPointDrawing*>& Drawing::pointDrawings(const QGeoRectangle&) const
+const QSet<LmCdl::I_VectorDataPointDrawing*>& Drawing::pointDrawings(
+    const QGeoRectangle&) const
 {
     return points_;
 }
 
-const QSet<LmCdl::I_VectorDataLineDrawing*>& Drawing::lineDrawings(const QGeoRectangle&) const
+const QSet<LmCdl::I_VectorDataLineDrawing*>& Drawing::lineDrawings(
+    const QGeoRectangle&) const
 {
     return lines_;
 }
 
-const QSet<LmCdl::I_VectorDataPolygonDrawing*>& Drawing::polygonDrawings(const QGeoRectangle&) const
+const QSet<LmCdl::I_VectorDataPolygonDrawing*>& Drawing::polygonDrawings(
+    const QGeoRectangle&) const
 {
     return polygons_;
 }
@@ -29,8 +32,7 @@ void Drawing::addPolygon(Polygon* polygon)
     polygons_.insert(polygon);
 }
 
-void Drawing::addPolygons(
-    const QList<Polygon*>& polygons)
+void Drawing::addPolygons(const QList<Polygon*>& polygons)
 {
     for (auto polygon : polygons)
         addPolygon(polygon);
@@ -66,8 +68,8 @@ bool Drawing::visible() const
     return true;
 }
 
-void Drawing::drawFlightPath(
-    MissionDomain& mission_, LmCdl::I_MissionDrawingApi& missionApi_)
+void Drawing::drawFlightPath(MissionDomain& mission_,
+                             LmCdl::I_MissionDrawingApi& missionApi_)
 {
     foreach(Waypoint* waypoint, mission_.waypoints()) {
         missionApi_.addDrawingForWaypoint(*waypoint);
@@ -79,8 +81,8 @@ void Drawing::drawFlightPath(
     }
 }
 
-void Drawing::clearFlightPath(
-    MissionDomain& mission_, LmCdl::I_MissionDrawingApi& missionApi_)
+void Drawing::clearFlightPath(MissionDomain& mission_,
+                              LmCdl::I_MissionDrawingApi& missionApi_)
 {
     foreach(Waypoint* waypoint, mission_.waypoints()) {
         missionApi_.removeDrawingForWaypoint(*waypoint);
@@ -92,18 +94,14 @@ void Drawing::clearFlightPath(
     }
 }
 
-void Drawing::clearMissionArea(
-    LmCdl::I_VectorDataDrawingApi& drawApi_)
+void Drawing::clearMissionArea(LmCdl::I_VectorDataDrawingApi& drawApi_)
 {
-    draw(QList<Polygon*>(),
-         QList<Line*>(),
-         drawApi_);
+    draw(QList<Polygon*>(), QList<Line*>(), drawApi_);
 }
 
-void Drawing::draw(
-    const QList<Polygon*>& polygons,
-    const QList<Line*>& lines,
-    LmCdl::I_VectorDataDrawingApi& drawApi_)
+void Drawing::draw(const QList<Polygon*>& polygons,
+                   const QList<Line*>& lines,
+                   LmCdl::I_VectorDataDrawingApi& drawApi_)
 {
     clear();
     addPolygons(polygons);

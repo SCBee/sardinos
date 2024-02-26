@@ -45,8 +45,7 @@ void MissionDomain::setupWaypoints(QList<QGeoCoordinate> coordinates)
         waypoint->setSelectionEnabled(true);
         waypoint->setDraggingEnabled(true);
         waypoint->setVisible(true);
-        waypoints_.emplace_back(waypoint,
-                                QList<WaypointConnector*>());
+        waypoints_.emplace_back(waypoint, QList<WaypointConnector*>());
     }
 }
 

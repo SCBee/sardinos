@@ -129,14 +129,14 @@ void MissionPlanningPlugin::startPluginIfInitialized()
 #endif
 
     if (isFullyInitialized()) {
-        pluginContentCreator_.reset(new ContentCreator(
-            applicationApi_->widgetExtensionApi().mapApi(),
-            *pointOfInterestApi_,
-            applicationApi_->userNotificationApi(),
-            *vectorDrawingApi_,
-            *missionDrawingApi_,
-            *routeApi_,
-            *trackApi_,
-            *videoCollectionApi_));
+        pluginContentCreator_.reset(
+            new ContentCreator(applicationApi_->widgetExtensionApi().mapApi(),
+                               *pointOfInterestApi_,
+                               applicationApi_->userNotificationApi(),
+                               *vectorDrawingApi_,
+                               *missionDrawingApi_,
+                               *routeApi_,
+                               *trackApi_,
+                               *videoCollectionApi_));
     }
 }

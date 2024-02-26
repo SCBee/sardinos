@@ -24,17 +24,6 @@ using std::this_thread::sleep_for;
 
 std::mutex mutex;
 
-volatile double ContentCreator::latitude    = 51.0f;
-volatile double ContentCreator::longitude   = -114.0f;
-volatile double ContentCreator::altitude    = 1500.0f;
-volatile double ContentCreator::altitudeAbs = 0.0f;
-volatile double ContentCreator::heading     = 0.0f;
-volatile double ContentCreator::speed       = 0.0f;
-volatile double ContentCreator::yaw         = 0.0f;
-volatile double ContentCreator::battery     = 0.0f;
-
-volatile bool ContentCreator::connectedToDrone_ = false;
-
 ContentCreator::ContentCreator(
     LmCdl::I_VcsiMapExtensionApi& mapApi,
     LmCdl::I_PointOfInterestApi& poiApi,
@@ -58,8 +47,7 @@ ContentCreator::ContentCreator(
     , m_state(UIHandler::State::STARTUP)
     , mission_()
     , drone_(new Drone(mapApi))
-    , imageProcessor_(std::ref(targets_), std::ref(latitude), std::ref(longitude), std::ref(altitude))
-    , timer_(new QTimer())
+    , imageProcessor_(std::ref(targets_), &droneTelemetry)
 {
     init();
 }
@@ -72,7 +60,6 @@ void ContentCreator::init()
                                     submitMissionMenuItem_,
                                     forceLandMissionMenuItem_);
     connectToApiSignals();
-    startLoop();
     trackApi_.addDrawingForTrack(*drone_);
     updatePois();
 
@@ -81,39 +68,19 @@ void ContentCreator::init()
 
     QtConcurrent::run(
         [this, connectStr]
-        {
-            missionManager_ = new MissionManager(connectStr,
-                                                 std::ref(connectedToDrone_),
-                                                 std::ref(latitude),
-                                                 std::ref(longitude),
-                                                 std::ref(altitude),
-                                                 std::ref(altitudeAbs),
-                                                 std::ref(heading),
-                                                 std::ref(speed),
-                                                 std::ref(yaw),
-                                                 std::ref(battery));
-        });
+        { missionManager_ = new MissionManager(connectStr, &droneTelemetry); });
 }
 
-void ContentCreator::startLoop()
+void ContentCreator::updateDroneWidget()
 {
-    timer_->setInterval(1000);
-
-    connect(
-        timer_,
-        &QTimer::timeout,
-        this,
-        [this]()
-        {
-            this->drone_->updateValues(
-                latitude+=0.01, longitude+=0.01, altitude, heading, speed, yaw, battery);
-
-            this->showTargets();
-
-            this->checkConnection();
-        });
-
-    timer_->start();
+    drone_->updateValues(droneTelemetry.latitude(),
+                         droneTelemetry.longitude(),
+                         droneTelemetry.altitude(),
+                         droneTelemetry.heading(),
+                         droneTelemetry.speed(),
+                         droneTelemetry.yaw(),
+                         droneTelemetry.battery());
+    showTargets();
 }
 
 void ContentCreator::connectToApiSignals()
@@ -137,11 +104,23 @@ void ContentCreator::connectToApiSignals()
             &LmCdl::I_PointOfInterestApi::pointOfInterestRemoved,
             this,
             &ContentCreator::updatePois);
+
+    connect(&droneTelemetry,
+            &DroneTelemetry::telemetryUpdated,
+            this,
+            &ContentCreator::updateDroneWidget,
+            Qt::QueuedConnection);
+
+    connect(&droneTelemetry,
+            &DroneTelemetry::connectionStatusChanged,
+            this,
+            &ContentCreator::checkConnection,
+            Qt::QueuedConnection);
 }
 
 void ContentCreator::forceLand()
 {
-    if (!connectedToDrone_) {
+    if (!droneTelemetry.isConnected()) {
         notis_.notify("Not connected to a drone.",
                       notApi_,
                       Notifications::Severity::Danger);
@@ -184,19 +163,14 @@ void ContentCreator::showTargets()
 
 void ContentCreator::checkConnection()
 {
-    if (alreadyConnected_)
-        return;
-
-    if (connectedToDrone_) {
+    if (droneTelemetry.isConnected()) {
         notis_.notify("Successfully connected to drone",
                       notApi_,
                       Notifications::Continue);
-        alreadyConnected_ = true;
     }
 }
 
-void ContentCreator::getPoiProperties(
-    const LmCdl::ContextMenuEvent& event)
+void ContentCreator::getPoiProperties(const LmCdl::ContextMenuEvent& event)
 {
     const auto& location = event.worldLocation();
 
@@ -244,7 +218,7 @@ void ContentCreator::runMission()
         return;
     }
 
-    if (!connectedToDrone_) {
+    if (!droneTelemetry.isConnected()) {
         notis_.notify("Not connected to a drone.",
                       notApi_,
                       Notifications::Severity::Danger);
@@ -290,9 +264,7 @@ void ContentCreator::runMission()
         [this, mavWaypoints]()
         {
             missionManager_->executeMissionQuad(std::ref(mavWaypoints),
-                                                std::ref(latitude),
-                                                std::ref(longitude),
-                                                std::ref(altitude));
+                                                &droneTelemetry);
         });
 }
 
