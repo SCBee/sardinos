@@ -149,13 +149,13 @@ QGeoCoordinate ImageProcessor::calcLocation(cv::Mat mat, cv::Rect boundingRect)
     auto widthMeters  = (altitude_ * tan((HFOV * (M_PI / 180))));
     auto heightMeters = (altitude_ * tan((VFOV * (M_PI / 180))));
 
-    auto widthChange  = xRatio * widthMeters;
+    auto widthChange  = -xRatio * widthMeters;
     auto heightChange = yRatio * heightMeters;
 
     std::cout << "Width change: " << widthChange << std::endl;
     std::cout << "Height change: " << heightChange << std::endl;
 
-    auto angle = atan(heightChange / widthChange) * (180 / M_PI) - 90;
+    auto angle = atan2(widthChange, heightChange) * (180 / M_PI) + 180;
 
     std::cout << "Angle: " << angle << std::endl;
 
