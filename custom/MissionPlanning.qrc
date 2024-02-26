@@ -6,6 +6,7 @@
         <file alias="CancelIcon">Cancel.svg</file>
         <file alias="PathIcon">Path.svg</file>
         <file alias="LandIcon">Land.svg</file>
+        <file alias="TargetIcon">Target.svg</file>
         <file>SampleFeed.mp4</file>
     </qresource>
 </RCC>

@@ -152,16 +152,9 @@ QGeoCoordinate ImageProcessor::calcLocation(cv::Mat mat, cv::Rect boundingRect)
     auto widthChange  = -xRatio * widthMeters;
     auto heightChange = yRatio * heightMeters;
 
-    std::cout << "Width change: " << widthChange << std::endl;
-    std::cout << "Height change: " << heightChange << std::endl;
-
     auto angle = atan2(widthChange, heightChange) * (180 / M_PI) + 180;
 
-    std::cout << "Angle: " << angle << std::endl;
-
     auto distance = sqrt(pow(widthChange, 2) + pow(heightChange, 2));
-
-    std::cout << "Distance: " << distance << std::endl;
 
     return sardinos::getLocation(latitude_, longitude_, altitude_, distance, angle);
 }
