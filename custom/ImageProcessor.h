@@ -7,6 +7,7 @@
 #include <iostream>
 #include <string>
 
+#include <DroneTelemetry.h>
 #include <LmCdl/I_VcsiMapExtensionApi.h>
 #include <Target.h>
 #include <opencv2/highgui/highgui.hpp>
@@ -16,18 +17,13 @@ class ImageProcessor : public QObject
 {
     Q_OBJECT
 public:
-    ImageProcessor(QList<Target>& targets,
-                   const volatile double& latitude,
-                   const volatile double& longitude,
-                   const volatile double& altitude);
+    ImageProcessor(QList<Target>& targets, DroneTelemetry* droneTelemetry);
 
     void init(const std::string& uri);
     void stop();
 
 private:
-    const volatile double& latitude_;
-    const volatile double& longitude_;
-    const volatile double& altitude_;
+    DroneTelemetry* droneTelemetry;
 
     bool processing_ = false;
 

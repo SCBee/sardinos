@@ -37,5 +37,6 @@ void Notifications::notify(const std::string& msg,
             break;
     };
 
-    QTimer::singleShot(durationMs, [&notApi, noti] () { notApi.removeNotification(*noti); });
+    QTimer::singleShot(durationMs,
+                       [&notApi, noti]() { notApi.removeNotification(*noti); });
 }

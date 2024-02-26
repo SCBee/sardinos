@@ -13,13 +13,9 @@ const double HFOV = 57.12;
 const double VFOV = 42.44;
 
 ImageProcessor::ImageProcessor(QList<Target>& targets,
-                               const volatile double& latitude,
-                               const volatile double& longitude,
-                               const volatile double& altitude)
-    : latitude_(latitude)
-    , longitude_(longitude)
-    , altitude_(altitude)
-    , targets_(targets)
+                               DroneTelemetry* droneTelemetry_)
+    : targets_(targets)
+    , droneTelemetry(droneTelemetry_)
 {
 }
 
@@ -143,11 +139,15 @@ QGeoCoordinate ImageProcessor::calcLocation(cv::Mat mat, cv::Rect boundingRect)
     auto midRectX = (double)boundingRect.width / 2 + boundingRect.x;
     auto midRectY = (double)boundingRect.height / 2 + boundingRect.y;
 
-    auto xRatio = (std::min(std::max(midRectX, 0.0), pixelWidth) / pixelWidth) * 2 - 1;
-    auto yRatio = (std::min(std::max(midRectY, 0.0), pixelHeight) / pixelHeight) * 2 - 1;
+    auto xRatio =
+        (std::min(std::max(midRectX, 0.0), pixelWidth) / pixelWidth) * 2 - 1;
+    auto yRatio =
+        (std::min(std::max(midRectY, 0.0), pixelHeight) / pixelHeight) * 2 - 1;
 
-    auto widthMeters  = (altitude_ * tan((HFOV * (M_PI / 180))));
-    auto heightMeters = (altitude_ * tan((VFOV * (M_PI / 180))));
+    auto widthMeters =
+        (droneTelemetry->altitude() * tan((HFOV * (M_PI / 180))));
+    auto heightMeters =
+        (droneTelemetry->altitude() * tan((VFOV * (M_PI / 180))));
 
     auto widthChange  = -xRatio * widthMeters;
     auto heightChange = yRatio * heightMeters;
@@ -163,7 +163,11 @@ QGeoCoordinate ImageProcessor::calcLocation(cv::Mat mat, cv::Rect boundingRect)
 
     std::cout << "Distance: " << distance << std::endl;
 
-    return sardinos::getLocation(latitude_, longitude_, altitude_, distance, angle);
+    return sardinos::getLocation(droneTelemetry->latitude(),
+                                 droneTelemetry->longitude(),
+                                 droneTelemetry->altitude(),
+                                 distance,
+                                 angle);
 }
 
 void ImageProcessor::stop()
