@@ -2,12 +2,11 @@
 // Created by smut on 2/25/2024.
 //
 
+#include <iostream>
+
 #include "DroneTelemetry.h"
 
-DroneTelemetry::DroneTelemetry(QObject* parent)
-    : QObject(parent)
-{
-}
+DroneTelemetry::DroneTelemetry()  = default;
 
 // Setters
 void DroneTelemetry::setLatitude(double latitude)

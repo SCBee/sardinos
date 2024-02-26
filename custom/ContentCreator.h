@@ -109,6 +109,8 @@ private:
 
     ImageProcessor imageProcessor_;
 
+    std::unique_ptr<DroneTelemetry> droneTelemetry = std::make_unique<DroneTelemetry>();
+
     Drawing* drawing_ = new Drawing();
     BoundingBox missionBounds_;
 
@@ -119,8 +121,6 @@ private:
     Notifications notis_;
 
     UIHandler::State m_state;
-
-    DroneTelemetry droneTelemetry;
 
     QList<Target> targets_;
 

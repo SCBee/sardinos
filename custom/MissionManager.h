@@ -23,7 +23,7 @@ class MissionManager
 {
 public:
     MissionManager(const std::string& connectStr,
-                   DroneTelemetry* droneTelemetry_)
+                   std::unique_ptr<DroneTelemetry>& droneTelemetry_)
     {
         ConnectionResult connection_result =
             mavsdk.add_any_connection(connectStr);
@@ -47,25 +47,28 @@ public:
 
         // TELEMETRY SUBSCRIPTIONS
         telemetry = std::make_unique<Telemetry>(system_.value());
-        Telemetry::Result set_rate_result = telemetry->set_rate_position(1.0);
-        while (set_rate_result != Telemetry::Result::Success) {
-            std::cerr << "Setting rate failed: " << set_rate_result
-                      << std::endl;
-            sleep_for(seconds(3));
-            set_rate_result = telemetry->set_rate_position(1.0);
-        }
+        set_rates(telemetry);
 
         telemetry->subscribe_heading(
             [&droneTelemetry_](const Telemetry::Heading& headTel)
-            { droneTelemetry_->setHeading(headTel.heading_deg); });
+            {
+                if (std::abs(droneTelemetry_->heading() - headTel.heading_deg)
+                    > 1.0)
+                {
+                    droneTelemetry_->setHeading(headTel.heading_deg);
+                }
+            });
 
         telemetry->subscribe_position(
             [&droneTelemetry_](const Telemetry::Position& position)
             {
                 droneTelemetry_->setLatitude(position.latitude_deg);
+
                 droneTelemetry_->setLongitude(position.longitude_deg);
+
                 droneTelemetry_->setAltitude(position.relative_altitude_m);
-                droneTelemetry_->setAltitudeAbs(position.absolute_altitude_m);
+
+//                droneTelemetry_->setAltitudeAbs(position.absolute_altitude_m);
             });
 
         telemetry->subscribe_velocity_ned(
@@ -74,20 +77,158 @@ public:
                 double vabs = std::sqrt(std::pow(vel.north_m_s, 2)
                                         + std::pow(vel.east_m_s, 2)
                                         + std::pow(vel.down_m_s, 2));
-                droneTelemetry_->setSpeed(vabs);
+                if (std::abs(droneTelemetry_->speed() - vabs) > 0.1) {
+                    droneTelemetry_->setSpeed(vabs);
+                }
             });
 
         telemetry->subscribe_attitude_euler(
             [&droneTelemetry_](const Telemetry::EulerAngle& euler)
-            { droneTelemetry_->setYaw(euler.yaw_deg); });
+            {
+                if (std::abs(droneTelemetry_->yaw() - euler.yaw_deg) > 1.0) {
+                    droneTelemetry_->setYaw(euler.yaw_deg);
+                }
+            });
 
         telemetry->subscribe_battery(
-            [&droneTelemetry_](const Telemetry::Battery& battery) {
-                droneTelemetry_->setBattery(battery.remaining_percent / 100.0);
+            [&droneTelemetry_](const Telemetry::Battery& battery)
+            {
+                if (std::abs(droneTelemetry_->battery()
+                             - (battery.remaining_percent / 100.0))
+                    > 0.01)
+                {
+                    droneTelemetry_->setBattery(battery.remaining_percent
+                                                / 100.0);
+                }
             });
         // END TELEMETRY SUBSCRIPTIONS
 
         droneTelemetry_->setConnectionStatus(true);
+    }
+
+    static void set_rates(std::unique_ptr<Telemetry>& telemetry_)
+    {
+        Telemetry::Result set_rate_result = telemetry_->set_rate_position(5.0);
+        while (set_rate_result != Telemetry::Result::Success) {
+            std::cerr << "Setting rate failed: " << set_rate_result
+                      << std::endl;
+            sleep_for(seconds(3));
+            set_rate_result = telemetry_->set_rate_position(5.0);
+        }
+
+        set_rate_result = telemetry_->set_rate_attitude_euler(1.0);
+        while (set_rate_result != Telemetry::Result::Success) {
+            std::cerr << "Setting rate failed: " << set_rate_result
+                      << std::endl;
+            sleep_for(seconds(3));
+            set_rate_result = telemetry_->set_rate_attitude_euler(1.0);
+        }
+
+        set_rate_result = telemetry_->set_rate_odometry(1.0);
+        while (set_rate_result != Telemetry::Result::Success) {
+            std::cerr << "Setting rate failed: " << set_rate_result
+                      << std::endl;
+            sleep_for(seconds(3));
+            set_rate_result = telemetry_->set_rate_odometry(1.0);
+        }
+
+        set_rate_result = telemetry_->set_rate_battery(1.0);
+        while (set_rate_result != Telemetry::Result::Success) {
+            std::cerr << "Setting rate failed: " << set_rate_result
+                      << std::endl;
+            sleep_for(seconds(3));
+            set_rate_result = telemetry_->set_rate_battery(1.0);
+        }
+
+        set_rate_result = telemetry_->set_rate_altitude(1.0);
+        while (set_rate_result != Telemetry::Result::Success) {
+            std::cerr << "Setting rate failed: " << set_rate_result
+                      << std::endl;
+            sleep_for(seconds(3));
+            set_rate_result = telemetry_->set_rate_altitude(1.0);
+        }
+
+        set_rate_result = telemetry_->set_rate_distance_sensor(1.0);
+        while (set_rate_result != Telemetry::Result::Success) {
+            std::cerr << "Setting rate failed: " << set_rate_result
+                      << std::endl;
+            sleep_for(seconds(3));
+            set_rate_result = telemetry_->set_rate_distance_sensor(1.0);
+        }
+
+        set_rate_result = telemetry_->set_rate_fixedwing_metrics(1.0);
+        while (set_rate_result != Telemetry::Result::Success) {
+            std::cerr << "Setting rate failed: " << set_rate_result
+                      << std::endl;
+            sleep_for(seconds(3));
+            set_rate_result = telemetry_->set_rate_fixedwing_metrics(1.0);
+        }
+
+        set_rate_result = telemetry_->set_rate_gps_info(1.0);
+        while (set_rate_result != Telemetry::Result::Success) {
+            std::cerr << "Setting rate failed: " << set_rate_result
+                      << std::endl;
+            sleep_for(seconds(3));
+            set_rate_result = telemetry_->set_rate_gps_info(1.0);
+        }
+
+        set_rate_result = telemetry_->set_rate_ground_truth(1.0);
+        while (set_rate_result != Telemetry::Result::Success) {
+            std::cerr << "Setting rate failed: " << set_rate_result
+                      << std::endl;
+            sleep_for(seconds(3));
+            set_rate_result = telemetry_->set_rate_ground_truth(1.0);
+        }
+
+        set_rate_result = telemetry_->set_rate_home(1.0);
+        while (set_rate_result != Telemetry::Result::Success) {
+            std::cerr << "Setting rate failed: " << set_rate_result
+                      << std::endl;
+            sleep_for(seconds(3));
+            set_rate_result = telemetry_->set_rate_home(1.0);
+        }
+
+        set_rate_result = telemetry_->set_rate_imu(1.0);
+        while (set_rate_result != Telemetry::Result::Success) {
+            std::cerr << "Setting rate failed: " << set_rate_result
+                      << std::endl;
+            sleep_for(seconds(3));
+            set_rate_result = telemetry_->set_rate_imu(1.0);
+        }
+
+        set_rate_result = telemetry_->set_rate_in_air(1.0);
+        while (set_rate_result != Telemetry::Result::Success) {
+            std::cerr << "Setting rate failed: " << set_rate_result
+                      << std::endl;
+            sleep_for(seconds(3));
+            set_rate_result = telemetry_->set_rate_in_air(1.0);
+        }
+
+        set_rate_result = telemetry_->set_rate_velocity_ned(1.0);
+        while (set_rate_result != Telemetry::Result::Success) {
+            std::cerr << "Setting rate failed: " << set_rate_result
+                      << std::endl;
+            sleep_for(seconds(3));
+            set_rate_result = telemetry_->set_rate_velocity_ned(1.0);
+        }
+
+        set_rate_result = telemetry_->set_rate_vtol_state(1.0);
+        while (set_rate_result != Telemetry::Result::Success) {
+            std::cerr << "Setting rate failed: " << set_rate_result
+                      << std::endl;
+            sleep_for(seconds(3));
+            set_rate_result = telemetry_->set_rate_vtol_state(1.0);
+        }
+
+        set_rate_result = telemetry_->set_rate_position_velocity_ned(1.0);
+        while (set_rate_result != Telemetry::Result::Success) {
+            std::cerr << "Setting rate failed: " << set_rate_result
+                      << std::endl;
+            sleep_for(seconds(3));
+            set_rate_result = telemetry_->set_rate_position_velocity_ned(1.0);
+        }
+
+        std::cout << "Successfully set all rates" << std::endl;
     }
 
     //    Mission::MissionItem make_mission_item(
@@ -115,7 +256,7 @@ public:
 
     void executeMissionQuad(
         const std::vector<std::pair<float, float>>& waypoints,
-        DroneTelemetry* droneTelemetry_)
+        std::unique_ptr<DroneTelemetry>& droneTelemetry_)
     {
         // Instantiate plugins.
         auto action = Action {system_.value()};
