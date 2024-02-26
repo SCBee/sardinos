@@ -137,16 +137,14 @@ void ImageProcessor::addTarget(cv::Mat mat, cv::Rect boundingRect)
 
 QGeoCoordinate ImageProcessor::calcLocation(cv::Mat mat, cv::Rect boundingRect)
 {
-    auto pixelWidth  = mat.cols;
-    auto pixelHeight = mat.rows;
+    auto pixelWidth  = (double)mat.cols;
+    auto pixelHeight = (double)mat.rows;
 
-    auto midRectX = (double)boundingRect.width / 2
-        + std::min(pixelWidth, std::max(0, boundingRect.x));
-    auto midRectY = (double)boundingRect.height / 2
-        + std::min(pixelHeight, std::max(0, boundingRect.y));
+    auto midRectX = (double)boundingRect.width / 2 + boundingRect.x;
+    auto midRectY = (double)boundingRect.height / 2 + boundingRect.y;
 
-    auto xRatio = (midRectX / pixelWidth) * 2 - 1;
-    auto yRatio = (midRectY / pixelHeight) * 2 - 1;
+    auto xRatio = (std::min(std::max(midRectX, 0.0), pixelWidth) / pixelWidth) * 2 - 1;
+    auto yRatio = (std::min(std::max(midRectY, 0.0), pixelHeight) / pixelHeight) * 2 - 1;
 
     auto widthMeters  = (altitude_ * tan((HFOV * (M_PI / 180))));
     auto heightMeters = (altitude_ * tan((VFOV * (M_PI / 180))));
@@ -165,8 +163,7 @@ QGeoCoordinate ImageProcessor::calcLocation(cv::Mat mat, cv::Rect boundingRect)
 
     std::cout << "Distance: " << distance << std::endl;
 
-    return sardinos::getLocation(
-        latitude_, longitude_, altitude_, distance, angle);
+    return sardinos::getLocation(latitude_, longitude_, altitude_, distance, angle);
 }
 
 void ImageProcessor::stop()
