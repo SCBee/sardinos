@@ -1,6 +1,5 @@
 #include <QGeoRectangle>
 #include <QTime>
-#include <QTimer>
 #include <thread>
 #include <utility>
 
@@ -47,7 +46,7 @@ ContentCreator::ContentCreator(
     , m_state(UIHandler::State::STARTUP)
     , mission_()
     , drone_(new Drone(mapApi))
-    , imageProcessor_(std::ref(targets_), &droneTelemetry)
+    , imageProcessor_(std::ref(targets_), droneTelemetry)
 {
     init();
 }
@@ -68,18 +67,18 @@ void ContentCreator::init()
 
     QtConcurrent::run(
         [this, connectStr]
-        { missionManager_ = new MissionManager(connectStr, &droneTelemetry); });
+        { missionManager_ = new MissionManager(connectStr, droneTelemetry); });
 }
 
 void ContentCreator::updateDroneWidget()
 {
-    drone_->updateValues(droneTelemetry.latitude(),
-                         droneTelemetry.longitude(),
-                         droneTelemetry.altitude(),
-                         droneTelemetry.heading(),
-                         droneTelemetry.speed(),
-                         droneTelemetry.yaw(),
-                         droneTelemetry.battery());
+    drone_->updateValues(droneTelemetry->latitude(),
+                         droneTelemetry->longitude(),
+                         droneTelemetry->altitude(),
+                         droneTelemetry->heading(),
+                         droneTelemetry->speed(),
+                         droneTelemetry->yaw(),
+                         droneTelemetry->battery());
     showTargets();
 }
 
@@ -105,13 +104,13 @@ void ContentCreator::connectToApiSignals()
             this,
             &ContentCreator::updatePois);
 
-    connect(&droneTelemetry,
+    connect(droneTelemetry.get(),
             &DroneTelemetry::telemetryUpdated,
             this,
             &ContentCreator::updateDroneWidget,
             Qt::QueuedConnection);
 
-    connect(&droneTelemetry,
+    connect(droneTelemetry.get(),
             &DroneTelemetry::connectionStatusChanged,
             this,
             &ContentCreator::checkConnection,
@@ -120,7 +119,7 @@ void ContentCreator::connectToApiSignals()
 
 void ContentCreator::forceLand()
 {
-    if (!droneTelemetry.isConnected()) {
+    if (!droneTelemetry->isConnected()) {
         notis_.notify("Not connected to a drone.",
                       notApi_,
                       Notifications::Severity::Danger);
@@ -163,7 +162,7 @@ void ContentCreator::showTargets()
 
 void ContentCreator::checkConnection()
 {
-    if (droneTelemetry.isConnected()) {
+    if (droneTelemetry->isConnected()) {
         notis_.notify("Successfully connected to drone",
                       notApi_,
                       Notifications::Continue);
@@ -218,7 +217,7 @@ void ContentCreator::runMission()
         return;
     }
 
-    if (!droneTelemetry.isConnected()) {
+    if (!droneTelemetry->isConnected()) {
         notis_.notify("Not connected to a drone.",
                       notApi_,
                       Notifications::Severity::Danger);
@@ -264,7 +263,7 @@ void ContentCreator::runMission()
         [this, mavWaypoints]()
         {
             missionManager_->executeMissionQuad(std::ref(mavWaypoints),
-                                                &droneTelemetry);
+                                                droneTelemetry);
         });
 }
 

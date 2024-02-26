@@ -13,7 +13,7 @@ class DroneTelemetry : public QObject
     Q_OBJECT
 
 public:
-    explicit DroneTelemetry(QObject* parent = nullptr);
+    explicit DroneTelemetry();
 
     // Setters
     void setLatitude(double latitude);

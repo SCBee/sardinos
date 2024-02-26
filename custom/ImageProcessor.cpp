@@ -13,7 +13,7 @@ const double HFOV = 57.12;
 const double VFOV = 42.44;
 
 ImageProcessor::ImageProcessor(QList<Target>& targets,
-                               DroneTelemetry* droneTelemetry_)
+                               std::unique_ptr<DroneTelemetry>& droneTelemetry_)
     : targets_(targets)
     , droneTelemetry(droneTelemetry_)
 {
