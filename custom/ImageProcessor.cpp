@@ -152,10 +152,18 @@ QGeoCoordinate ImageProcessor::calcLocation(cv::Mat mat, cv::Rect boundingRect)
     auto widthMeters = (altitude_ / sin(HFOV)) * 2;
     auto heightMeters = (altitude_ / sin(VFOV)) * 2;
 
-    auto widthChange = xRatio * widthMeters;
+    auto widthMeters  = (altitude_ * tan((HFOV * (M_PI / 180))));
+    auto heightMeters = (altitude_ * tan((VFOV * (M_PI / 180))));
+
+    auto widthChange  = -xRatio * widthMeters;
     auto heightChange = yRatio * heightMeters;
 
-    auto angle = atan(heightChange / widthChange);
+    std::cout << "Width change: " << widthChange << std::endl;
+    std::cout << "Height change: " << heightChange << std::endl;
+
+    auto angle = atan2(widthChange, heightChange) * (180 / M_PI) + 180;
+
+    std::cout << "Angle: " << angle << std::endl;
 
     auto distance = sqrt(pow(widthChange, 2) + pow(heightChange, 2));
 
