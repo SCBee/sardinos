@@ -1,12 +1,12 @@
 #include <QGeoCoordinate>
 #include <QPointer>
+#include <algorithm>
 #include <utility>
-#include <qmath.h>
-
 
 #include <ImageProcessor.h>
 #include <Sardinos.h>
 #include <TargetWidget.h>
+#include <qmath.h>
 
 const double DFOV = 72.64;
 const double HFOV = 57.12;
@@ -77,7 +77,7 @@ void ImageProcessor::processFrame(const cv::Mat& frame)
 
     // Threshold the image to create a binary mask of 0-intensity pixels
     cv::Mat mask;
-    cv::threshold(grayImage, mask, 95, 255, cv::THRESH_BINARY_INV);
+    cv::threshold(grayImage, mask, 120, 255, cv::THRESH_BINARY_INV);
 
     // Find contours of the 0-intensity pixels
     std::vector<std::vector<cv::Point>> contours;
@@ -115,6 +115,12 @@ void ImageProcessor::processFrame(const cv::Mat& frame)
     // Draw the rectangle around the largest contour on the original image
     cv::rectangle(targetFoundMat, boundingRect, cv::Scalar(255, 255, 0), 2);
 
+    // Calculate the center of the image
+    cv::Point center(frame.cols / 2, frame.rows / 2);
+
+    // Draw a red point at the center
+    cv::circle(targetFoundMat, center, 5, cv::Scalar(0, 0, 255), cv::FILLED);
+
     cv::cvtColor(targetFoundMat, targetFoundMat, cv::COLOR_BGR2RGB);
 
     addTarget(targetFoundMat, boundingRect);
@@ -124,30 +130,43 @@ void ImageProcessor::addTarget(cv::Mat mat, cv::Rect boundingRect)
 {
     auto location = calcLocation(mat, boundingRect);
 
-    auto target = Target(location, mat);
+    auto target = Target(location, std::move(mat));
 
     targets_.append(target);
 }
 
 QGeoCoordinate ImageProcessor::calcLocation(cv::Mat mat, cv::Rect boundingRect)
 {
-    auto midRectX = (double) boundingRect.width / 2;
-    auto midRectY = (double) boundingRect.height / 2;
+    auto pixelWidth  = mat.cols;
+    auto pixelHeight = mat.rows;
 
-    auto xRatio = (midRectX / mat.cols) * 2 - 1;
-    auto yRatio = (midRectY / mat.rows) * 2 - 1;
+    auto midRectX = (double)boundingRect.width / 2
+        + std::min(pixelWidth, std::max(0, boundingRect.x));
+    auto midRectY = (double)boundingRect.height / 2
+        + std::min(pixelHeight, std::max(0, boundingRect.y));
 
-    auto widthMeters = (altitude_ / sin(HFOV)) * 2;
-    auto heightMeters = (altitude_ / sin(VFOV)) * 2;
+    auto xRatio = (midRectX / pixelWidth) * 2 - 1;
+    auto yRatio = (midRectY / pixelHeight) * 2 - 1;
 
-    auto widthChange = xRatio * widthMeters;
+    auto widthMeters  = (altitude_ * tan((HFOV * (M_PI / 180))));
+    auto heightMeters = (altitude_ * tan((VFOV * (M_PI / 180))));
+
+    auto widthChange  = xRatio * widthMeters;
     auto heightChange = yRatio * heightMeters;
 
-    auto angle = atan(heightChange / widthChange);
+    std::cout << "Width change: " << widthChange << std::endl;
+    std::cout << "Height change: " << heightChange << std::endl;
+
+    auto angle = atan(heightChange / widthChange) * (180 / M_PI) - 90;
+
+    std::cout << "Angle: " << angle << std::endl;
 
     auto distance = sqrt(pow(widthChange, 2) + pow(heightChange, 2));
 
-    return sardinos::getLocation(latitude_, longitude_, altitude_, distance, angle);
+    std::cout << "Distance: " << distance << std::endl;
+
+    return sardinos::getLocation(
+        latitude_, longitude_, altitude_, distance, angle);
 }
 
 void ImageProcessor::stop()

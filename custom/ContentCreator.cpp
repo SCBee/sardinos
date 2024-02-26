@@ -26,7 +26,7 @@ std::mutex mutex;
 
 volatile double ContentCreator::latitude    = 51.0f;
 volatile double ContentCreator::longitude   = -114.0f;
-volatile double ContentCreator::altitude    = 1500.0f;
+volatile double ContentCreator::altitude    = 8000.0f;
 volatile double ContentCreator::altitudeAbs = 0.0f;
 volatile double ContentCreator::heading     = 0.0f;
 volatile double ContentCreator::speed       = 0.0f;
@@ -106,7 +106,7 @@ void ContentCreator::startLoop()
         [this]()
         {
             this->drone_->updateValues(
-                latitude+=0.01, longitude+=0.01, altitude, heading, speed, yaw, battery);
+                latitude, longitude, altitude, heading, speed, yaw, battery);
 
             this->showTargets();
 
