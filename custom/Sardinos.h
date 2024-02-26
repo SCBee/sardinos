@@ -279,22 +279,25 @@ public:
         return sum <= MAXDISTANCEMETERS;
     }
 
-    static QGeoCoordinate getLocation(double lat1,
-                                      double lon1,
-                                      double alt,
+    static QGeoCoordinate getLocation(const double lat,
+                                      const double lon,
+                                      const double alt,
                                       double d,  // meters
                                       double a)  // degrees
     {
         a *= M_PI / 180;  // to rads
         d /= 1000.0;  // to kms
-        lat1 *= (M_PI / 180);
-        lon1 *= (M_PI / 180);
+        auto lat1 = lat * (M_PI / 180);
+        auto lon1 = lon * (M_PI / 180);
 
         auto lat2 =
             asin(sin(lat1) * cos(d / R) + cos(lat1) * sin(d / R) * cos(a));
         auto lon2 = lon1
             + atan2(sin(a) * sin(d / R) * cos(lat1),
                     cos(d / R) - sin(lat1) * sin(lat2));
+
+        // Normalize longitude to the range -180 to 180 degrees
+        lon2 = fmod(lon2 + 3 * M_PI, 2 * M_PI) - M_PI;
 
         return QGeoCoordinate(lat2 * (180 / M_PI), lon2 * (180 / M_PI), alt);
     }

@@ -41,7 +41,7 @@ public:
 
         connect(button,
                 &QPushButton::clicked,
-                [&, this]()
+                [=]()
                 {
                     visible_ = !visible_;
                     if (visible_) {
