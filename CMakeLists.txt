@@ -59,9 +59,8 @@ set(MOCS
         build/obj/moc_MissionPlanningPlugin.cpp
         build/obj/moc_Target.cpp
         build/obj/moc_Waypoint.cpp
+        build/obj/moc_DroneTelemetry.cpp
         build/obj/moc_WaypointConnector.cpp
-        custom/DroneTelemetry.cpp
-        custom/DroneTelemetry.h
 )
 
 add_executable(vcsi_sardinos
