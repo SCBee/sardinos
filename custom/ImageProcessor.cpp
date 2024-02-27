@@ -135,6 +135,7 @@ void ImageProcessor::addTarget(cv::Mat mat, cv::Rect boundingRect)
     auto target = Target(location, mat);
 
     targets_.append(target);
+    emit droneTelemetry->targetFound();
 }
 
 QGeoCoordinate ImageProcessor::calcLocation(cv::Mat mat, cv::Rect boundingRect)

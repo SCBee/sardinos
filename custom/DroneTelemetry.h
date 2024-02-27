@@ -40,6 +40,7 @@ public:
 signals:
     void telemetryUpdated();
     void connectionStatusChanged(bool connected);
+    void targetFound();
 
 private:
     mutable std::mutex dataMutex;
