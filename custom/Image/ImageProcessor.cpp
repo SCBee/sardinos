@@ -6,7 +6,7 @@
 
 #include "ImageProcessor.h"
 #include "TargetWidget.h"
-#include <Helpers/Sardinos.h>
+#include "Helpers/Sardinos.h"
 
 const double DFOV = 72.64;
 const double HFOV = 57.12;
@@ -153,16 +153,9 @@ QGeoCoordinate ImageProcessor::calcLocation(const cv::Mat& mat, cv::Rect boundin
     auto widthChange  = -xRatio * widthMeters;
     auto heightChange = yRatio * heightMeters;
 
-    std::cout << "Width change: " << widthChange << std::endl;
-    std::cout << "Height change: " << heightChange << std::endl;
-
     auto angle = atan2(widthChange, heightChange) * (180 / M_PI) + 180;
 
-    std::cout << "Angle: " << angle << std::endl;
-
     auto distance = sqrt(pow(widthChange, 2) + pow(heightChange, 2));
-
-    std::cout << "Distance: " << distance << std::endl;
 
     return sardinos::getLocation(droneTelemetry->latitude(),
                                  droneTelemetry->longitude(),

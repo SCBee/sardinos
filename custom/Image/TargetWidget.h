@@ -34,9 +34,9 @@ public:
 
         layout->addWidget(button);
 
-        latLabel_   = new QLabel("Latitude: " + QString::number(lat));
-        lonLabel_   = new QLabel("Longitude: " + QString::number(lon));
-        imageLabel_ = new QLabel();
+        auto latLabel_   = new QLabel("Latitude: " + QString::number(lat));
+        auto lonLabel_   = new QLabel("Longitude: " + QString::number(lon));
+        auto imageLabel_ = new QLabel();
 
         auto image = QImage((uchar*)mat.data,
                             mat.cols,
@@ -82,8 +82,5 @@ protected:
     }
 
 private:
-    QLabel* latLabel_;
-    QLabel* lonLabel_;
-    QLabel* imageLabel_;
     bool visible_ = false;
 };
