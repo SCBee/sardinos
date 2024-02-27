@@ -6,6 +6,7 @@
 #include <QPainter>
 #include <QPushButton>
 #include <QTimer>
+#include <QToolButton>
 #include <QVBoxLayout>
 #include <QWidget>
 #include <iostream>
@@ -21,13 +22,21 @@ public:
         auto* layout = new QVBoxLayout(this);
 
         // Create a QPushButton
-        auto button = new QPushButton("View Target");
+        auto button = new QToolButton();
+
+        auto icon = QIcon(":/MissionPlanning/TargetIcon");
+
+        button->setIcon(icon);
+
+        button->setIconSize(QSize(20, 20));
+
+        button->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
 
         layout->addWidget(button);
 
-        latLabel_   = new QLabel("Latitude: " + QString::number(lat));
-        lonLabel_   = new QLabel("Longitude: " + QString::number(lon));
-        imageLabel_ = new QLabel();
+        auto latLabel_   = new QLabel("Latitude: " + QString::number(lat));
+        auto lonLabel_   = new QLabel("Longitude: " + QString::number(lon));
+        auto imageLabel_ = new QLabel();
 
         auto image = QImage((uchar*)mat.data,
                             mat.cols,
@@ -49,11 +58,14 @@ public:
                         layout->addWidget(lonLabel_);
                         layout->addWidget(imageLabel_);
                         button->setText("Close");
+                        button->setIcon(QIcon());
+
                     } else {
                         layout->removeWidget(latLabel_);
                         layout->removeWidget(lonLabel_);
                         layout->removeWidget(imageLabel_);
-                        button->setText("View Target");
+                        button->setText("");
+                        button->setIcon(icon);
                     }
                     update();
                 });
@@ -70,8 +82,5 @@ protected:
     }
 
 private:
-    QLabel* latLabel_;
-    QLabel* lonLabel_;
-    QLabel* imageLabel_;
     bool visible_ = false;
 };
