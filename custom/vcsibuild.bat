@@ -16,11 +16,14 @@ if exist "C:\Program Files\LMCDL\vcsi\bin\plugins\vcsi\%1.dll" (
 move "..\build\%1.dll" "C:\Program Files\LMCDL\vcsi\bin\plugins\vcsi"
 move "..\build\%1.pdb" "C:\Program Files\LMCDL\vcsi\bin\plugins\vcsi"
 
+
 goto :end
 
 :error
 echo Failed with error 
+echo %TIME%
 exit /B
 
 :end
+echo %TIME%
 endlocal
