@@ -7,7 +7,8 @@
 #include <utility>
 
 #include <LmCdl/I_GraphicsWidget.h>
-#include <TargetWidget.h>
+
+#include "TargetWidget.h"
 
 struct Target : public QObject
 {

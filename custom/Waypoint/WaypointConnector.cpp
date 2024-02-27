@@ -1,4 +1,4 @@
-#include <WaypointConnector.h>
+#include "WaypointConnector.h"
 
 WaypointConnector::WaypointConnector()
     : color_(Qt::red)

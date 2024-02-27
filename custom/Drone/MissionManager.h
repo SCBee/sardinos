@@ -5,8 +5,6 @@
 #include <memory>
 #include <thread>
 
-#include <DroneTelemetry.h>
-#include <Sardinos.h>
 #include <Windows.h>
 #include <mavlink/common/mavlink.h>
 #include <mavsdk/mavsdk.h>
@@ -14,6 +12,9 @@
 #include <mavsdk/plugins/mavlink_passthrough/mavlink_passthrough.h>
 #include <mavsdk/plugins/mission/mission.h>
 #include <mavsdk/plugins/telemetry/telemetry.h>
+
+#include "DroneTelemetry.h"
+#include "Helpers/Sardinos.h"
 
 using namespace mavsdk;
 using std::chrono::seconds;

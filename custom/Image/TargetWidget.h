@@ -74,7 +74,7 @@ public:
 protected:
     void paintEvent(QPaintEvent* event) override
     {
-        Q_UNUSED(event);
+        Q_UNUSED(event)
         QPainter painter(this);
         painter.setBrush(Qt::red);
         painter.setPen(Qt::NoPen);

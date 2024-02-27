@@ -5,8 +5,8 @@
 #include <QTimer>
 
 #include <LmCdl/I_MissionDrawingApi.h>
-#include <Waypoint.h>
-#include <WaypointConnector.h>
+#include "Waypoint.h"
+#include "WaypointConnector.h"
 
 namespace LmCdl
 {

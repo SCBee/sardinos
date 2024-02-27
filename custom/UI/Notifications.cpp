@@ -35,7 +35,7 @@ void Notifications::notify(const std::string& msg,
             noti = &notApi.addNotification(label);
             noti->setBackgroundColor(Qt::red);
             break;
-    };
+    }
 
     QTimer::singleShot(durationMs,
                        [&notApi, noti]() { notApi.removeNotification(*noti); });

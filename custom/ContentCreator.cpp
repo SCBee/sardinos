@@ -1,12 +1,9 @@
 #include <QGeoRectangle>
-#include <QTime>
 #include <thread>
 #include <utility>
 
 #include <ContentCreator.h>
-#include <Drone.h>
 #include <LmCdl/ContextMenuEvent.h>
-#include <LmCdl/GroundElevation.h>
 #include <LmCdl/I_PlannedRouteCollection.h>
 #include <LmCdl/I_VcsiUserNotificationApi.h>
 #include <LmCdl/I_VectorDataDrawingApi.h>
@@ -15,8 +12,9 @@
 #include <LmCdl/StanagRoute.h>
 #include <LmCdl/StanagWaypoint.h>
 #include <LmCdl/VcsiPointOfInterestProperties.h>
-#include <MissionDomain.h>
 #include <QtConcurrent/QtConcurrent>
+
+#include <Waypoint/MissionDomain.h>
 
 using std::chrono::seconds;
 using std::this_thread::sleep_for;

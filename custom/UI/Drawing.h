@@ -1,18 +1,22 @@
 #pragma once
 
 #include <QObject>
+#include <QGeoRectangle>
+#include <QSet>
 
-#include <BoundingBox.h>
-#include <Line.h>
 #include <LmCdl/I_VcsiUserNotificationApi.h>
 #include <LmCdl/I_VectorDataDrawing.h>
 #include <LmCdl/I_VectorDataDrawingApi.h>
 #include <LmCdl/I_VectorDataLineDrawing.h>
 #include <LmCdl/I_VectorDataPointDrawing.h>
 #include <LmCdl/I_VectorDataPolygonDrawing.h>
-#include <MissionDomain.h>
-#include <Notifications.h>
-#include <Polygon.h>
+
+#include "Polygon.h"
+#include "Line.h"
+#include "Notifications.h"
+#include <Helpers/Sardinos.h>
+#include <Helpers/BoundingBox.h>
+#include <Waypoint/MissionDomain.h>
 
 class Drawing : public LmCdl::I_VectorDataDrawing
 {
@@ -32,9 +36,9 @@ public:
     [[nodiscard]] const QSet<LmCdl::I_VectorDataPolygonDrawing*>&
     polygonDrawings(const QGeoRectangle& area) const override;
 
-    void addPolygon(Polygon* polygon);
+    void addPolygon(class Polygon* polygon);
 
-    void addPolygons(const QList<Polygon*>& polygon);
+    void addPolygons(const QList<class Polygon*>& polygon);
 
     void addLine(Line* line);
 
@@ -56,7 +60,7 @@ public:
 
     void clearMissionArea(LmCdl::I_VectorDataDrawingApi& drawApi_);
 
-    void draw(const QList<Polygon*>& polygons,
+    void draw(const QList<class Polygon*>& polygons,
               const QList<Line*>& lines,
               LmCdl::I_VectorDataDrawingApi& drawApi_);
 

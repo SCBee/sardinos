@@ -1,8 +1,8 @@
 #include <QColor>
 #include <utility>
 
-#include <MissionDomain.h>
-#include <Sardinos.h>
+#include "MissionDomain.h"
+#include <Helpers/Sardinos.h>
 
 QList<Waypoint*> MissionDomain::waypoints() const
 {
