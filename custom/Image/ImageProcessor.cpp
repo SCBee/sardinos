@@ -152,14 +152,14 @@ QGeoCoordinate ImageProcessor::calcLocation(const cv::Mat& mat, cv::Rect boundin
         (std::min(std::max(midRectY, 0.0), pixelHeight) / pixelHeight) * 2 - 1;
 
     auto widthMeters =
-        (droneTelemetry->altitude() * tan((HFOV * (M_PI / 180))));
+        (droneTelemetry->altitude() / tan((VFOV * (M_PI / 180))));
     auto heightMeters =
-        (droneTelemetry->altitude() * tan((VFOV * (M_PI / 180))));
+        (droneTelemetry->altitude() / tan((HFOV * (M_PI / 180))));
 
-    auto widthChange  = -xRatio * widthMeters;
-    auto heightChange = yRatio * heightMeters;
+    auto widthChange  = xRatio * widthMeters;
+    auto heightChange = -yRatio * heightMeters;
 
-    auto angle = atan2(widthChange, heightChange) * (180 / M_PI) + 180;
+    auto angle = atan2(widthChange, heightChange) * (180 / M_PI);
 
     auto distance = sqrt(pow(widthChange, 2) + pow(heightChange, 2));
 
