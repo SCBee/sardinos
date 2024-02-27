@@ -1,7 +1,7 @@
 #include <QTimer>
 #include <utility>
 
-#include <Drone.h>
+#include "Drone.h"
 
 Drone::Drone(LmCdl::I_VcsiMapExtensionApi& mapApi)
     : visible_(false)

@@ -1,8 +1,8 @@
 #include <QColor>
 #include <utility>
 
-#include <MissionDomain.h>
-#include <Sardinos.h>
+#include "MissionDomain.h"
+#include <Helpers/Sardinos.h>
 
 QList<Waypoint*> MissionDomain::waypoints() const
 {
@@ -45,8 +45,7 @@ void MissionDomain::setupWaypoints(QList<QGeoCoordinate> coordinates)
         waypoint->setSelectionEnabled(true);
         waypoint->setDraggingEnabled(true);
         waypoint->setVisible(true);
-        waypoints_.emplace_back(waypoint,
-                                QList<WaypointConnector*>());
+        waypoints_.emplace_back(waypoint, QList<WaypointConnector*>());
     }
 }
 

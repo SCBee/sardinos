@@ -1,7 +1,6 @@
-#include <Line.h>
+#include "Line.h"
 
-Line::Line(const QGeoCoordinate& start,
-                                         const QGeoCoordinate& end)
+Line::Line(const QGeoCoordinate& start, const QGeoCoordinate& end)
     : start_(start)
     , end_(end)
 {
@@ -24,8 +23,7 @@ QGeoPath Line::path() const
     return path_;
 }
 
-[[maybe_unused]] void Line::updateStart(
-    const QGeoCoordinate& newStart)
+[[maybe_unused]] void Line::updateStart(const QGeoCoordinate& newStart)
 {
     start_ = newStart;
 
@@ -34,8 +32,7 @@ QGeoPath Line::path() const
     path_.append(end_);
 }
 
-[[maybe_unused]] void Line::updateEnd(
-    const QGeoCoordinate& newEnd)
+[[maybe_unused]] void Line::updateEnd(const QGeoCoordinate& newEnd)
 {
     end_ = newEnd;
 

@@ -8,26 +8,23 @@
 #include <string>
 
 #include <LmCdl/I_VcsiMapExtensionApi.h>
-#include <Target.h>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/opencv.hpp>
+
+#include <Drone/DroneTelemetry.h>
+#include "Target.h"
 
 class ImageProcessor : public QObject
 {
     Q_OBJECT
 public:
-    ImageProcessor(QList<Target>& targets,
-                   const volatile double& latitude,
-                   const volatile double& longitude,
-                   const volatile double& altitude);
+    ImageProcessor(QList<Target>& targets, std::unique_ptr<DroneTelemetry>& droneTelemetry_);
 
     void init(const std::string& uri);
     void stop();
 
 private:
-    const volatile double& latitude_;
-    const volatile double& longitude_;
-    const volatile double& altitude_;
+    std::unique_ptr<DroneTelemetry>& droneTelemetry;
 
     bool processing_ = false;
 
@@ -39,7 +36,7 @@ private:
 
     void addTarget(cv::Mat mat, cv::Rect boundingRect);
 
-    QGeoCoordinate calcLocation(cv::Mat mat, cv::Rect boundingrect);
+    QGeoCoordinate calcLocation(const cv::Mat& mat, cv::Rect boundingrect);
 
     void processFrame(const cv::Mat& frame);
 };
