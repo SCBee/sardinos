@@ -1,10 +1,11 @@
 #pragma once
 
-#include <Drawing.h>
 #include <LmCdl/I_ContextMenuItem.h>
 #include <LmCdl/I_MissionDrawingApi.h>
 #include <LmCdl/I_VectorDataDrawingApi.h>
-#include <MissionDomain.h>
+
+#include "Drawing.h"
+#include "Waypoint/MissionDomain.h"
 
 class UIHandler
 {

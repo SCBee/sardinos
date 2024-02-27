@@ -45,9 +45,6 @@ include_directories("C:/Qt/Qt5.12.7/5.12.7/mingw73_64/include/QtQuick")
 include_directories("C:/Qt/Qt5.12.7/5.12.7/mingw73_64/include/QtWidgets")
 include_directories("C:/Qt/Qt5.12.7/5.12.7/mingw73_64/include/QtPositioning/5.12.7/QtPositioning/private")
 
-# custom libs
-include_directories("C:/Program Files/LMCDL/vcsi/sdk/examples/custom")
-
 # MOC
 set(MOCS
         build/obj/moc_predefs.h
@@ -64,38 +61,43 @@ set(MOCS
 )
 
 add_executable(vcsi_sardinos
-        custom/BoundingBox.h
-        custom/Drone.h
-        custom/Drone.cpp
-        custom/DroneTelemetry.cpp
-        custom/DroneTelemetry.h
-        custom/DroneWidget.h
-        custom/ImageProcessor.h
-        custom/ImageProcessor.cpp
-        custom/MissionDomain.h
-        custom/MissionDomain.cpp
-        custom/MissionManager.h
-        custom/ContentCreator.h
+        custom/Drone/Drone.cpp
+        custom/Drone/Drone.h
+        custom/Drone/DroneTelemetry.cpp
+        custom/Drone/DroneTelemetry.h
+        custom/Drone/DroneWidget.h
+        custom/Drone/MissionManager.h
+
+        custom/Helpers/BoundingBox.h
+        custom/Helpers/Sardinos.h
+
+        custom/Image/ImageProcessor.cpp
+        custom/Image/ImageProcessor.h
+        custom/Image/Target.h
+        custom/Image/TargetWidget.h
+
+        custom/UI/Drawing.cpp
+        custom/UI/Drawing.h
+        custom/UI/Line.cpp
+        custom/UI/Line.h
+        custom/UI/Notifications.cpp
+        custom/UI/Notifications.h
+        custom/UI/Polygon.cpp
+        custom/UI/Polygon.h
+        custom/UI/UIHandler.cpp
+        custom/UI/UIHandler.h
+
+        custom/Waypoint/MissionDomain.cpp
+        custom/Waypoint/MissionDomain.h
+        custom/Waypoint/Waypoint.cpp
+        custom/Waypoint/Waypoint.h
+        custom/Waypoint/WaypointConnector.cpp
+        custom/Waypoint/WaypointConnector.h
+
         custom/ContentCreator.cpp
-        custom/Drawing.h
-        custom/Drawing.cpp
-        custom/Line.h
-        custom/Line.cpp
-        custom/MissionPlanningPlugin.h
+        custom/ContentCreator.h
         custom/MissionPlanningPlugin.cpp
-        custom/Polygon.h
-        custom/Polygon.cpp
-        custom/Waypoint.h
-        custom/Waypoint.cpp
-        custom/WaypointConnector.h
-        custom/WaypointConnector.cpp
-        custom/Notifications.h
-        custom/Notifications.cpp
-        custom/Sardinos.h
-        custom/Target.h
-        custom/TargetWidget.h
-        custom/UIHandler.h
-        custom/UIHandler.cpp
+        custom/MissionPlanningPlugin.h
         ${MOCS}
 )
 

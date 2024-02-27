@@ -1,9 +1,4 @@
-#include <QGeoRectangle>
-#include <QSet>
-
-#include <Drawing.h>
-#include <Polygon.h>
-#include <Sardinos.h>
+#include "Drawing.h"
 
 Drawing::Drawing() = default;
 

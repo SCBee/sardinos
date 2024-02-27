@@ -1,12 +1,12 @@
 #include <QGeoCoordinate>
 #include <QPointer>
+#include <qmath.h>
 #include <algorithm>
 #include <utility>
 
-#include <ImageProcessor.h>
-#include <Sardinos.h>
-#include <TargetWidget.h>
-#include <qmath.h>
+#include "ImageProcessor.h"
+#include "TargetWidget.h"
+#include <Helpers/Sardinos.h>
 
 const double DFOV = 72.64;
 const double HFOV = 57.12;
@@ -132,7 +132,7 @@ void ImageProcessor::addTarget(cv::Mat mat, cv::Rect boundingRect)
     emit droneTelemetry->targetFound();
 }
 
-QGeoCoordinate ImageProcessor::calcLocation(cv::Mat mat, cv::Rect boundingRect)
+QGeoCoordinate ImageProcessor::calcLocation(const cv::Mat& mat, cv::Rect boundingRect)
 {
     auto pixelWidth  = (double)mat.cols;
     auto pixelHeight = (double)mat.rows;

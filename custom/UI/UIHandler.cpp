@@ -71,7 +71,7 @@ void UIHandler::changeUI(State& newState,
             submitMissionMenuItem.setIcon(":/MissionPlanning/PathIcon");
             drawing_->clearFlightPath(mission, missionApi);
             break;
-    };
+    }
 }
 
 void UIHandler::updateUIState(const State& newState,

@@ -1,4 +1,4 @@
-#include <Line.h>
+#include "Line.h"
 
 Line::Line(const QGeoCoordinate& start, const QGeoCoordinate& end)
     : start_(start)

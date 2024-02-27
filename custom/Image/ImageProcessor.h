@@ -7,11 +7,12 @@
 #include <iostream>
 #include <string>
 
-#include <DroneTelemetry.h>
 #include <LmCdl/I_VcsiMapExtensionApi.h>
-#include <Target.h>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/opencv.hpp>
+
+#include <Drone/DroneTelemetry.h>
+#include "Target.h"
 
 class ImageProcessor : public QObject
 {
@@ -35,7 +36,7 @@ private:
 
     void addTarget(cv::Mat mat, cv::Rect boundingRect);
 
-    QGeoCoordinate calcLocation(cv::Mat mat, cv::Rect boundingrect);
+    QGeoCoordinate calcLocation(const cv::Mat& mat, cv::Rect boundingrect);
 
     void processFrame(const cv::Mat& frame);
 };

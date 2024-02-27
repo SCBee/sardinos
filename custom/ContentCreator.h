@@ -8,12 +8,6 @@
 #include <unordered_map>
 #include <vector>
 
-#include <BoundingBox.h>
-#include <Drawing.h>
-#include <Drone.h>
-#include <DroneTelemetry.h>
-#include <ImageProcessor.h>
-#include <Line.h>
 #include <LmCdl/I_ContextMenu.h>
 #include <LmCdl/I_ContextMenuItem.h>
 #include <LmCdl/I_GroundElevationApi.h>
@@ -31,14 +25,21 @@
 #include <LmCdl/VcsiIdentifiedPointOfInterest.h>
 #include <LmCdl/VcsiMilStdCode.h>
 #include <LmCdl/VcsiPointOfInterestProperties.h>
-#include <MissionDomain.h>
-#include <MissionManager.h>
-#include <Notifications.h>
-#include <Polygon.h>
-#include <UIHandler.h>
-#include <Waypoint.h>
-#include <WaypointConnector.h>
 #include <qgeocoordinate.h>
+
+#include <Drone/Drone.h>
+#include <Drone/DroneTelemetry.h>
+#include <Drone/MissionManager.h>
+#include <Image/ImageProcessor.h>
+#include <UI/Drawing.h>
+#include <UI/Line.h>
+#include <UI/Polygon.h>
+#include <UI/UIHandler.h>
+#include <Waypoint/MissionDomain.h>
+#include <Waypoint/Waypoint.h>
+#include <Waypoint/WaypointConnector.h>
+#include <Helpers/BoundingBox.h>
+#include <UI/Notifications.h>
 
 namespace LmCdl
 {

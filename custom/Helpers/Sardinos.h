@@ -4,18 +4,21 @@
 #include <QGeoCoordinate>
 #include <QList>
 #include <QTime>
+#include <qmath.h>
 #include <algorithm>
 #include <iostream>
 #include <map>
 #include <string>
 #include <unordered_map>
 
-#include <BoundingBox.h>
 #include <LmCdl/VcsiIdentifiedPointOfInterest.h>
 #include <LmCdl/VcsiPointOfInterestProperties.h>
-#include <Waypoint.h>
-#include <WaypointConnector.h>
-#include <qmath.h>
+
+#include "BoundingBox.h"
+#include "Waypoint/Waypoint.h"
+#include "Waypoint/WaypointConnector.h"
+#undef min
+#undef max
 
 class sardinos
 {
@@ -299,6 +302,6 @@ public:
         // Normalize longitude to the range -180 to 180 degrees
         lon2 = fmod(lon2 + 3 * M_PI, 2 * M_PI) - M_PI;
 
-        return QGeoCoordinate(lat2 * (180 / M_PI), lon2 * (180 / M_PI), alt);
+        return {lat2 * (180 / M_PI), lon2 * (180 / M_PI), alt};
     }
 };

@@ -1,4 +1,4 @@
-#include <Polygon.h>
+#include "Polygon.h"
 
 Polygon::Polygon(const QGeoPolygon& polygon)
     : polygon_(polygon)

@@ -1,6 +1,6 @@
 #include <QColor>
 
-#include <Waypoint.h>
+#include "Waypoint.h"
 
 Waypoint::Waypoint()
     : location_()
