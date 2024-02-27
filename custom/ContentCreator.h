@@ -108,11 +108,12 @@ private:
     LmCdl::I_VideoStreamApiCollection& videoCollectionApi_;
     LmCdl::I_VcsiMapExtensionApi& mapApi_;
 
-    ImageProcessor imageProcessor_;
-
     std::unique_ptr<DroneTelemetry> droneTelemetry = std::make_unique<DroneTelemetry>();
 
+    ImageProcessor imageProcessor_;
+
     Drawing* drawing_ = new Drawing();
+
     BoundingBox missionBounds_;
 
     MissionDomain mission_;
