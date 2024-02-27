@@ -24,7 +24,7 @@ class MissionManager
 {
 public:
     MissionManager(const std::string& connectStr,
-                   std::unique_ptr<DroneTelemetry>& droneTelemetry_)
+                   DroneTelemetry* droneTelemetry_)
     {
         ConnectionResult connection_result =
             mavsdk.add_any_connection(connectStr);
@@ -48,7 +48,7 @@ public:
 
         // TELEMETRY SUBSCRIPTIONS
         telemetry = std::make_unique<Telemetry>(system_.value());
-        set_rates(telemetry);
+        set_rates(telemetry.get());
 
         telemetry->subscribe_heading(
             [&droneTelemetry_](const Telemetry::Heading& headTel)
@@ -107,7 +107,7 @@ public:
         droneTelemetry_->setConnectionStatus(true);
     }
 
-    static void set_rates(std::unique_ptr<Telemetry>& telemetry_)
+    static void set_rates(Telemetry* telemetry_)
     {
         Telemetry::Result set_rate_result = telemetry_->set_rate_position(5.0);
         while (set_rate_result != Telemetry::Result::Success) {
@@ -257,7 +257,7 @@ public:
 
     void executeMissionQuad(
         const std::vector<std::pair<float, float>>& waypoints,
-        std::unique_ptr<DroneTelemetry>& droneTelemetry_)
+        DroneTelemetry* droneTelemetry_)
     {
         // Instantiate plugins.
         auto action = Action {system_.value()};
