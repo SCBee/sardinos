@@ -8,10 +8,9 @@
 #include <string>
 
 #include <LmCdl/I_VcsiMapExtensionApi.h>
-#include <opencv2/highgui/highgui.hpp>
 #include <opencv2/opencv.hpp>
 
-#include <Drone/DroneTelemetry.h>
+#include "Drone/DroneTelemetry.h"
 #include "Target.h"
 
 class ImageProcessor : public QObject
