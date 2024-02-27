@@ -115,6 +115,12 @@ void ContentCreator::connectToApiSignals()
             this,
             &ContentCreator::checkConnection,
             Qt::QueuedConnection);
+
+    connect(droneTelemetry.get(),
+            &DroneTelemetry::targetFound,
+            this,
+            &ContentCreator::showTargets,
+            Qt::QueuedConnection);
 }
 
 void ContentCreator::forceLand()
