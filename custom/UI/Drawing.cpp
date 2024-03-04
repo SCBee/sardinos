@@ -22,17 +22,6 @@ const QSet<LmCdl::I_VectorDataPolygonDrawing*>& Drawing::polygonDrawings(
     return polygons_;
 }
 
-void Drawing::addPolygon(Polygon* polygon)
-{
-    polygons_.insert(polygon);
-}
-
-void Drawing::addPolygons(const QList<Polygon*>& polygons)
-{
-    for (auto polygon : polygons)
-        addPolygon(polygon);
-}
-
 void Drawing::addLine(Line* line)
 {
     lines_.insert(line);
@@ -91,15 +80,13 @@ void Drawing::clearFlightPath(MissionDomain& mission_,
 
 void Drawing::clearMissionArea(LmCdl::I_VectorDataDrawingApi& drawApi_)
 {
-    draw(QList<Polygon*>(), QList<Line*>(), drawApi_);
+    draw(QList<Line*>(), drawApi_);
 }
 
-void Drawing::draw(const QList<Polygon*>& polygons,
-                   const QList<Line*>& lines,
+void Drawing::draw(const QList<Line*>& lines,
                    LmCdl::I_VectorDataDrawingApi& drawApi_)
 {
     clear();
-    addPolygons(polygons);
     addLines(lines);
     update();
 
@@ -117,10 +104,6 @@ Q_SLOT void Drawing::drawMissionArea(
 {
     auto polygon = QGeoPolygon(missionBounds_.list());
 
-    auto polygons = QList<Polygon*>();
-
-    polygons.append(new Polygon(polygon));
-
     auto lines = QList<Line*>();
 
     sardinos::cvhull(pois_);
@@ -131,5 +114,5 @@ Q_SLOT void Drawing::drawMissionArea(
             lines.push_back(new Line(pois_[i][0], pois_[0][0]));
     }
 
-    draw(polygons, lines, drawApi_);
+    draw(lines, drawApi_);
 }

@@ -23,7 +23,7 @@ void UIHandler::initContextMenuItems(
     forceLandMenuItem.setDescription("Force Land");
     forceLandMenuItem.setGrouping(LmCdl::ContextMenuItemGrouping::Top);
     forceLandMenuItem.setIcon(":/MissionPlanning/LandIcon");
-    forceLandMenuItem.setVisible(true);
+    forceLandMenuItem.setVisible(false);
 }
 
 void UIHandler::changeUI(State& newState,

@@ -33,7 +33,6 @@
 #include <Image/ImageProcessor.h>
 #include <UI/Drawing.h>
 #include <UI/Line.h>
-#include <UI/Polygon.h>
 #include <UI/UIHandler.h>
 #include <Waypoint/MissionDomain.h>
 #include <Waypoint/Waypoint.h>
