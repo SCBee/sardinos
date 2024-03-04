@@ -11,7 +11,6 @@
 #include <LmCdl/I_VectorDataPointDrawing.h>
 #include <LmCdl/I_VectorDataPolygonDrawing.h>
 
-#include "Polygon.h"
 #include "Line.h"
 #include "Notifications.h"
 #include <Helpers/Sardinos.h>
@@ -36,10 +35,6 @@ public:
     [[nodiscard]] const QSet<LmCdl::I_VectorDataPolygonDrawing*>&
     polygonDrawings(const QGeoRectangle& area) const override;
 
-    void addPolygon(class Polygon* polygon);
-
-    void addPolygons(const QList<class Polygon*>& polygon);
-
     void addLine(Line* line);
 
     void addLines(const QList<Line*>& lines);
@@ -60,8 +55,7 @@ public:
 
     void clearMissionArea(LmCdl::I_VectorDataDrawingApi& drawApi_);
 
-    void draw(const QList<class Polygon*>& polygons,
-              const QList<Line*>& lines,
+    void draw(const QList<Line*>& lines,
               LmCdl::I_VectorDataDrawingApi& drawApi_);
 
     [[nodiscard]] bool visible() const override;
