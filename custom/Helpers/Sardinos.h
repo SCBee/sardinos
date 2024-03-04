@@ -22,7 +22,7 @@
 
 class sardinos
 {
-    static inline const double SCANWIDTHMETERS   = 100.0;
+    static inline const double SCANWIDTHMETERS   = 50.0;
     static inline const double MAXDISTANCEMETERS = 200000.0;
     static inline const double R                 = 6378.137;
 

@@ -230,7 +230,7 @@ void ContentCreator::runMission()
 
     cancelFut_.cancel();
 
-    notis_.notify("Starting Mission.", notApi_, Notifications::Continue);
+    notis_.notify("Starting Mission.", notApi_, Notifications::Continue, 15000);
 
     uiHandler_.updateUIState(UIHandler::State::CanCancelMission,
                              m_state,
