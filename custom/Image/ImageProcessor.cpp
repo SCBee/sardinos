@@ -1,12 +1,14 @@
 #include <QGeoCoordinate>
 #include <QPointer>
-#include <qmath.h>
 #include <algorithm>
 #include <utility>
 
 #include "ImageProcessor.h"
-#include "TargetWidget.h"
+
+#include <qmath.h>
+
 #include "Helpers/Sardinos.h"
+#include "TargetWidget.h"
 
 const double DFOV = 72.64;
 const double HFOV = 57.12;
@@ -41,11 +43,26 @@ void ImageProcessor::init(const std::string& uri)
             break;
         }
 
+        cv::Mat grayImage = currentFrame_->clone();
+
+        // Split the color image into individual channels
+        std::vector<cv::Mat> channels;
+        cv::split(*currentFrame_, channels);
+
+        channels[2] += 50;
+
+        channels[0] -= 50;
+        channels[1] -= 50;
+
+        // Merge the channels back into a color image
+        cv::Mat processedColorImage;
+        cv::merge(channels, processedColorImage);
+
         if (processing_)
-            processFrame(*currentFrame_);
+            processFrame(processedColorImage);
 
         cv::imshow("[INTERNAL] VCSi Video Stream",
-                   *currentFrame_);  // Display the frame
+                   processedColorImage);  // Display the frame
 
         // Break the loop when 'ESC' is pressed
         if (cv::waitKey(1) == 27) {
@@ -108,14 +125,9 @@ void ImageProcessor::processFrame(const cv::Mat& frame)
     boundingRect &= cv::Rect(0, 0, frame.cols, frame.rows);
 
     cv::Mat targetFoundMat = frame.clone();
+
     // Draw the rectangle around the largest contour on the original image
     cv::rectangle(targetFoundMat, boundingRect, cv::Scalar(255, 255, 0), 2);
-
-    // Calculate the center of the image
-    cv::Point center(frame.cols / 2, frame.rows / 2);
-
-    // Draw a red point at the center
-    cv::circle(targetFoundMat, center, 5, cv::Scalar(0, 0, 255), cv::FILLED);
 
     cv::cvtColor(targetFoundMat, targetFoundMat, cv::COLOR_BGR2RGB);
 
@@ -132,7 +144,8 @@ void ImageProcessor::addTarget(cv::Mat mat, cv::Rect boundingRect)
     emit droneTelemetry->targetFound();
 }
 
-QGeoCoordinate ImageProcessor::calcLocation(const cv::Mat& mat, cv::Rect boundingRect)
+QGeoCoordinate ImageProcessor::calcLocation(const cv::Mat& mat,
+                                            cv::Rect boundingRect)
 {
     auto pixelWidth  = (double)mat.cols;
     auto pixelHeight = (double)mat.rows;
