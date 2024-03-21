@@ -43,26 +43,11 @@ void ImageProcessor::init(const std::string& uri)
             break;
         }
 
-        cv::Mat grayImage = currentFrame_->clone();
-
-        // Split the color image into individual channels
-        std::vector<cv::Mat> channels;
-        cv::split(*currentFrame_, channels);
-
-        channels[2] += 50;
-
-        channels[0] -= 50;
-        channels[1] -= 50;
-
-        // Merge the channels back into a color image
-        cv::Mat processedColorImage;
-        cv::merge(channels, processedColorImage);
-
         if (processing_)
-            processFrame(processedColorImage);
+            processFrame(*currentFrame_);
 
         cv::imshow("[INTERNAL] VCSi Video Stream",
-                   processedColorImage);  // Display the frame
+                   *currentFrame_);  // Display the frame
 
         // Break the loop when 'ESC' is pressed
         if (cv::waitKey(1) == 27) {
@@ -84,18 +69,21 @@ void ImageProcessor::processFrame(const cv::Mat& frame)
 
     lastProcess_ = currentTime;
 
-    cv::Mat grayImage;
+    cv::Mat hsv;
 
-    cv::cvtColor(frame, grayImage, cv::COLOR_RGB2GRAY);
+    cv::cvtColor(frame, hsv, cv::COLOR_BGR2HSV);
 
-    // Threshold the image to create a binary mask of 0-intensity pixels
+    cv::Scalar lowerRed = cv::Scalar(0, 100, 100);
+
+    cv::Scalar upperRed = cv::Scalar(10, 255, 255);
+
     cv::Mat mask;
-    cv::threshold(grayImage, mask, 120, 255, cv::THRESH_BINARY_INV);
+
+    cv::inRange(hsv, lowerRed, upperRed, mask);
 
     // Find contours of the 0-intensity pixels
     std::vector<std::vector<cv::Point>> contours;
-    cv::findContours(
-        mask, contours, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_SIMPLE);
+    cv::findContours(mask, contours, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_SIMPLE);
 
     if (contours.empty()) {
         return;

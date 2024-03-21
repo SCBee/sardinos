@@ -44,7 +44,7 @@ public:
                             static_cast<int>(mat.step),
                             QImage::Format_RGB888);
 
-        imageLabel_->setPixmap(QPixmap::fromImage(image));
+        imageLabel_->setPixmap(QPixmap::fromImage(image).scaled(1000, 1600, Qt::KeepAspectRatio));
 
         setLayout(layout);
 

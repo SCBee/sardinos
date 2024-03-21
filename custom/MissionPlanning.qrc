@@ -7,6 +7,6 @@
         <file alias="PathIcon">Assets/Path.svg</file>
         <file alias="LandIcon">Assets/Land.svg</file>
         <file alias="TargetIcon">Assets/Target.svg</file>
-        <file>Assets/SampleFeed.mp4</file>
+        <file>Assets/DroneFlight1.mp4</file>
     </qresource>
 </RCC>
