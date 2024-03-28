@@ -26,83 +26,83 @@ public:
     MissionManager(const std::string& connectStr,
                    DroneTelemetry* droneTelemetry_)
     {
-//        ConnectionResult connection_result =
-//            mavsdk.add_any_connection(connectStr);
-//
-//        // wait while we try to establish our connection (heartbeat needs to
-//        // be recorded)
-//        while (connection_result != ConnectionResult::Success) {
-//            std::cerr << "Connection failed: " << connection_result
-//                      << std::endl;
-//            sleep_for(seconds(3));
-//            connection_result = mavsdk.add_any_connection(connectStr);
-//        }
-//
-//        // wait while we connect to the system
-//        system_ = mavsdk.first_autopilot(3.0);
-//        while (!system_) {
-//            std::cerr << "Attempting to connect to the system..." << std::endl;
-//            sleep_for(seconds(3));
-//            system_ = mavsdk.first_autopilot(3.0);
-//        }
-//
-//        // TELEMETRY SUBSCRIPTIONS
-//        telemetry = std::make_unique<Telemetry>(system_.value());
-//        set_rates(telemetry.get());
-//
-//        telemetry->subscribe_heading(
-//            [&droneTelemetry_](const Telemetry::Heading& headTel)
-//            {
-//                if (std::abs(droneTelemetry_->heading() - headTel.heading_deg)
-//                    > 1.0)
-//                {
-//                    droneTelemetry_->setHeading(headTel.heading_deg);
-//                }
-//            });
-//
-//        telemetry->subscribe_position(
-//            [&droneTelemetry_](const Telemetry::Position& position)
-//            {
-//                droneTelemetry_->setLatitude(position.latitude_deg);
-//
-//                droneTelemetry_->setLongitude(position.longitude_deg);
-//
-//                droneTelemetry_->setAltitude(position.relative_altitude_m);
-//
-////                droneTelemetry_->setAltitudeAbs(position.absolute_altitude_m);
-//            });
-//
-//        telemetry->subscribe_velocity_ned(
-//            [&droneTelemetry_](const Telemetry::VelocityNed& vel)
-//            {
-//                double vabs = std::sqrt(std::pow(vel.north_m_s, 2)
-//                                        + std::pow(vel.east_m_s, 2)
-//                                        + std::pow(vel.down_m_s, 2));
-//                if (std::abs(droneTelemetry_->speed() - vabs) > 0.1) {
-//                    droneTelemetry_->setSpeed(vabs);
-//                }
-//            });
-//
-//        telemetry->subscribe_attitude_euler(
-//            [&droneTelemetry_](const Telemetry::EulerAngle& euler)
-//            {
-//                if (std::abs(droneTelemetry_->yaw() - euler.yaw_deg) > 1.0) {
-//                    droneTelemetry_->setYaw(euler.yaw_deg);
-//                }
-//            });
-//
-//        telemetry->subscribe_battery(
-//            [&droneTelemetry_](const Telemetry::Battery& battery)
-//            {
-//                if (std::abs(droneTelemetry_->battery()
-//                             - (battery.remaining_percent / 100.0))
-//                    > 0.01)
-//                {
-//                    droneTelemetry_->setBattery(battery.remaining_percent
-//                                                / 100.0);
-//                }
-//            });
-//        // END TELEMETRY SUBSCRIPTIONS
+       ConnectionResult connection_result =
+           mavsdk.add_any_connection(connectStr);
+
+       // wait while we try to establish our connection (heartbeat needs to
+       // be recorded)
+       while (connection_result != ConnectionResult::Success) {
+           std::cerr << "Connection failed: " << connection_result
+                     << std::endl;
+           sleep_for(seconds(3));
+           connection_result = mavsdk.add_any_connection(connectStr);
+       }
+
+       // wait while we connect to the system
+       system_ = mavsdk.first_autopilot(3.0);
+       while (!system_) {
+           std::cerr << "Attempting to connect to the system..." << std::endl;
+           sleep_for(seconds(3));
+           system_ = mavsdk.first_autopilot(3.0);
+       }
+
+       // TELEMETRY SUBSCRIPTIONS
+       telemetry = std::make_unique<Telemetry>(system_.value());
+       set_rates(telemetry.get());
+
+       telemetry->subscribe_heading(
+           [&droneTelemetry_](const Telemetry::Heading& headTel)
+           {
+               if (std::abs(droneTelemetry_->heading() - headTel.heading_deg)
+                   > 1.0)
+               {
+                   droneTelemetry_->setHeading(headTel.heading_deg);
+               }
+           });
+
+       telemetry->subscribe_position(
+           [&droneTelemetry_](const Telemetry::Position& position)
+           {
+               droneTelemetry_->setLatitude(position.latitude_deg);
+
+               droneTelemetry_->setLongitude(position.longitude_deg);
+
+               droneTelemetry_->setAltitude(position.relative_altitude_m);
+
+//                droneTelemetry_->setAltitudeAbs(position.absolute_altitude_m);
+           });
+
+       telemetry->subscribe_velocity_ned(
+           [&droneTelemetry_](const Telemetry::VelocityNed& vel)
+           {
+               double vabs = std::sqrt(std::pow(vel.north_m_s, 2)
+                                       + std::pow(vel.east_m_s, 2)
+                                       + std::pow(vel.down_m_s, 2));
+               if (std::abs(droneTelemetry_->speed() - vabs) > 0.1) {
+                   droneTelemetry_->setSpeed(vabs);
+               }
+           });
+
+       telemetry->subscribe_attitude_euler(
+           [&droneTelemetry_](const Telemetry::EulerAngle& euler)
+           {
+               if (std::abs(droneTelemetry_->yaw() - euler.yaw_deg) > 1.0) {
+                   droneTelemetry_->setYaw(euler.yaw_deg);
+               }
+           });
+
+       telemetry->subscribe_battery(
+           [&droneTelemetry_](const Telemetry::Battery& battery)
+           {
+               if (std::abs(droneTelemetry_->battery()
+                            - (battery.remaining_percent / 100.0))
+                   > 0.01)
+               {
+                   droneTelemetry_->setBattery(battery.remaining_percent
+                                               / 100.0);
+               }
+           });
+       // END TELEMETRY SUBSCRIPTIONS
 
         droneTelemetry_->setConnectionStatus(true);
     }
