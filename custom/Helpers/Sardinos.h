@@ -301,8 +301,6 @@ public:
                                waypoints[i + 1]->location());
         }
 
-        std::cout << "\n\n" << sum << "\n\n";
-
         return sum <= MAXDISTANCEMETERS;
     }
 

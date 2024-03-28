@@ -214,20 +214,6 @@ void ContentCreator::getFlightPath()
                              mission_,
                              missionApi_,
                              drawApi_);
-
-    auto pois = poiApi_.pointsOfInterest();
-
-    for (auto i = 0; i < pois.count(); i ++){
-
-        std::cout << pois[i].pointOfInterest().location().latitude() << ", ";
-    }
-
-    std::cout << "\n\n";
-
-    for (auto i = 0; i < pois.count(); i ++){
-
-        std::cout << pois[i].pointOfInterest().location().longitude() << ", ";
-    }
 }
 
 void ContentCreator::runMission()

@@ -14,7 +14,6 @@ const double DFOV = 72.64;
 const double HFOV = 57.12;
 const double VFOV = 42.44;
 
-
 double lat = 51.37652;
 double lon = -114.2974;
 
