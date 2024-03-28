@@ -47,10 +47,6 @@ ContentCreator::ContentCreator(
     , imageProcessor_(std::ref(targets_), droneTelemetry.get())
 {
     init();
-
-    droneTelemetry->setLatitude(51.37652);
-    droneTelemetry->setLongitude(-114.2974);
-    droneTelemetry->setAltitude(2000);
 }
 
 ContentCreator::~ContentCreator() = default;

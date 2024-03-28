@@ -14,9 +14,6 @@ const double DFOV = 72.64;
 const double HFOV = 57.12;
 const double VFOV = 42.44;
 
-double lat = 51.37652;
-double lon = -114.2974;
-
 ImageProcessor::ImageProcessor(QList<Target>& targets,
                                DroneTelemetry* droneTelemetry_)
     : targets_(targets)
@@ -56,11 +53,6 @@ void ImageProcessor::init(const std::string& uri)
         if (cv::waitKey(1) == 27) {
             break;
         }
-
-        droneTelemetry->setLatitude(lat += 0.01);
-        droneTelemetry->setLongitude(lon +=0.01);
-
-        sardinos::delay(200);
     }
 
     // Cleanup
