@@ -1,12 +1,14 @@
 #include <QGeoCoordinate>
 #include <QPointer>
-#include <qmath.h>
 #include <algorithm>
 #include <utility>
 
 #include "ImageProcessor.h"
-#include "TargetWidget.h"
+
+#include <qmath.h>
+
 #include "Helpers/Sardinos.h"
+#include "TargetWidget.h"
 
 const double DFOV = 72.64;
 const double HFOV = 57.12;
@@ -67,18 +69,21 @@ void ImageProcessor::processFrame(const cv::Mat& frame)
 
     lastProcess_ = currentTime;
 
-    cv::Mat grayImage;
+    cv::Mat hsv;
 
-    cv::cvtColor(frame, grayImage, cv::COLOR_RGB2GRAY);
+    cv::cvtColor(frame, hsv, cv::COLOR_BGR2HSV);
 
-    // Threshold the image to create a binary mask of 0-intensity pixels
+    cv::Scalar lowerRed = cv::Scalar(0, 100, 100);
+
+    cv::Scalar upperRed = cv::Scalar(10, 255, 255);
+
     cv::Mat mask;
-    cv::threshold(grayImage, mask, 120, 255, cv::THRESH_BINARY_INV);
+
+    cv::inRange(hsv, lowerRed, upperRed, mask);
 
     // Find contours of the 0-intensity pixels
     std::vector<std::vector<cv::Point>> contours;
-    cv::findContours(
-        mask, contours, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_SIMPLE);
+    cv::findContours(mask, contours, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_SIMPLE);
 
     if (contours.empty()) {
         return;
@@ -108,14 +113,9 @@ void ImageProcessor::processFrame(const cv::Mat& frame)
     boundingRect &= cv::Rect(0, 0, frame.cols, frame.rows);
 
     cv::Mat targetFoundMat = frame.clone();
+
     // Draw the rectangle around the largest contour on the original image
     cv::rectangle(targetFoundMat, boundingRect, cv::Scalar(255, 255, 0), 2);
-
-    // Calculate the center of the image
-    cv::Point center(frame.cols / 2, frame.rows / 2);
-
-    // Draw a red point at the center
-    cv::circle(targetFoundMat, center, 5, cv::Scalar(0, 0, 255), cv::FILLED);
 
     cv::cvtColor(targetFoundMat, targetFoundMat, cv::COLOR_BGR2RGB);
 
@@ -132,7 +132,8 @@ void ImageProcessor::addTarget(cv::Mat mat, cv::Rect boundingRect)
     emit droneTelemetry->targetFound();
 }
 
-QGeoCoordinate ImageProcessor::calcLocation(const cv::Mat& mat, cv::Rect boundingRect)
+QGeoCoordinate ImageProcessor::calcLocation(const cv::Mat& mat,
+                                            cv::Rect boundingRect)
 {
     auto pixelWidth  = (double)mat.cols;
     auto pixelHeight = (double)mat.rows;
@@ -146,14 +147,14 @@ QGeoCoordinate ImageProcessor::calcLocation(const cv::Mat& mat, cv::Rect boundin
         (std::min(std::max(midRectY, 0.0), pixelHeight) / pixelHeight) * 2 - 1;
 
     auto widthMeters =
-        (droneTelemetry->altitude() * tan((HFOV * (M_PI / 180))));
+        (droneTelemetry->altitude() / tan((VFOV * (M_PI / 180))));
     auto heightMeters =
-        (droneTelemetry->altitude() * tan((VFOV * (M_PI / 180))));
+        (droneTelemetry->altitude() / tan((HFOV * (M_PI / 180))));
 
-    auto widthChange  = -xRatio * widthMeters;
-    auto heightChange = yRatio * heightMeters;
+    auto widthChange  = xRatio * widthMeters;
+    auto heightChange = -yRatio * heightMeters;
 
-    auto angle = atan2(widthChange, heightChange) * (180 / M_PI) + 180;
+    auto angle = atan2(widthChange, heightChange) * (180 / M_PI);
 
     auto distance = sqrt(pow(widthChange, 2) + pow(heightChange, 2));
 
