@@ -199,7 +199,7 @@ void ContentCreator::getFlightPath()
 
     notis_.notify("Building Flight Path.", notApi_);
 
-    mission_.setPath(sardinos::getPath(missionBounds_));
+    mission_.setPath(sardinos::getCheesePath(missionBounds_));
 
     drawing_->drawFlightPath(mission_, missionApi_);
 
