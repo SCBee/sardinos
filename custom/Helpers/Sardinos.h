@@ -269,6 +269,11 @@ public:
         else
             return getHorizontalFlightPath(missionBounds);
     }
+    
+    static bool AreSame(double a, double b)
+    {
+        return fabs(a - b) < std::numeric_limits<double>::epsilon();
+    }
 
     static QList<QGeoCoordinate> getCheesePath(const BoundingBox& missionBounds)
     {
