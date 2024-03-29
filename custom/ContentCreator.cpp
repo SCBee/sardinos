@@ -252,7 +252,7 @@ void ContentCreator::runMission()
     mission_.startMission();
 
     // Sample video
-    auto uri = "C:/Users/dev/repos/sardinos/custom/Assets/SampleFeed.mp4";
+    auto uri = "C:/Program Files/LMCDL/vcsi/sdk/examples/custom/Assets/DroneFlight1.mp4";
 
     // GStreamer pipeline string adapted for OpenCV
     // auto uri =

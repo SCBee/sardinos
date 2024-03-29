@@ -119,7 +119,7 @@ Q_SLOT void Drawing::drawMissionArea(
 
     auto polygons = QList<Polygon*>();
 
-    polygons.append(new Polygon(polygon));
+    // polygons.append(new Polygon(polygon));
 
     auto lines = QList<Line*>();
 

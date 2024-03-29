@@ -28,7 +28,7 @@ public:
     {
 //        ConnectionResult connection_result =
 //            mavsdk.add_any_connection(connectStr);
-//
+
 //        // wait while we try to establish our connection (heartbeat needs to
 //        // be recorded)
 //        while (connection_result != ConnectionResult::Success) {
@@ -37,7 +37,7 @@ public:
 //            sleep_for(seconds(3));
 //            connection_result = mavsdk.add_any_connection(connectStr);
 //        }
-//
+
 //        // wait while we connect to the system
 //        system_ = mavsdk.first_autopilot(3.0);
 //        while (!system_) {
@@ -45,11 +45,11 @@ public:
 //            sleep_for(seconds(3));
 //            system_ = mavsdk.first_autopilot(3.0);
 //        }
-//
+
 //        // TELEMETRY SUBSCRIPTIONS
 //        telemetry = std::make_unique<Telemetry>(system_.value());
 //        set_rates(telemetry.get());
-//
+
 //        telemetry->subscribe_heading(
 //            [&droneTelemetry_](const Telemetry::Heading& headTel)
 //            {
@@ -59,19 +59,19 @@ public:
 //                    droneTelemetry_->setHeading(headTel.heading_deg);
 //                }
 //            });
-//
+
 //        telemetry->subscribe_position(
 //            [&droneTelemetry_](const Telemetry::Position& position)
 //            {
 //                droneTelemetry_->setLatitude(position.latitude_deg);
-//
+
 //                droneTelemetry_->setLongitude(position.longitude_deg);
-//
+
 //                droneTelemetry_->setAltitude(position.relative_altitude_m);
-//
-////                droneTelemetry_->setAltitudeAbs(position.absolute_altitude_m);
+
+// //                droneTelemetry_->setAltitudeAbs(position.absolute_altitude_m);
 //            });
-//
+
 //        telemetry->subscribe_velocity_ned(
 //            [&droneTelemetry_](const Telemetry::VelocityNed& vel)
 //            {
@@ -82,7 +82,7 @@ public:
 //                    droneTelemetry_->setSpeed(vabs);
 //                }
 //            });
-//
+
 //        telemetry->subscribe_attitude_euler(
 //            [&droneTelemetry_](const Telemetry::EulerAngle& euler)
 //            {
@@ -90,7 +90,7 @@ public:
 //                    droneTelemetry_->setYaw(euler.yaw_deg);
 //                }
 //            });
-//
+
 //        telemetry->subscribe_battery(
 //            [&droneTelemetry_](const Telemetry::Battery& battery)
 //            {
