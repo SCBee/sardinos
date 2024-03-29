@@ -44,7 +44,7 @@ ContentCreator::ContentCreator(
     , m_state(UIHandler::State::STARTUP)
     , mission_()
     , drone_(new Drone(mapApi))
-    , imageProcessor_(std::ref(targets_), droneTelemetry.get())
+    , imageProcessor_(std::ref(targets_), droneTelemetry)
 {
     init();
 }
@@ -65,7 +65,7 @@ void ContentCreator::init()
 
     QtConcurrent::run(
         [this, connectStr]
-        { missionManager_ = new MissionManager(connectStr, droneTelemetry.get()); });
+        { missionManager_ = new MissionManager(connectStr, droneTelemetry); });
 }
 
 void ContentCreator::updateDroneWidget()
@@ -230,7 +230,7 @@ void ContentCreator::runMission()
 
     cancelFut_.cancel();
 
-    notis_.notify("Starting Mission.", notApi_, Notifications::Continue, 15000);
+    notis_.notify("Starting Mission.", notApi_, Notifications::Continue);
 
     uiHandler_.updateUIState(UIHandler::State::CanCancelMission,
                              m_state,
@@ -267,7 +267,7 @@ void ContentCreator::runMission()
         [this, mavWaypoints]()
         {
             missionManager_->executeMissionQuad(std::ref(mavWaypoints),
-                                                droneTelemetry.get());
+                                                droneTelemetry);
         });
 }
 

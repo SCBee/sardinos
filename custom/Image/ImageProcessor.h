@@ -17,13 +17,13 @@ class ImageProcessor : public QObject
 {
     Q_OBJECT
 public:
-    ImageProcessor(QList<Target>& targets, DroneTelemetry* droneTelemetry_);
+    ImageProcessor(QList<Target>& targets, std::unique_ptr<DroneTelemetry>& droneTelemetry_);
 
     void init(const std::string& uri);
     void stop();
 
 private:
-    DroneTelemetry* droneTelemetry;
+    std::unique_ptr<DroneTelemetry>& droneTelemetry;
 
     bool processing_ = false;
 

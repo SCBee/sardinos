@@ -24,7 +24,7 @@ class MissionManager
 {
 public:
     MissionManager(const std::string& connectStr,
-                   DroneTelemetry* droneTelemetry_)
+                   std::unique_ptr<DroneTelemetry>& droneTelemetry_)
     {
        ConnectionResult connection_result =
            mavsdk.add_any_connection(connectStr);
@@ -257,7 +257,7 @@ public:
 
     void executeMissionQuad(
         const std::vector<std::pair<float, float>>& waypoints,
-        DroneTelemetry* droneTelemetry_)
+        std::unique_ptr<DroneTelemetry>& droneTelemetry_)
     {
         // Instantiate plugins.
         auto action = Action {system_.value()};
