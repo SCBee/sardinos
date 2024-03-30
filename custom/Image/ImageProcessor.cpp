@@ -72,10 +72,10 @@ void ImageProcessor::processFrame(const cv::Mat& frame)
     cv::Mat hsv;
 
     cv::cvtColor(frame, hsv, cv::COLOR_BGR2HSV);
+    
+    cv::Scalar lowerRed = cv::Scalar(0, 50, 50);
 
-    cv::Scalar lowerRed = cv::Scalar(0, 100, 100);
-
-    cv::Scalar upperRed = cv::Scalar(10, 255, 255);
+    cv::Scalar upperRed = cv::Scalar(181, 256, 190);
 
     cv::Mat mask;
 
