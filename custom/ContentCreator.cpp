@@ -252,14 +252,10 @@ void ContentCreator::runMission()
     mission_.startMission();
 
     // Sample video
-    auto uri = "C:/Program Files/LMCDL/vcsi/sdk/examples/custom/Assets/DroneFlight1.mp4";
+    // auto uri = "C:/Program Files/LMCDL/vcsi/sdk/examples/custom/Assets/DroneFlight1.mp4";
 
     // GStreamer pipeline string adapted for OpenCV
-    // auto uri =
-    //     "udpsrc port=5200 caps = \"application/x-rtp, media=(string)video, "
-    //     "clock-rate=(int)90000, encoding-name=(string)H264, payload=(int)96\"
-    //     "
-    //     "! rtph264depay ! decodebin ! videoconvert ! appsink";
+    auto uri = "udpsrc port=5600 ! application/x-rtp,payload=96,encoding-name=H264 ! rtpjitterbuffer mode=1 ! rtph264depay ! h264parse ! decodebin ! videoco ! appsink";
 
     QtConcurrent::run([this, uri] { imageProcessor_.init(uri); });
 
