@@ -1,12 +1,11 @@
 <RCC>
     <qresource prefix="/MissionPlanning">
-        <file alias="MissionIcon">Mission.svg</file>
-        <file alias="SelectIcon">Select.svg</file>
-        <file alias="HomeIcon">Home.svg</file>
-        <file alias="CancelIcon">Cancel.svg</file>
-        <file alias="PathIcon">Path.svg</file>
-        <file alias="LandIcon">Land.svg</file>
-        <file alias="TargetIcon">Target.svg</file>
-        <file>SampleFeed.mp4</file>
+        <file alias="MissionIcon">Assets/Mission.svg</file>
+        <file alias="SelectIcon">Assets/Select.svg</file>
+        <file alias="HomeIcon">Assets/Home.svg</file>
+        <file alias="CancelIcon">Assets/Cancel.svg</file>
+        <file alias="PathIcon">Assets/Path.svg</file>
+        <file alias="LandIcon">Assets/Land.svg</file>
+        <file alias="TargetIcon">Assets/Target.svg</file>
+        <file>Assets/SampleFeed.mp4</file>
     </qresource>
-</RCC>
